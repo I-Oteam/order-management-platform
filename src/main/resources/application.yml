@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: local
+
+---
+# local ??
+spring:
+  config:
+    activate:
+      on-profile: local
+    import: file:.env[.properties]
+  application:
+    name: order-management-platform
+  datasource:
+    url: jdbc:postgresql://localhost:5432/omp
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create
