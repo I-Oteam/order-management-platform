@@ -1,6 +1,8 @@
 spring:
+  config:
+    import: file:.env[.properties]
   profiles:
-    active: local
+    active: ${ACTIVE_VAL}
 
 ---
 # local ??
@@ -8,13 +10,12 @@ spring:
   config:
     activate:
       on-profile: local
-    import: file:.env[.properties]
   application:
     name: order-management-platform
   datasource:
-    url: jdbc:postgresql://localhost:5432/omp
-    username: postgres
-    password: 1234
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
