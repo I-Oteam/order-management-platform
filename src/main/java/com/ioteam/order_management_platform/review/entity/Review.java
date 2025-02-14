@@ -23,7 +23,7 @@ public class Review extends BaseEntity {
     private String reviewContent;
     @Column(length = 100)
     private String reviewImageUrl;
-    private boolean isPublic;
+    private Boolean isPublic;
     private LocalDateTime deletedAt;
     private UUID deletedBy;
 
@@ -31,7 +31,7 @@ public class Review extends BaseEntity {
         this.reviewScore = requestDto.getReviewScore();
         this.reviewContent = requestDto.getReviewContent();
         this.reviewImageUrl = requestDto.getReviewImageUrl();
-        this.isPublic = requestDto.isPublic();
+        this.isPublic = requestDto.getIsPublic();
     }
 
     public ReviewResponseDto toResponseDto() {

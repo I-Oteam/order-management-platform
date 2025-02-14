@@ -21,5 +21,5 @@ public class CreateReviewRequestDto {
     @NotNull
     private String reviewContent;
     private String reviewImageUrl;
-    private boolean isPublic;
+    private Boolean isPublic;
 }

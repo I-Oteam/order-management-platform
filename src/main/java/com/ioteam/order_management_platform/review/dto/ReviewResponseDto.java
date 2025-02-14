@@ -17,5 +17,5 @@ public class ReviewResponseDto {
     private final String reviewContent;
     private final String reviewImageUrl;
     private final UUID reviewOrderId;
-    private final boolean isPublic;
+    private final Boolean isPublic;
 }

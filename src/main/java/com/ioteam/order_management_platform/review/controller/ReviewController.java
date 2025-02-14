@@ -26,7 +26,7 @@ public class ReviewController {
     public ResponseEntity<CommonResponse<ReviewResponseDto>> createReview(@RequestBody CreateReviewRequestDto requestDto) {
 
         ReviewResponseDto responseDto = reviewService.createReview(requestDto);
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath() //.fromContextPath(request)
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/reviews/" + responseDto.getReviewId().toString())
                 .build()
                 .toUri();

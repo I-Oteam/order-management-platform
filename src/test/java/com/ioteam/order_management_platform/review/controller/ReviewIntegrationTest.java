@@ -46,6 +46,12 @@ class ReviewIntegrationTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.result.reviewScore")
                         .value(5))
+                .andExpect(jsonPath("$.result.reviewContent")
+                        .value("test"))
+                .andExpect(jsonPath("$.result.reviewImageUrl")
+                        .value("test"))
+                .andExpect(jsonPath("$.result.isPublic")
+                        .value(true))
 //                .andExpect(jsonPath("$.result.reviewOrderId")
 //                        .value("d8ef5ca7-2b3c-49bb-9c6d-425c85036dec"))
                 .andDo(print());
