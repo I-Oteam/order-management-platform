@@ -1,12 +1,3 @@
----
-name: I/O팀 PR Template
-about: 주문관리플랫폼 PR Template
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ## 변경 타입
 - [ ] 신규 기능 추가/수정
 - [ ] 버그 수정
