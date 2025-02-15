@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.review.entity;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,5 +50,12 @@ public class Review extends BaseEntity {
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = UUID.randomUUID();
+    }
+
+    public void modify(ModifyReviewRequestDto requestDto) {
+        this.reviewScore = requestDto.getReviewScore();
+        this.reviewContent = requestDto.getReviewContent();
+        this.reviewImageUrl = requestDto.getReviewImageUrl();
+        this.isPublic = requestDto.getIsPublic();
     }
 }

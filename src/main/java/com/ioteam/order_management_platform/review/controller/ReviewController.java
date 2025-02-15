@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.review.controller;
 
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,16 @@ public class ReviewController {
         return ResponseEntity.ok(new CommonResponse<>(
                 "리뷰가 성공적으로 삭제되었습니다.",
                 null));
+    }
+
+    @PatchMapping("/reviews/{reviewId}")
+    public ResponseEntity<CommonResponse<ReviewResponseDto>> modifyReview(
+            @PathVariable UUID reviewId,
+            @RequestBody @Validated ModifyReviewRequestDto requestDto) {
+
+        ReviewResponseDto responseDto = reviewService.modifyReview(reviewId, requestDto);
+        return ResponseEntity.ok(new CommonResponse<>(
+                "리뷰가 성공적으로 수정되었습니다.",
+                responseDto));
     }
 }
