@@ -33,3 +33,6 @@ spring:
   devtools:
     livereload:
       enabled: true
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
