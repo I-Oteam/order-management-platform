@@ -32,7 +32,7 @@ public class CategoryController {
                 .toUri();
 
         return ResponseEntity.created(location)
-                .body(new CommonResponse<CategoryResponseDto>("카테고리 생성 완료" , categoryResponseDto));
+                .body(new CommonResponse<>("카테고리 생성 완료" , categoryResponseDto));
 
     }
 
