@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.review.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -56,8 +56,6 @@ class ReviewIntegrationTest {
                         .value("test"))
                 .andExpect(jsonPath("$.result.isPublic")
                         .value(true))
-//                .andExpect(jsonPath("$.result.reviewOrderId")
-//                        .value("d8ef5ca7-2b3c-49bb-9c6d-425c85036dec"))
                 .andDo(print());
     }
 
@@ -68,10 +66,40 @@ class ReviewIntegrationTest {
         UUID reviewId = UUID.fromString("1c114e8f-ccd0-42b8-a7fa-67fee61d4d13");
 
         // when, then
-        mockMvc.perform(delete("/api/reviews/" + reviewId)
+        mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId)
                         .header("Authorization", "Bearer {ACCESS_TOKEN}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andDo(print());
+    }
+
+    @DisplayName("리뷰 수정 성공 200")
+    @Test
+    void modifyReview_200() throws Exception {
+        // given
+        UUID reviewId = UUID.fromString("1c114e8f-ccd0-42b8-a7fa-67fee61d4d13");
+        ModifyReviewRequestDto request = ModifyReviewRequestDto.builder()
+                .reviewScore(3)
+                .reviewContent("modifyTest")
+                .reviewImageUrl("modifyTest")
+                .isPublic(false)
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/api/reviews/{reviewId}", reviewId)
+                        .header("Authorization", "Bearer {ACCESS_TOKEN}")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.result.reviewScore")
+                        .value(3))
+                .andExpect(jsonPath("$.result.reviewContent")
+                        .value("modifyTest"))
+                .andExpect(jsonPath("$.result.reviewImageUrl")
+                        .value("modifyTest"))
+                .andExpect(jsonPath("$.result.isPublic")
+                        .value(false))
                 .andDo(print());
     }
 }
