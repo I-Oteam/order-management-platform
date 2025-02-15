@@ -1,8 +1,10 @@
 package com.ioteam.order_management_platform.user.service;
 
+import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
+import com.ioteam.order_management_platform.user.exception.UserException;
 import com.ioteam.order_management_platform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,27 +31,27 @@ public class UserService {
         // 회원 중복 확인
         Optional<User> checkUsername = userRepository.findByUsername(username);
         if (checkUsername.isPresent()) {
-            throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
+            throw new CustomApiException(UserException.DUPLICATE_USER);
         }
 
-        // email 중복확인
+        // email 중복 확인
         String email = requestDto.getEmail();
         Optional<User> checkEmail = userRepository.findByEmail(email);
         if (checkEmail.isPresent()) {
-            throw new IllegalArgumentException("중복된 Email 입니다.");
+            throw new CustomApiException(UserException.DUPLICATE_EMAIL);
         }
 
         // 사용자 ROLE 확인
         UserRoleEnum role = UserRoleEnum.CUSTOMER;
         if (requestDto.isAdmin()) {
             if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
-                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
+                throw new CustomApiException(UserException.INVALID_ADMIN_TOKEN);
             }
             role = UserRoleEnum.MANAGER;
         }
         if (requestDto.isOwner()) {
             if (!OWNER_TOKEN.equals(requestDto.getOwnerToken())){
-                throw new IllegalArgumentException("점주 인증 암호가 틀려 등록이 불가능합니다.");
+                throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
             }
             role = UserRoleEnum.OWNER;
         }
