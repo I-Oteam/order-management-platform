@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.review.service;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
@@ -33,5 +34,16 @@ public class ReviewService {
                     throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
                 });
         review.softDelete();
+    }
+
+    @Transactional
+    public ReviewResponseDto modifyReview(UUID reviewId, ModifyReviewRequestDto requestDto) {
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> {
+                    throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
+                });
+        review.modify(requestDto);
+        return review.toResponseDto();
     }
 }
