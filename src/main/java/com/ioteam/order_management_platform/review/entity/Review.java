@@ -45,4 +45,9 @@ public class Review extends BaseEntity {
                 .isPublic(this.isPublic)
                 .build();
     }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = UUID.randomUUID();
+    }
 }

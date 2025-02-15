@@ -6,10 +6,8 @@ import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -23,7 +21,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/reviews")
-    public ResponseEntity<CommonResponse<ReviewResponseDto>> createReview(@RequestBody CreateReviewRequestDto requestDto) {
+    public ResponseEntity<CommonResponse<ReviewResponseDto>> createReview(@RequestBody @Validated CreateReviewRequestDto requestDto) {
 
         ReviewResponseDto responseDto = reviewService.createReview(requestDto);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -31,8 +29,17 @@ public class ReviewController {
                 .build()
                 .toUri();
         return ResponseEntity.created(location)
-                .body(new CommonResponse<ReviewResponseDto>(
+                .body(new CommonResponse<>(
                 "리뷰가 성공적으로 생성되었습니다.",
                 responseDto));
+    }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<CommonResponse<Void>> softDeleteReview(@PathVariable UUID reviewId) {
+
+        reviewService.softDeleteReview(reviewId);
+        return ResponseEntity.ok(new CommonResponse<>(
+                "리뷰가 성공적으로 삭제되었습니다.",
+                null));
     }
 }
