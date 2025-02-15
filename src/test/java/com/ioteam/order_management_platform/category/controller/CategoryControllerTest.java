@@ -20,15 +20,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 class CategoryControllerTest {
 
     @Mock
     private CategoryService categoryService;
-
-    @InjectMocks
-    private CategoryController categoryController;
 
     @Autowired
     MockMvc mockMvc;
@@ -40,7 +37,7 @@ class CategoryControllerTest {
     @DisplayName("Controller Test : 카테고리 생성 테스트")
     void createCategory() throws Exception {
         // given - mock 객체 설정
-        CategoryRequestDto requestDto = new CategoryRequestDto("일식", null, null);
+        CategoryRequestDto requestDto = new CategoryRequestDto("일식");
         Category category = new Category(requestDto);
         CategoryResponseDto responseDto = new CategoryResponseDto(category);
 
@@ -51,8 +48,9 @@ class CategoryControllerTest {
         mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
+                .andDo(result -> System.out.println("응답 : " + result.getResponse().getContentAsString()))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(jsonPath("$.result.rcName").value( "일식"));
+                .andExpect(jsonPath("$.result.rcName").value("일식"));
 
 
     }
