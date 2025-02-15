@@ -9,10 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
@@ -49,5 +53,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         // 예외 메세지 확인을 위한 오버라이딩
         return handleExceptionInternal(ex, new CommonErrorResponse(ex.getMessage(), BaseException.SERVER_ERROR), headers, status, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        String message = "";
+        for(FieldError fieldError :fieldErrors) {
+            if (!message.equals("")) message += " | ";
+            message = fieldError.getField() + " : " + fieldError.getDefaultMessage();
+        }
+        return handleExceptionInternal(ex, new CommonErrorResponse(message, BaseException.INVALID_INPUT), headers, status, request);
     }
 }
