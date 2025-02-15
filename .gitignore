@@ -38,3 +38,6 @@ out/
 
 ### .env 파일 제외
 .env
+
+### postgres data 제외
+postgres-data/
