@@ -19,6 +19,9 @@ public class User extends BaseEntity {
     private UUID userId;
 
     @Column(nullable = false, unique = true)
+    private String nickname;
+
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false, unique = true)
@@ -34,7 +37,8 @@ public class User extends BaseEntity {
     private LocalDateTime deletedAt;
     private UUID deletedBy;
 
-    public User(String username, String password, String email, UserRoleEnum role) {
+    public User(String nickname, String username, String password, String email, UserRoleEnum role) {
+        this.nickname = nickname;
         this.username = username;
         this.email = email;
         this.password = password;
