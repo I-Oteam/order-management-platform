@@ -21,6 +21,18 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    @GetMapping("/reviews/all")
+    public ResponseEntity<CommonResponse<CommonPageResponse<ReviewResponseDto>>> searchReviews(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            ReviewSearchCondition condition,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewsByCondition(condition, pageable);
+        return ResponseEntity.ok(new CommonResponse <>(
+                "리뷰가 성공적으로 조회되었습니다.",
+                pageResponse));
+    }
+
     @PostMapping("/reviews")
     public ResponseEntity<CommonResponse<ReviewResponseDto>> createReview(@RequestBody @Validated CreateReviewRequestDto requestDto) {
 
