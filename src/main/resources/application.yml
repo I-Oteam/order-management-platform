@@ -36,7 +36,8 @@ spring:
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
-
+    admin: ${ADMIN_TOKEN}
+    owner: ${OWNER_TOKEN}
 ---
 # test 환경
 spring:

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 @Getter
 public class UserDetailsImpl implements UserDetails {
@@ -28,6 +29,8 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() {
         return user.getUsername();
     }
+
+    public UUID getUserId() { return user.getUserId();}
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

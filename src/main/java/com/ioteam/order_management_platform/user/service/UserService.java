@@ -6,6 +6,7 @@ import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.exception.UserException;
 import com.ioteam.order_management_platform.user.repository.UserRepository;
+import com.ioteam.order_management_platform.user.security.TokenConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    // ADMIN_TOKEN
-    private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
-    private final String OWNER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiT1dORVIiLCJpYXQiOjE1MTYyMzkwMjJ9.uG58LIFCUGkdi4u1vasLY4KnxWVjQcxUV2MDX8ZE_38";
+    private final TokenConfig tokenConfig;
 
     public void signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
+        String nickname = requestDto.getNickname();
+        // 닉네임 중복 확인
+        Optional<User> checkNickname = userRepository.findByNickname(nickname);
+        if (checkNickname.isPresent()) {
+            throw new CustomApiException(UserException.DUPLICATE_NICKNAME);
+        }
 
         // 회원 중복 확인
         Optional<User> checkUsername = userRepository.findByUsername(username);
@@ -41,23 +45,27 @@ public class UserService {
             throw new CustomApiException(UserException.DUPLICATE_EMAIL);
         }
 
-        // 사용자 ROLE 확인
+        UserRoleEnum role = getUserRoleEnum(requestDto);
+
+        // 사용자 등록
+        User user = new User(nickname, username, password, email, role);
+        userRepository.save(user);
+    }
+
+    private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
         UserRoleEnum role = UserRoleEnum.CUSTOMER;
         if (requestDto.isAdmin()) {
-            if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
+            if (!tokenConfig.getAdminToken().equals(requestDto.getAdminToken())) {
                 throw new CustomApiException(UserException.INVALID_ADMIN_TOKEN);
             }
             role = UserRoleEnum.MANAGER;
         }
         if (requestDto.isOwner()) {
-            if (!OWNER_TOKEN.equals(requestDto.getOwnerToken())){
+            if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())){
                 throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
             }
             role = UserRoleEnum.OWNER;
         }
-
-        // 사용자 등록
-        User user = new User(username, password, email, role);
-        userRepository.save(user);
+        return role;
     }
 }

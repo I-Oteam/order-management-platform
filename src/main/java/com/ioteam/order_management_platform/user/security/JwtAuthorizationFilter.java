@@ -32,24 +32,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
 
         String tokenValue = jwtUtil.getJwtFromHeader(req);
-
-        if (StringUtils.hasText(tokenValue)) {
-
-            if (!jwtUtil.validateToken(tokenValue)) {
-                log.error("Token Error");
-                return;
-            }
-
-            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-
+        if (StringUtils.hasText(tokenValue) && jwtUtil.validateToken(tokenValue)) {
             try {
-                setAuthentication(info.getSubject());
+                Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+                String username = info.getSubject();
+
+                if (username != null) {
+                    setAuthentication(username);
+                } else {
+                    log.error("JWT 토큰에서 사용자 이름을 찾을 수 없습니다.");
+                }
             } catch (Exception e) {
-                log.error(e.getMessage());
-                return;
+                log.error("JWT 인증 중 오류 발생: " + e.getMessage());
             }
         }
-
         filterChain.doFilter(req, res);
     }
 
