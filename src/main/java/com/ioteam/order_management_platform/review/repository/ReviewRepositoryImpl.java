@@ -68,18 +68,18 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
 
-        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
-
-        // 생성 시간, 별점 기준으로만 정렬
-        for(Sort.Order order : sort) {
-            Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-            switch(order.getProperty()) {
-                case "score":
-                    orderSpecifiers.add(new OrderSpecifier(direction, review.reviewScore));
-                case "createdAt":
-                    orderSpecifiers.add(new OrderSpecifier(direction, review.createdAt));
-            }
-        }
-        return orderSpecifiers.toArray(new OrderSpecifier[0]);
+        return sort.stream()
+                .filter(order -> List.of("score", "createdAt").contains(order.getProperty()))
+                .map(order -> {
+                    Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+                    switch(order.getProperty()) {
+                        case "score":
+                            return new OrderSpecifier(direction, review.reviewScore);
+                        case "createdAt":
+                            return new OrderSpecifier(direction, review.createdAt);
+                    }
+                    return null;
+                })
+                .toArray(OrderSpecifier[]::new);
     }
 }

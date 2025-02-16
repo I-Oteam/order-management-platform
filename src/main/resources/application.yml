@@ -62,4 +62,6 @@ spring:
       data-locations: classpath:db/data.sql # db 시작할때 실행시킬 script (더미 데이터 생성)
 jwt:
   secret:
-    key: ${JWT_SECRET_KEY}
+    key: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
+    admin: test
+    owner: test
