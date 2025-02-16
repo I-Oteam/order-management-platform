@@ -3,6 +3,7 @@ package com.ioteam.order_management_platform.review.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.utils.security.WithMockCustomer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,46 @@ class ReviewIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+
+    @DisplayName("리뷰 조회 성공 200")
+    @Test
+    void searchReviewAll_200() throws Exception {
+        // given
+        LocalDateTime startCreatedAt = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
+        LocalDateTime endCreatedAt = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
+        Integer score = 4;
+
+        // when, then
+        mockMvc.perform(get("/api/reviews/all?startCreatedAt={startCreatedAt}&endCreatedAt={endCreatedAt}&score={score}",
+                        startCreatedAt, endCreatedAt, score)
+                        .header("Authorization", "Bearer {ACCESS_TOKEN}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.result.content[0].reviewScore")
+                        .value(4))
+                .andExpect(jsonPath("$.result.totalElements")
+                        .value(5))
+                .andDo(print());
+    }
+
+    @WithMockCustomer
+    @DisplayName("고객_본인 리뷰 단건 조회 성공 200")
+    @Test
+    void customer_getReview_200() throws Exception {
+        // given
+        String reviewId = "1c114e8f-ccd0-42b8-a7fa-67fee61d4d18";
+
+        // when, then
+        mockMvc.perform(get("/api/reviews/{reviewId}", reviewId)
+                        .header("Authorization", "Bearer {ACCESS_TOKEN}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.result.reviewScore")
+                        .value(5))
+                .andExpect(jsonPath("$.result.reviewContent")
+                        .value("test"))
+                .andDo(print());
+    }
 
     //@WithMockCustomer
     @DisplayName("리뷰 생성 성공 201")
@@ -105,24 +146,4 @@ class ReviewIntegrationTest {
                 .andDo(print());
     }
 
-    @DisplayName("리뷰 조회 성공 200")
-    @Test
-    void searchReview_200() throws Exception {
-        // given
-        LocalDateTime startCreatedAt = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
-        LocalDateTime endCreatedAt = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
-        Integer score = 4;
-
-        // when, then
-        mockMvc.perform(get("/api/reviews/all?startCreatedAt={startCreatedAt}&endCreatedAt={endCreatedAt}&score={score}",
-                        startCreatedAt, endCreatedAt,score)
-                        .header("Authorization", "Bearer {ACCESS_TOKEN}"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.result.content[0].reviewScore")
-                        .value(4))
-                .andExpect(jsonPath("$.result.totalElements")
-                        .value(5))
-                .andDo(print());
-    }
 }
