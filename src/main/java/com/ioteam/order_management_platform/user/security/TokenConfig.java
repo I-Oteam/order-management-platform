@@ -10,8 +10,8 @@ public class TokenConfig {
     private final String adminToken;
     private final String ownerToken;
 
-    public TokenConfig(@Value("${ADMIN_TOKEN}") String adminToken,
-                       @Value("${OWNER_TOKEN}") String ownerToken) {
+    public TokenConfig(@Value("${jwt.secret.admin}") String adminToken,
+                       @Value("${jwt.secret.owner}") String ownerToken) {
         this.adminToken = adminToken;
         this.ownerToken = ownerToken;
     }
