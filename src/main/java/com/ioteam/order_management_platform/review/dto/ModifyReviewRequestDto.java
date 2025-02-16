@@ -19,6 +19,7 @@ public class ModifyReviewRequestDto {
     @NotNull
     @Length(max = 1000)
     private String reviewContent;
+    @Length(max = 100)
     private String reviewImageUrl;
     @NotNull
     private Boolean isPublic;
