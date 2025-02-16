@@ -1,6 +1,8 @@
 package com.ioteam.order_management_platform.global.config;
 
 import com.ioteam.order_management_platform.global.jpa.UserAuditorAware;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -17,4 +19,8 @@ public class JpaConfig {
         return new UserAuditorAware();
     }
 
+    @Bean
+    JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
+        return new JPAQueryFactory(entityManager);
+    }
 }
