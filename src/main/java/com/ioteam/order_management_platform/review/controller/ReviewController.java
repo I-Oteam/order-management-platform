@@ -37,8 +37,21 @@ public class ReviewController {
                 pageResponse));
     }
 
+    @GetMapping("/reviews/{reviewId}")
+    public ResponseEntity<CommonResponse<ReviewResponseDto>> getReview(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable UUID reviewId) {
+
+        ReviewResponseDto responseDto = reviewService.getReview(
+                reviewId, userDetails.getUser().getUser_id(), userDetails.getUser().getRole());
+        return ResponseEntity.ok(new CommonResponse<>(
+                "리뷰가 성공적으로 조회되었습니다.",
+                responseDto));
+    }
+
     @PostMapping("/reviews")
-    public ResponseEntity<CommonResponse<ReviewResponseDto>> createReview(@RequestBody @Validated CreateReviewRequestDto requestDto) {
+    public ResponseEntity<CommonResponse<ReviewResponseDto>> createReview(
+            @RequestBody @Validated CreateReviewRequestDto requestDto) {
 
         ReviewResponseDto responseDto = reviewService.createReview(requestDto);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
