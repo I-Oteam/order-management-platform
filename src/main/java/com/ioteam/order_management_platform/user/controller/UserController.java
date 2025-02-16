@@ -4,6 +4,7 @@ package com.ioteam.order_management_platform.user.controller;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
+import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
 import com.ioteam.order_management_platform.user.dto.UserInfoDto;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
@@ -30,7 +31,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/user/signup")
+    @PostMapping("user/signup")
     public ResponseEntity<CommonResponse<Void>> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
         // Validation 예외처리
         if (bindingResult.hasErrors()) {
@@ -55,8 +56,13 @@ public class UserController {
             }
         }
         userService.signup(requestDto);
-        CommonResponse<Void> successResponse = new CommonResponse<>("회원가입이 성공적으로 완료되었습니다.", null);
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(new CommonResponse<>("회원가입이 성공적으로 완료되었습니다.", null));
+    }
+
+    @PostMapping("user/login")
+    public ResponseEntity<CommonResponse<String>> login(@Valid @RequestBody LoginRequestDto requestDto) {
+        String token = userService.login(requestDto);
+        return ResponseEntity.ok(new CommonResponse<>("로그인이 되었습니다.", token));
     }
 
     // 회원 관련 정보 받기
