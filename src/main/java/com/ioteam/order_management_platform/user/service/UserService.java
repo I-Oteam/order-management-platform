@@ -61,7 +61,7 @@ public class UserService {
             role = UserRoleEnum.MANAGER;
         }
         if (requestDto.isOwner()) {
-            if (!tokenConfig.getAdminToken().equals(requestDto.getOwnerToken())){
+            if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())){
                 throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
             }
             role = UserRoleEnum.OWNER;
