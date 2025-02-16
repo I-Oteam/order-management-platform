@@ -11,13 +11,12 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @Table(name = "p_users")
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID user_id;
+    private UUID userId;
 
     @Column(nullable = false, unique = true)
     private String username;
