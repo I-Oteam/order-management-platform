@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,6 +30,7 @@ class ReviewIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    //@WithMockCustomer
     @DisplayName("리뷰 생성 성공 201")
     @Test
     void createReview_201() throws Exception {
@@ -100,6 +102,27 @@ class ReviewIntegrationTest {
                         .value("modifyTest"))
                 .andExpect(jsonPath("$.result.isPublic")
                         .value(false))
+                .andDo(print());
+    }
+
+    @DisplayName("리뷰 조회 성공 200")
+    @Test
+    void searchReview_200() throws Exception {
+        // given
+        LocalDateTime startCreatedAt = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
+        LocalDateTime endCreatedAt = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
+        Integer score = 4;
+
+        // when, then
+        mockMvc.perform(get("/api/reviews/all?startCreatedAt={startCreatedAt}&endCreatedAt={endCreatedAt}&score={score}",
+                        startCreatedAt, endCreatedAt,score)
+                        .header("Authorization", "Bearer {ACCESS_TOKEN}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.result.content[0].reviewScore")
+                        .value(4))
+                .andExpect(jsonPath("$.result.totalElements")
+                        .value(5))
                 .andDo(print());
     }
 }
