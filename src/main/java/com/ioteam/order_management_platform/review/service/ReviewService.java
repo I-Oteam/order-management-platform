@@ -46,7 +46,7 @@ public class ReviewService {
         // 1. is_public=true 누구나 확인 가능
         // 2. is_public=false 작성자와 가게 오너, 관리자만 확인 가능
         if (review.getIsPublic()
-                || review.getUser().getUser_id().equals(userId)
+                || review.getUser().getUserId().equals(userId)
                 || List.of("OWNER", "MANAGER", "MASTER").contains(role.name())) {
             return review.toResponseDto();
         }

@@ -43,7 +43,7 @@ public class ReviewController {
             @PathVariable UUID reviewId) {
 
         ReviewResponseDto responseDto = reviewService.getReview(
-                reviewId, userDetails.getUser().getUser_id(), userDetails.getUser().getRole());
+                reviewId, userDetails.getUser().getUserId(), userDetails.getUser().getRole());
         return ResponseEntity.ok(new CommonResponse<>(
                 "리뷰가 성공적으로 조회되었습니다.",
                 responseDto));

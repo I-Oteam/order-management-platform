@@ -1,7 +1,7 @@
 -- p_users 테이블 목데이터 추가
 INSERT INTO p_users
-    (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, user_id, email, password, role, username)
-VALUES(now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e7'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e7'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e7'::uuid, 'test@example.com', '1234', 'CUSTOMER', 'testId');
+    (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, user_id, email, password, role, username, nickname)
+VALUES(now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e7'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e7'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e7'::uuid, 'test@example.com', '1234', 'CUSTOMER', 'testId', 'nickname');
 
 
 -- p_review 테이블 목데이터 추가
