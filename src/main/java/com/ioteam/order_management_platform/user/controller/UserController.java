@@ -26,12 +26,12 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("user/signup")
+    @PostMapping("/signup")
     public ResponseEntity<CommonResponse<Void>> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
         // Validation 예외처리
         if (bindingResult.hasErrors()) {
@@ -59,7 +59,7 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponse<>("회원가입이 성공적으로 완료되었습니다.", null));
     }
 
-    @PostMapping("user/login")
+    @PostMapping("/login")
     public ResponseEntity<CommonResponse<String>> login(@Valid @RequestBody LoginRequestDto requestDto) {
         String token = userService.login(requestDto);
         return ResponseEntity.ok(new CommonResponse<>("로그인이 되었습니다.", token));
