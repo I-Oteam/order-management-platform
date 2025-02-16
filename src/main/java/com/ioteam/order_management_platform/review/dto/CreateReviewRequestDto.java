@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.review.dto;
 
+import com.ioteam.order_management_platform.review.entity.Review;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,4 +27,13 @@ public class CreateReviewRequestDto {
     private String reviewImageUrl;
     @NotNull
     private Boolean isPublic;
+
+    public Review toEntity() {
+        return Review.builder()
+                .reviewScore(this.reviewScore)
+                .reviewContent(this.reviewContent)
+                .reviewImageUrl(this.reviewImageUrl)
+                .isPublic(this.isPublic)
+                .build();
+    }
 }
