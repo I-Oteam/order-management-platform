@@ -22,8 +22,8 @@ public class UserDetailsImpl implements UserDetails {
 		this.user = user;
 	}
 
-	public String getRole() {
-		return user.getRole().toString();
+	public UserRoleEnum getRole() {
+		return user.getRole();
 	}
 
 	@Override
