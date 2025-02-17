@@ -1,16 +1,14 @@
 package com.ioteam.order_management_platform.user.entity;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "p_users")
 public class User extends BaseEntity {
