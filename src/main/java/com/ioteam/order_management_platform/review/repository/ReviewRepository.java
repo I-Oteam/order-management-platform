@@ -1,11 +1,14 @@
 package com.ioteam.order_management_platform.review.repository;
 
-import com.ioteam.order_management_platform.review.entity.Review;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
+import com.ioteam.order_management_platform.review.entity.Review;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID>, ReviewRepositoryCustom {
+	Optional<Review> findByReviewIdAndDeletedAtIsNull(UUID reviewId);
 }
