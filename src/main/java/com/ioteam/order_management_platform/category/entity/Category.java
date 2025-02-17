@@ -1,36 +1,40 @@
 package com.ioteam.order_management_platform.category.entity;
 
-import com.ioteam.order_management_platform.category.dto.CategoryRequestDto;
-import com.ioteam.order_management_platform.global.entity.BaseEntity;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.ioteam.order_management_platform.global.entity.BaseEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Getter
-@Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "p_restaurant_category")
 public class Category extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID rcId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID rcId;
 
-    @Column(nullable = false,  unique = true)
-    private String rcName;
+	@Column(nullable = false, unique = true, length = 100)
+	private String rcName;
 
-    @Column
-    private LocalDateTime deletedAt;
+	@Column
+	private LocalDateTime deletedAt;
 
-    @Column
-    private UUID deletedBy;
+	@Column
+	private UUID deletedBy;
 
-    public Category(CategoryRequestDto categoryRequestDto) {
-        this.rcName = categoryRequestDto.getRcName();
-    }
 }
