@@ -31,8 +31,9 @@ import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class CategoryIntegrationTest {
 
 	@Autowired
@@ -40,6 +41,9 @@ class CategoryIntegrationTest {
 
 	@Autowired
 	ObjectMapper objectMapper;
+
+	@MockitoBean // 실제 빈이 아니에요  -> 껍데만, 구현체가 없어요 구현을 못해줘요, 반환값이 없어요,
+	private CategoryService categoryService;
 
 	private UserDetailsImpl userDetails;
 
@@ -78,7 +82,9 @@ class CategoryIntegrationTest {
 		System.out.println("responseDto.getRcId() = " + responseDto.getRcId());
 
 		// mock 서비스 메서드
-		when(categoryService.createCategory(requestDto, userDetails)).thenReturn(responseDto);
+		// when(categoryService.createCategory(requestDto, userDetails)).thenReturn(responseDto);
+		given(categoryService.createCategory(requestDto, userDetails))
+			.willReturn(responseDto);
 
 		// when & then - POST 요청 보내고 응답 검증
 		mockMvc.perform(post("/api/categories")
