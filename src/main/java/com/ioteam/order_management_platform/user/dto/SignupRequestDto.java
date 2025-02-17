@@ -8,6 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SignupRequestDto {
+    @NotBlank(message = "nickname은 공백일 수 없습니다.")
+    private String nickname;
     @NotBlank(message = "username은 공백일 수 없습니다.")
     private String username;
     @NotBlank(message = "password는 공백일 수 없습니다.")

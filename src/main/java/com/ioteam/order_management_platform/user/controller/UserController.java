@@ -38,6 +38,8 @@ public class UserController {
                 log.error("Validation error - field: {}, message: {}", error.getField(), error.getDefaultMessage());
 
                 switch (error.getField()) {
+                    case "nickname":
+                        throw new CustomApiException(UserException.EMPTY_NICKNAME);
                     case "username":
                         throw new CustomApiException(UserException.EMPTY_USERNAME);
                     case "password":
