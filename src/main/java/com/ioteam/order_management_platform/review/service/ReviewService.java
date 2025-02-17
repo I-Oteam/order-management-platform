@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
+import com.ioteam.order_management_platform.review.dto.AdminReviewResponseDto;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
-import com.ioteam.order_management_platform.review.dto.*;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
 import com.ioteam.order_management_platform.review.repository.ReviewRepository;
@@ -28,13 +28,13 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 
-    public CommonPageResponse<AdminReviewResponseDto> searchReviewsByCondition(
-            ReviewSearchCondition condition, Pageable pageable) {
+	public CommonPageResponse<AdminReviewResponseDto> searchReviewsByCondition(
+		ReviewSearchCondition condition, Pageable pageable) {
 
-        Page<AdminReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable)
-                .map(AdminReviewResponseDto::from);
-        return new CommonPageResponse<>(reviewDtoList);
-    }
+		Page<AdminReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable)
+			.map(AdminReviewResponseDto::from);
+		return new CommonPageResponse<>(reviewDtoList);
+	}
 
 	public ReviewResponseDto getReview(UUID reviewId) { //, UUID userId, UserRoleEnum role) {
 
@@ -48,7 +48,7 @@ public class ReviewService {
 		if (review.getIsPublic()) {
 			// || review.getUser().getUserId().equals(userId)
 			// || List.of("OWNER", "MANAGER", "MASTER").contains(role.name())) {
-			return review.toResponseDto();
+			return ReviewResponseDto.from(review);
 		}
 		throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 	}
@@ -56,9 +56,9 @@ public class ReviewService {
 	@Transactional
 	public ReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
 
-		Review reviewEntity = new Review(requestDto);
+		Review reviewEntity = requestDto.toEntity();
 		Review save = reviewRepository.save(reviewEntity);
-		return save.toResponseDto();
+		return ReviewResponseDto.from(save);
 	}
 
 	@Transactional
@@ -78,6 +78,6 @@ public class ReviewService {
 				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
 			});
 		review.modify(requestDto);
-		return review.toResponseDto();
+		return ReviewResponseDto.from(review);
 	}
 }

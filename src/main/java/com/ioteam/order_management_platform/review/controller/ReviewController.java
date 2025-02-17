@@ -21,30 +21,38 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
-import com.ioteam.order_management_platform.review.dto.*;
+import com.ioteam.order_management_platform.global.success.SuccessCode;
+import com.ioteam.order_management_platform.review.dto.AdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
 import com.ioteam.order_management_platform.review.service.ReviewService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
+@Tag(name = "리뷰", description = "리뷰 API")
 public class ReviewController {
 
 	private final ReviewService reviewService;
 
-    @GetMapping("/reviews/all")
-    public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviews(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            ReviewSearchCondition condition,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewsByCondition(condition, pageable);
-        return ResponseEntity.ok(new CommonResponse <>(
-                "리뷰가 성공적으로 조회되었습니다.",
-                pageResponse));
-    }
+	@GetMapping("/reviews/all")
+	public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviews(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		ReviewSearchCondition condition,
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewsByCondition(condition,
+			pageable);
+		return ResponseEntity.ok(new CommonResponse<>(
+			SuccessCode.REVIEW_SEARCH.getMessage(),
+			pageResponse));
+	}
 
 	@GetMapping("/reviews/{reviewId}")
 	public ResponseEntity<CommonResponse<ReviewResponseDto>> getReview(
@@ -54,7 +62,7 @@ public class ReviewController {
 		ReviewResponseDto responseDto = reviewService.getReview(
 			reviewId); //, userDetails.getUser().getUserId(), userDetails.getUser().getRole());
 		return ResponseEntity.ok(new CommonResponse<>(
-			"리뷰가 성공적으로 조회되었습니다.",
+			SuccessCode.REVIEW_CREATE.getMessage(),
 			responseDto));
 	}
 
@@ -69,7 +77,7 @@ public class ReviewController {
 			.toUri();
 		return ResponseEntity.created(location)
 			.body(new CommonResponse<>(
-				"리뷰가 성공적으로 생성되었습니다.",
+				SuccessCode.REVIEW_CREATE.getMessage(),
 				responseDto));
 	}
 
@@ -78,7 +86,7 @@ public class ReviewController {
 
 		reviewService.softDeleteReview(reviewId);
 		return ResponseEntity.ok(new CommonResponse<>(
-			"리뷰가 성공적으로 삭제되었습니다.",
+			SuccessCode.REVIEW_DELETE.getMessage(),
 			null));
 	}
 
@@ -89,7 +97,7 @@ public class ReviewController {
 
 		ReviewResponseDto responseDto = reviewService.modifyReview(reviewId, requestDto);
 		return ResponseEntity.ok(new CommonResponse<>(
-			"리뷰가 성공적으로 수정되었습니다.",
+			SuccessCode.REVIEW_MODIFY.getMessage(),
 			responseDto));
 	}
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import com.ioteam.order_management_platform.review.entity.Review;
 
-@Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID>, ReviewRepositoryCustom {
 	Optional<Review> findByReviewIdAndDeletedAtIsNull(UUID reviewId);
 }

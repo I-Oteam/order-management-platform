@@ -43,26 +43,6 @@ public class Review extends BaseEntity {
 
     private UUID deletedBy;
 
-    public Review(CreateReviewRequestDto requestDto) {
-        this.reviewScore = requestDto.getReviewScore();
-        this.reviewContent = requestDto.getReviewContent();
-        this.reviewImageUrl = requestDto.getReviewImageUrl();
-        this.isPublic = requestDto.getIsPublic();
-    }
-
-    public ReviewResponseDto toResponseDto() {
-        return ReviewResponseDto
-                .builder()
-                .reviewId(this.reviewId)
-                //.userResponseDto(this.user.toReviewUserResponseDto())
-                .reviewScore(this.reviewScore)
-                .reviewContent(this.reviewContent)
-                .reviewImageUrl(this.reviewImageUrl)
-                .isPublic(this.isPublic)
-                .createdAt(this.createdAt)
-                .build();
-    }
-
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = UUID.randomUUID();
