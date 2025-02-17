@@ -1,10 +1,12 @@
 package com.ioteam.order_management_platform.user.service;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.exception.UserException;
+import com.ioteam.order_management_platform.user.jwt.JwtUtil;
 import com.ioteam.order_management_platform.user.repository.UserRepository;
 import com.ioteam.order_management_platform.user.security.TokenConfig;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenConfig tokenConfig;
+    private final JwtUtil jwtUtil;
 
     public void signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
@@ -68,4 +71,18 @@ public class UserService {
         }
         return role;
     }
+    public String login(LoginRequestDto requestDto) { // ✅ JWT 토큰 반환하도록 변경
+        String username = requestDto.getUsername();
+        String password = requestDto.getPassword();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomApiException(UserException.INVALID_USERNAME));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new CustomApiException(UserException.INVALID_PASSWORD);
+        }
+
+        return jwtUtil.createToken(username, user.getRole());
+    }
+
 }

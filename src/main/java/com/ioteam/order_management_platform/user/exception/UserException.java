@@ -14,8 +14,9 @@ public enum UserException implements ExceptionType {
     DUPLICATE_USER(HttpStatus.CONFLICT, "중복된 사용자가 존재합니다.", "E_DUPLICATE_USER"),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "중복된 Email 입니다.", "E_DUPLICATE_EMAIL"),
     INVALID_ADMIN_TOKEN(HttpStatus.UNAUTHORIZED, "관리자 암호가 틀려 등록이 불가능합니다.", "E_INVALID_ADMIN_TOKEN"),
-    INVALID_OWNER_TOKEN(HttpStatus.UNAUTHORIZED, "점주 인증 암호가 틀려 등록이 불가능합니다.", "E_INVALID_OWNER_TOKEN");
-
+    INVALID_OWNER_TOKEN(HttpStatus.UNAUTHORIZED, "점주 인증 암호가 틀려 등록이 불가능합니다.", "E_INVALID_OWNER_TOKEN"),
+    INVALID_USERNAME(HttpStatus.UNAUTHORIZED,"사용자 정보가 없습니다.", "E_INVALID_USERNAME"),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "암호가 틀렸습니다.", "E_INVALID_PASSWORD");
 
     private final HttpStatus status;
     private final String message;
