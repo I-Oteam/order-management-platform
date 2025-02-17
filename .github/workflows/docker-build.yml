@@ -1,7 +1,7 @@
 name: CI with Gradle And Docker
 on:
   push:
-    branches: feat/#23_dockerCi
+    branches: develop
 
 jobs:
   ci:
