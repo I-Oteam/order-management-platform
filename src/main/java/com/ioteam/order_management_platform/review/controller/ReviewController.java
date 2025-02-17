@@ -2,10 +2,7 @@ package com.ioteam.order_management_platform.review.controller;
 
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
-import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
+import com.ioteam.order_management_platform.review.dto.*;
 import com.ioteam.order_management_platform.review.service.ReviewService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +26,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/reviews/all")
-    public ResponseEntity<CommonResponse<CommonPageResponse<ReviewResponseDto>>> searchReviews(
+    public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviews(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             ReviewSearchCondition condition,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewsByCondition(condition, pageable);
+        CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewsByCondition(condition, pageable);
         return ResponseEntity.ok(new CommonResponse <>(
                 "리뷰가 성공적으로 조회되었습니다.",
                 pageResponse));

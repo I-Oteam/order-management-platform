@@ -34,7 +34,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .from(review)
                 .where(
                         betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-                        reviewScoreEq(condition.getScore())
+                        eqReviewScore(condition.getScore()),
+                        isPublic(condition.getIsPublic()),
+                        isDeleted(condition.getIsDeleted())
                 )
                 .orderBy(createOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())
@@ -46,14 +48,16 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .from(review)
                 .where(
                         betweenPeriod(condition.getEndCreatedAt(), condition.getEndCreatedAt()),
-                        reviewScoreEq(condition.getScore())
+                        eqReviewScore(condition.getScore()),
+                        isPublic(condition.getIsPublic()),
+                        isDeleted(condition.getIsDeleted())
                 );
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchOne());
 
     }
 
-    private BooleanExpression reviewScoreEq(Integer score) {
+    private BooleanExpression eqReviewScore(Integer score) {
 
         if (score == null) return null;
         return review.reviewScore.eq(score);
@@ -64,6 +68,20 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         if (startCreatedAt == null || endCreatedAt == null)  return null;
         if (startCreatedAt.isAfter(endCreatedAt)) throw new CustomApiException(ReviewException.INVALID_PERIOD);
         return review.createdAt.between(startCreatedAt, endCreatedAt);
+    }
+
+    private BooleanExpression isPublic(Boolean isPublic) {
+
+        if (isPublic == null) return null;
+        return review.isPublic.eq(isPublic);
+    }
+
+    private BooleanExpression isDeleted(Boolean isDeleted) {
+
+        if (isDeleted == null) return null;
+        if (isDeleted) return review.deletedAt.isNotNull();
+        if (!isDeleted) return review.deletedAt.isNull();
+        return null;
     }
 
     private OrderSpecifier[] createOrderSpecifiers(Sort sort) {

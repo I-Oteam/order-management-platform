@@ -2,10 +2,7 @@ package com.ioteam.order_management_platform.review.service;
 
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
-import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
+import com.ioteam.order_management_platform.review.dto.*;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
 import com.ioteam.order_management_platform.review.repository.ReviewRepository;
@@ -23,12 +20,11 @@ import java.util.UUID;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
 
-    public CommonPageResponse<ReviewResponseDto> searchReviewsByCondition(
+    public CommonPageResponse<AdminReviewResponseDto> searchReviewsByCondition(
             ReviewSearchCondition condition, Pageable pageable) {
 
-        Page<ReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable)
-                .map(Review::toResponseDto);
-
+        Page<AdminReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable)
+                .map(AdminReviewResponseDto::from);
         return new CommonPageResponse<>(reviewDtoList);
     }
 
