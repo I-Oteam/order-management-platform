@@ -4,11 +4,10 @@ import org.springframework.http.HttpStatus;
 
 public enum BaseException implements ExceptionType {
 
-    SERVER_ERROR(HttpStatus.BAD_REQUEST, "Server Error", "E_NOT_DEFINED"),
-    INVALID_INPUT(HttpStatus.BAD_REQUEST, "Validation Failed", "E_VALIDATION"),
-    NULL_DATA(HttpStatus.BAD_REQUEST, "Null Data Exists When Should Be Not Null", "E_NULL"),
-    IRONIC_REQUEST(HttpStatus.BAD_REQUEST, "Not Valid Request : Ironic", "E_IRONIC"),
-    UNABLE_REQUEST(HttpStatus.BAD_REQUEST, "Not Valid Request : Unable", "E_UNABLE");
+    SERVER_ERROR(HttpStatus.BAD_REQUEST, "서버 오류가 발생하였습니다.", "E_NOT_DEFINED"),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "유효성 검증에 실패했습니다.", "E_VALIDATION"),
+    NULL_DATA(HttpStatus.BAD_REQUEST, "널 데이터가 존재해서는 안 됩니다.", "E_NULL"),
+    UNAUTHORIZED_REQ(HttpStatus.FORBIDDEN, "권한이 없는 요청입니다.", "E_UNAUTH");
 
     private final HttpStatus status;
     private final String message;
