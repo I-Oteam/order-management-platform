@@ -1,23 +1,45 @@
 package com.ioteam.order_management_platform.category.service;
 
-import com.ioteam.order_management_platform.category.dto.CategoryRequestDto;
-import com.ioteam.order_management_platform.category.dto.CategoryResponseDto;
-import com.ioteam.order_management_platform.category.entity.Category;
-import com.ioteam.order_management_platform.category.repository.CategoryRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ioteam.order_management_platform.category.dto.CategoryResponseDto;
+import com.ioteam.order_management_platform.category.dto.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.entity.Category;
+import com.ioteam.order_management_platform.category.execption.CategoryException;
+import com.ioteam.order_management_platform.category.repository.CategoryRepository;
+import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CategoryService {
 
-    private final CategoryRepository categoryRepository;
+	private final CategoryRepository categoryRepository;
 
-    @Transactional
-    public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
-        Category category = categoryRepository.save(new Category(categoryRequestDto));
+	@Transactional
+	public CategoryResponseDto createCategory(CreateCategoryRequestDto categoryRequestDto,
+		UserDetailsImpl userDetails) {
 
-        return new CategoryResponseDto(category);
-    }
+		// Role이 Manager 인지 검증
+		boolean isManager = userDetails.getAuthorities()
+			.stream()
+			.anyMatch(authority -> authority.getAuthority().equals("ROLE_MANAGER"));
+
+		// 카테고리 커스텀 익셉션 발생
+		if (!isManager) {
+			throw new CustomApiException(CategoryException.NOT_MANAGER_ROLE);
+		}
+
+		if (categoryRequestDto.getRcName().trim().isEmpty()) {
+			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
+		}
+
+		Category category = categoryRepository.save(new Category(categoryRequestDto));
+
+		return new CategoryResponseDto(category);
+	}
 }
