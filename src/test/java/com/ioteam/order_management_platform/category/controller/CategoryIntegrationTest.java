@@ -1,14 +1,15 @@
 package com.ioteam.order_management_platform.category.controller;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -32,9 +35,6 @@ import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 @AutoConfigureMockMvc
 class CategoryIntegrationTest {
 
-	@Mock
-	private CategoryService categoryService;
-
 	@Autowired
 	MockMvc mockMvc;
 
@@ -45,7 +45,13 @@ class CategoryIntegrationTest {
 
 	@BeforeEach
 	void setUp() {
-		User user = new User("테스트 닉네임", "테스트", "테스트비밀번호", "테스트이메일@테스트.테스트", UserRoleEnum.MANAGER);
+		User user = new User(
+			"테스트 닉네임",
+			"테스트",
+			"테스트비밀번호",
+			"테스트이메일@테스트.테스트",
+			UserRoleEnum.MANAGER
+		);
 		userDetails = new UserDetailsImpl(user);
 
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -59,8 +65,17 @@ class CategoryIntegrationTest {
 	void createCategory_201() throws Exception {
 		// given - mock 객체 설정
 		CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto("일식");
-		Category category = new Category(requestDto);
-		CategoryResponseDto responseDto = new CategoryResponseDto(category);
+
+		// 생성자 패턴에서 빌더 패턴으로 변경 (통합테스트 환경 유연하게)
+		Category category = Category.builder()
+			.rcId(UUID.randomUUID())
+			.rcName(requestDto.getRcName())
+			.build();
+
+		CategoryResponseDto responseDto = CategoryResponseDto.fromCategory(category);
+
+		System.out.println("responseDto.getRcName() = " + responseDto.getRcName());
+		System.out.println("responseDto.getRcId() = " + responseDto.getRcId());
 
 		// mock 서비스 메서드
 		when(categoryService.createCategory(requestDto, userDetails)).thenReturn(responseDto);
@@ -74,6 +89,8 @@ class CategoryIntegrationTest {
 			.andExpect(jsonPath("$.result.rcName").value("일식"))
 			.andDo(print());
 
+		verify(categoryService, times(1)).createCategory(requestDto, userDetails);
+
 	}
-	
+
 }

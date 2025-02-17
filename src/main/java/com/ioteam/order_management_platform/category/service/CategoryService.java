@@ -34,12 +34,18 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.NOT_MANAGER_ROLE);
 		}
 
-		if (categoryRequestDto.getRcName().trim().isEmpty()) {
+		if (categoryRequestDto.getRcName()
+			.trim()
+			.isEmpty()) {
 			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
 		}
 
-		Category category = categoryRepository.save(new Category(categoryRequestDto));
+		Category category = categoryRepository.save(
+			Category.builder()
+				.rcName(categoryRequestDto.getRcName())
+				.build()
+		);
 
-		return new CategoryResponseDto(category);
+		return CategoryResponseDto.fromCategory(category);
 	}
 }
