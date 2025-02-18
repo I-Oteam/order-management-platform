@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.review.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -18,6 +19,9 @@ import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
 import com.ioteam.order_management_platform.review.repository.ReviewRepository;
+import com.ioteam.order_management_platform.user.entity.User;
+import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
+import com.ioteam.order_management_platform.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,16 +31,16 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
+	private final UserRepository userRepository;
 
 	public CommonPageResponse<AdminReviewResponseDto> searchReviewsByCondition(
 		ReviewSearchCondition condition, Pageable pageable) {
 
-		Page<AdminReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable)
-			.map(AdminReviewResponseDto::from);
+		Page<AdminReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable);
 		return new CommonPageResponse<>(reviewDtoList);
 	}
 
-	public ReviewResponseDto getReview(UUID reviewId) { //, UUID userId, UserRoleEnum role) {
+	public ReviewResponseDto getReview(UUID reviewId, UUID userId, UserRoleEnum role) {
 
 		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
 			.orElseThrow(() -> {
@@ -45,39 +49,48 @@ public class ReviewService {
 
 		// 1. is_public=true 누구나 확인 가능
 		// 2. is_public=false 작성자와 가게 오너, 관리자만 확인 가능
-		if (review.getIsPublic()) {
-			// || review.getUser().getUserId().equals(userId)
-			// || List.of("OWNER", "MANAGER", "MASTER").contains(role.name())) {
+		if (review.getIsPublic()
+			|| review.getUser().getUserId().equals(userId)
+			// || review.getRestaurant().getOwnerId().equals(userId)
+			|| List.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(role)) {
 			return ReviewResponseDto.from(review);
 		}
 		throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 	}
 
 	@Transactional
-	public ReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
+	public ReviewResponseDto createReview(UUID userId, CreateReviewRequestDto requestDto) {
 
-		Review reviewEntity = requestDto.toEntity();
-		Review save = reviewRepository.save(reviewEntity);
+		User referenceUser = userRepository.getReferenceById(userId);
+		Review review = requestDto.toEntity(referenceUser);
+		Review save = reviewRepository.save(review);
 		return ReviewResponseDto.from(save);
 	}
 
 	@Transactional
-	public void softDeleteReview(UUID reviewId) {
-		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
-			.orElseThrow(() -> {
-				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
-			});
-		review.softDelete();
-	}
+	public ReviewResponseDto modifyReview(UUID reviewId, UUID userId, ModifyReviewRequestDto requestDto) {
 
-	@Transactional
-	public ReviewResponseDto modifyReview(UUID reviewId, ModifyReviewRequestDto requestDto) {
-
-		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
+		// 글 작성자만 수정 가능
+		Review review = reviewRepository.findByReviewIdAndUser_userIdAndDeletedAtIsNull(reviewId, userId)
 			.orElseThrow(() -> {
 				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
 			});
 		review.modify(requestDto);
 		return ReviewResponseDto.from(review);
+	}
+
+	@Transactional
+	public void softDeleteReview(UUID reviewId, UUID userId, UserRoleEnum role) {
+
+		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
+			.orElseThrow(() -> {
+				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
+			});
+
+		// 매니저가 아니고, 작성자가 아닌 경우 예외 처리
+		if (!role.equals(UserRoleEnum.MANAGER) && !review.getUser().getUserId().equals(userId)) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
+		review.softDelete();
 	}
 }
