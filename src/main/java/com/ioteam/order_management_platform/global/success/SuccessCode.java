@@ -13,7 +13,7 @@ public enum SuccessCode {
 	USER_SIGNUP(HttpStatus.CREATED, "회원가입이 성공적으로 완료되었습니다.", "S_USER_SIGNUP"),
 	USER_LOGIN(HttpStatus.OK, "로그인에 성공하였습니다.", "S_USER_LOGIN"),
 	USER_DETAILS_INFO(HttpStatus.OK, "회원 정보를 가져오는데에 성공하였습니다.", "S_USER_DETAILS_INFO"),
-	USER_INFO(HttpStatus.OK, "모든 회원 정보를 가져오는데에 성공하였습니다.", "S_USER_INFO");
+	USER_INFO(HttpStatus.OK, "모든 회원 정보를 가져오는데에 성공하였습니다.", "S_USER_INFO"),
 
 	// review
 
@@ -24,6 +24,7 @@ public enum SuccessCode {
 	// order
 
 	// menu
+	MENU_LIST_INFO(HttpStatus.OK, "메뉴 목록을 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO");
 
 	// payment
 

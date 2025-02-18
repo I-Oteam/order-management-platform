@@ -1,9 +1,12 @@
 package com.ioteam.order_management_platform.menu.repository;
 
-import com.ioteam.order_management_platform.menu.entity.Menu;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.UUID;
 
-@Repository
-public interface MenuRepository extends JpaRepository<Menu, Long> {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ioteam.order_management_platform.menu.entity.Menu;
+
+public interface MenuRepository extends JpaRepository<Menu, UUID> {
+	List<Menu> findByRestaurant_ResId(UUID restaurantId);
 }

@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.menu.dto;
+package com.ioteam.order_management_platform.menu.dto.res;
 
 import java.math.BigDecimal;
 import java.util.UUID;
