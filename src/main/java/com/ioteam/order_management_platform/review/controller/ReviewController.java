@@ -23,11 +23,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
-import com.ioteam.order_management_platform.review.dto.AdminReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
+import com.ioteam.order_management_platform.review.dto.req.AdminReviewSearchCondition;
+import com.ioteam.order_management_platform.review.dto.req.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.req.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.res.AdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.res.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.service.ReviewService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
@@ -45,16 +45,31 @@ public class ReviewController {
 
 	@Operation(summary = "전체 리뷰 조회", description = "전체 리뷰 조회는 'MANAGER', 'MASTER' 만 가능")
 	@PreAuthorize("hasAnyRole('MANAGER', 'MASTER')")
-	@GetMapping("/reviews/all")
-	public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviews(
-		ReviewSearchCondition condition,
+	@GetMapping("/reviews/admin")
+	public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviewAdmin(
+		AdminReviewSearchCondition condition,
 		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewsByCondition(condition,
+
+		CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewAdminByCondition(condition,
 			pageable);
 		return ResponseEntity.ok(new CommonResponse<>(
-			SuccessCode.REVIEW_SEARCH.getMessage(),
+			SuccessCode.REVIEW_SEARCH,
 			pageResponse));
+	}
+
+	@Operation(summary = "유저별 리뷰 조회", description = "유저별 리뷰 조회는 'CUSTOMER' 만 가능")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	@GetMapping("/reviews/users/{userId}")
+	public ResponseEntity<CommonResponse<CommonPageResponse<ReviewResponseDto>>> searchReviewsByUser(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable UUID userId,
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+
+		CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewByUser(
+			userDetails.getUserId(), userId, pageable);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_SEARCH, pageResponse));
 	}
 
 	@Operation(summary = "리뷰 조회", description = "리뷰 조회는 인증된 사용자만 가능")
@@ -67,7 +82,7 @@ public class ReviewController {
 		ReviewResponseDto responseDto = reviewService.getReview(reviewId, userDetails.getUserId(),
 			userDetails.getRole());
 		return ResponseEntity.ok(new CommonResponse<>(
-			SuccessCode.REVIEW_CREATE.getMessage(),
+			SuccessCode.REVIEW_CREATE,
 			responseDto));
 	}
 
@@ -84,9 +99,7 @@ public class ReviewController {
 			.build()
 			.toUri();
 		return ResponseEntity.created(location)
-			.body(new CommonResponse<>(
-				SuccessCode.REVIEW_CREATE.getMessage(),
-				responseDto));
+			.body(new CommonResponse<>(SuccessCode.REVIEW_CREATE, responseDto));
 	}
 
 	@Operation(summary = "리뷰 수정", description = "리뷰 수정은 'CUSTOMER' 만 가능")
@@ -98,7 +111,7 @@ public class ReviewController {
 		@RequestBody @Validated ModifyReviewRequestDto requestDto) {
 
 		ReviewResponseDto responseDto = reviewService.modifyReview(reviewId, userDetails.getUserId(), requestDto);
-		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_MODIFY.getMessage(), responseDto));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_MODIFY, responseDto));
 	}
 
 	@Operation(summary = "리뷰 삭제", description = "리뷰 삭제는 'MANAGER', 'CUSTOMER' 만 가능")
@@ -109,6 +122,6 @@ public class ReviewController {
 		@PathVariable UUID reviewId) {
 
 		reviewService.softDeleteReview(reviewId, userDetails.getUserId(), userDetails.getRole());
-		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_DELETE.getMessage(), null));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_DELETE, null));
 	}
 }
