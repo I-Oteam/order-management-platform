@@ -2,6 +2,9 @@ package com.ioteam.order_management_platform.user.controller;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,11 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.user.dto.AdminUserResponseDto;
 import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
 import com.ioteam.order_management_platform.user.dto.UserInfoResponseDto;
+import com.ioteam.order_management_platform.user.dto.UserSearchCondition;
 import com.ioteam.order_management_platform.user.exception.UserException;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 import com.ioteam.order_management_platform.user.service.UserService;
@@ -74,5 +80,18 @@ public class UserController {
 		@PathVariable UUID userId) {
 		UserInfoResponseDto userInfo = userService.getUserByUserId(userDetails, userId);
 		return ResponseEntity.ok(new CommonResponse<>("사용자 조회 성공", userInfo));
+	}
+
+	@GetMapping("/all")
+	public ResponseEntity<CommonResponse<CommonPageResponse<AdminUserResponseDto>>> searchUsers(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		UserSearchCondition condition,
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		CommonPageResponse<AdminUserResponseDto> pageResponse = userService.searchUsersByCondition(userDetails,
+			condition, pageable);
+		return ResponseEntity.ok(new CommonResponse<>(
+			"전체 사용자 조회 성공",
+			pageResponse));
 	}
 }
