@@ -29,6 +29,11 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: create
+    defer-datasource-initialization: true # hibernate가 초기화되기 전 data.sql 실행하는 것을 방지
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/data.sql # db 시작할때 실행시킬 script (더미 데이터 생성)
 
   devtools:
     livereload:
@@ -38,6 +43,13 @@ jwt:
     key: ${JWT_SECRET_KEY}
     admin: ${ADMIN_TOKEN}
     owner: ${OWNER_TOKEN}
+logging:
+  level:
+    root: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+
 ---
 # test 환경
 spring:
@@ -62,6 +74,6 @@ spring:
       data-locations: classpath:db/data.sql # db 시작할때 실행시킬 script (더미 데이터 생성)
 jwt:
   secret:
-    key: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
-    admin: test
-    owner: test
+    key: ${JWT_SECRET_KEY}
+    admin: ${ADMIN_TOKEN}
+    owner: ${OWNER_TOKEN}

@@ -1,0 +1,3 @@
+[submodule "omp-private"]
+	path = omp-private
+	url = https://github.com/I-Oteam/omp-private.git
