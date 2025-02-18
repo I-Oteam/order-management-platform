@@ -44,3 +44,7 @@ postgres-data/
 
 ### conventions 제외
 conventions/
+
+### src/main/resources/ 로 복사되는 .env 파일
+src/main/resources/.env
+
