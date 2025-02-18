@@ -19,8 +19,8 @@ public enum SuccessCode {
 	REVIEW_CREATE(HttpStatus.CREATED, "리뷰가 성공적으로 생성되었습니다.", "S_REVIEW_CREATE"),
 	REVIEW_SEARCH(HttpStatus.OK, "리뷰가 성공적으로 조회되었습니다.", "S_REVIEW_SEARCH"),
 	REVIEW_DELETE(HttpStatus.OK, "리뷰가 성공적으로 삭제되었습니다.", "S_REVIEW_DELETE"),
-	REVIEW_MODIFY(HttpStatus.OK, "리뷰가 성공적으로 수정되었습니다.", "S_REVIEW_MODIFY");
-	
+	REVIEW_MODIFY(HttpStatus.OK, "리뷰가 성공적으로 수정되었습니다.", "S_REVIEW_MODIFY"),
+
 	// restaurant
 
 	// category
