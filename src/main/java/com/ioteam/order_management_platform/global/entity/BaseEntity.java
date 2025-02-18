@@ -19,12 +19,14 @@ import java.util.UUID;
 public abstract class BaseEntity {
 
     @CreatedDate
+    @Column(updatable = false)
     protected LocalDateTime createdAt;
 
     @LastModifiedDate
     protected LocalDateTime modifiedAt;
 
     @CreatedBy
+    @Column(updatable = false)
     protected UUID createdBy;
 
     @LastModifiedBy
