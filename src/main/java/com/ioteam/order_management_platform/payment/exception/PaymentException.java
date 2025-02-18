@@ -7,6 +7,7 @@ import com.ioteam.order_management_platform.global.exception.type.ExceptionType;
 public enum PaymentException implements ExceptionType {
 
 	INVALID_USERNAME(HttpStatus.NOT_FOUND, "주문번호가 존재하지 않습니다.", "E_INVALID_USERNAME"),
+	PAYMENT_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다.", "E_PAYMENT_ALREADY_COMPLETED"),
 	;
 
 	private final HttpStatus status;

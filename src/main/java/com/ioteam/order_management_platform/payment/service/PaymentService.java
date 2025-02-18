@@ -26,6 +26,10 @@ public class PaymentService {
 		Order order = orderRepository.findById(requestDto.getOrderId())
 			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_USERNAME));
 
+		if (paymentRepository.existsByOrderOrderId(requestDto.getOrderId())) {
+			throw new CustomApiException(PaymentException.PAYMENT_ALREADY_COMPLETED);
+		}
+
 		Payment savedPayment = paymentRepository.save(requestDto.toEntity(order));
 
 		return PaymentResponseDto.fromEntity(savedPayment);
