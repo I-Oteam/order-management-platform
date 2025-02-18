@@ -80,7 +80,7 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
 		}
 
-		Page<Category> categories = categoryRepository.findALlByDeletedAtIsNull(pageable);
+		Page<Category> categories = categoryRepository.findAllByDeletedAtIsNull(pageable);
 
 		if (categories.isEmpty()) {
 			throw new CustomApiException(CategoryException.CATEGORY_NOT_FOUND);
