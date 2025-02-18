@@ -68,8 +68,8 @@ public class WebSecurityConfig {
 				.permitAll() // resources 접근 허용 설정
 				.requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
 				.permitAll() // swagger 문서 접근 허용
-				.requestMatchers("/api/users/**") // todo. 수정 필요
-				.permitAll() // '/api/user/'로 시작하는 요청 모두 접근 허가
+				.requestMatchers("/api/users/login", "/api/users/signup")
+				.permitAll() // '/api/users/login' 과 '/api/users/signup' 으로 시작하는 요청 모두 접근 허가
 				.anyRequest()
 				.permitAll() //.authenticated() // 그 외 모든 요청 인증처리
 		);

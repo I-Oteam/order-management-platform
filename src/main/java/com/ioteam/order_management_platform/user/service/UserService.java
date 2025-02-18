@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.user.service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -35,53 +34,20 @@ public class UserService {
 	private final JwtUtil jwtUtil;
 
 	public void signup(SignupRequestDto requestDto) {
-		String username = requestDto.getUsername();
+		// 예외 처리
+		validateDuplicateFields(requestDto);
+
+		// 비밀번호 암호화 및 권한 부여
 		String password = passwordEncoder.encode(requestDto.getPassword());
-		String nickname = requestDto.getNickname();
-		// 닉네임 중복 확인
-		Optional<User> checkNickname = userRepository.findByNickname(nickname);
-		if (checkNickname.isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_NICKNAME);
-		}
-
-		// 회원 중복 확인
-		Optional<User> checkUsername = userRepository.findByUsername(username);
-		if (checkUsername.isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_USER);
-		}
-
-		// email 중복 확인
-		String email = requestDto.getEmail();
-		Optional<User> checkEmail = userRepository.findByEmail(email);
-		if (checkEmail.isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_EMAIL);
-		}
-
 		UserRoleEnum role = getUserRoleEnum(requestDto);
 
 		// 사용자 등록
-		User user = new User(nickname, username, password, email, role);
+		User user = requestDto.toEntity(password, role);
+
 		userRepository.save(user);
 	}
 
-	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
-		UserRoleEnum role = UserRoleEnum.CUSTOMER;
-		if (requestDto.isAdmin()) {
-			if (!tokenConfig.getAdminToken().equals(requestDto.getAdminToken())) {
-				throw new CustomApiException(UserException.INVALID_ADMIN_TOKEN);
-			}
-			role = UserRoleEnum.MANAGER;
-		}
-		if (requestDto.isOwner()) {
-			if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())) {
-				throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
-			}
-			role = UserRoleEnum.OWNER;
-		}
-		return role;
-	}
-
-	public String login(LoginRequestDto requestDto) { // ✅ JWT 토큰 반환하도록 변경
+	public String login(LoginRequestDto requestDto) {
 		String username = requestDto.getUsername();
 		String password = requestDto.getPassword();
 
@@ -112,5 +78,34 @@ public class UserService {
 		Page<AdminUserResponseDto> userDtoList = userRepository.searchUserByCondition(condition, pageable)
 			.map(AdminUserResponseDto::from);
 		return new CommonPageResponse<>(userDtoList);
+	}
+
+	private void validateDuplicateFields(SignupRequestDto requestDto) {
+		if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
+			throw new CustomApiException(UserException.DUPLICATE_NICKNAME);
+		}
+		if (userRepository.findByUsername(requestDto.getUsername()).isPresent()) {
+			throw new CustomApiException(UserException.DUPLICATE_USER);
+		}
+		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
+			throw new CustomApiException(UserException.DUPLICATE_EMAIL);
+		}
+	}
+
+	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
+		UserRoleEnum role = UserRoleEnum.CUSTOMER;
+		if (requestDto.isAdmin()) {
+			if (!tokenConfig.getAdminToken().equals(requestDto.getAdminToken())) {
+				throw new CustomApiException(UserException.INVALID_ADMIN_TOKEN);
+			}
+			role = UserRoleEnum.MANAGER;
+		}
+		if (requestDto.isOwner()) {
+			if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())) {
+				throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
+			}
+			role = UserRoleEnum.OWNER;
+		}
+		return role;
 	}
 }
