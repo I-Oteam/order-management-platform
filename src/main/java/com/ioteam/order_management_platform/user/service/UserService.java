@@ -3,13 +3,18 @@ package com.ioteam.order_management_platform.user.service;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.user.dto.AdminUserResponseDto;
 import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
 import com.ioteam.order_management_platform.user.dto.UserInfoResponseDto;
+import com.ioteam.order_management_platform.user.dto.UserSearchCondition;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.exception.UserException;
@@ -95,5 +100,17 @@ public class UserService {
 		User user = userRepository.findByUserId(userId)
 			.orElseThrow(() -> new CustomApiException(UserException.USER_NOT_FOUND));
 		return UserInfoResponseDto.from(user);
+	}
+
+	public CommonPageResponse<AdminUserResponseDto> searchUsersByCondition(UserDetailsImpl userDetails,
+		UserSearchCondition condition,
+		Pageable pageable) {
+		UserRoleEnum role = userDetails.getUser().getRole();
+		if (role != UserRoleEnum.MASTER && role != UserRoleEnum.MANAGER) {
+			throw new CustomApiException(UserException.NO_PERMISSION);
+		}
+		Page<AdminUserResponseDto> userDtoList = userRepository.searchUserByCondition(condition, pageable)
+			.map(AdminUserResponseDto::from);
+		return new CommonPageResponse<>(userDtoList);
 	}
 }
