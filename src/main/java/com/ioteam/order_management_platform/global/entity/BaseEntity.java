@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.global.entity;
 
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
