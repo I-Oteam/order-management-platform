@@ -13,6 +13,7 @@ import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.exception.MenuException;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,15 +30,22 @@ public class MenuService {
 
 	@Transactional
 	public MenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
-		Menu menu = requestDto.toEntity(requestDto);
+		Restaurant restaurant = restaurantRepository.findById(requestDto.getResId())
+			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
+		Menu menu = requestDto.toEntity(requestDto, restaurant);
 		Menu savedMenu = menuRepository.save(menu);
 		return MenuResponseDto.fromEntity(savedMenu);
 	}
 
 	public MenuListResponseDto getAllMenus(UUID restaurantId) {
-		restaurantRepository.findById(restaurantId)
-			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
+		validRestaurantExist(restaurantId);
 		List<Menu> menuList = menuRepository.findByRestaurant_ResId(restaurantId);
 		return MenuListResponseDto.of(menuList);
+	}
+
+	private void validRestaurantExist(UUID restaurantId) {
+		if (!restaurantRepository.existsById(restaurantId)) {
+			throw new CustomApiException(MenuException.INVALID_RESTAURANT_ID);
+		}
 	}
 }
