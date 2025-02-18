@@ -15,7 +15,7 @@ import lombok.Getter;
 public class ReviewResponseDto {
 
 	private final UUID reviewId;
-	private final ReviewUserResponseDto userResponseDto;
+	private final ReviewUserResponseDto user;
 	private final int reviewScore;
 	private final String reviewContent;
 	private final String reviewImageUrl;
@@ -27,7 +27,7 @@ public class ReviewResponseDto {
 		return ReviewResponseDto
 			.builder()
 			.reviewId(review.getReviewId())
-			//.userResponseDto(this.user.toReviewUserResponseDto())
+			.user(ReviewUserResponseDto.from(review.getUser()))
 			.reviewScore(review.getReviewScore())
 			.reviewContent(review.getReviewContent())
 			.reviewImageUrl(review.getReviewImageUrl())
