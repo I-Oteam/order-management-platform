@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.global.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -18,6 +17,7 @@ import java.util.UUID;
 @Getter
 public abstract class BaseEntity {
 
+
     @CreatedDate
     @Column(updatable = false)
     protected LocalDateTime createdAt;
@@ -31,4 +31,5 @@ public abstract class BaseEntity {
 
     @LastModifiedBy
     protected UUID modifiedBy;
+
 }
