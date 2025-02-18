@@ -35,7 +35,7 @@ public class MenuController {
 
 	@Operation(summary = "상품 등록")
 	@PostMapping()
-	@PreAuthorize("hasRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','MANAGER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> createMenu(
 		@RequestBody @Validated CreateMenuRequestDto requestDto) {
 		MenuResponseDto responseDto = menuService.createMenu(requestDto);
@@ -47,11 +47,18 @@ public class MenuController {
 			.body(new CommonResponse<>(SuccessCode.MENU_CREATE, responseDto));
 	}
 
-	@Operation(summary = "상품 전체 조회")
-	@GetMapping("/{restaurant_id}")
+	@Operation(summary = "특정 가게 상품 전체 조회")
+	@GetMapping("restaurant/{restaurant_id}")
 	public ResponseEntity<CommonResponse<MenuListResponseDto>> getAllMenu(
 		@PathVariable("restaurant_id") UUID restaurantId) {
 		MenuListResponseDto responseDto = menuService.getAllMenus(restaurantId);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_LIST_INFO, responseDto));
+	}
+
+	@Operation(summary = "상품 상세 조회")
+	@GetMapping("/{menu_id}")
+	public ResponseEntity<CommonResponse<MenuResponseDto>> getMenuDetail(@PathVariable("menu_id") UUID menuId) {
+		MenuResponseDto responseDto = menuService.getMenuDetail(menuId);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_DETAIL_INFO, responseDto));
 	}
 }

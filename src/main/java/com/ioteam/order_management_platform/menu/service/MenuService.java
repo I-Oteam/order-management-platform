@@ -43,6 +43,12 @@ public class MenuService {
 		return MenuListResponseDto.of(menuList);
 	}
 
+	public MenuResponseDto getMenuDetail(UUID menuId) {
+		Menu menu = menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
+		return MenuResponseDto.fromEntity(menu);
+	}
+
 	private void validRestaurantExist(UUID restaurantId) {
 		if (!restaurantRepository.existsById(restaurantId)) {
 			throw new CustomApiException(MenuException.INVALID_RESTAURANT_ID);
