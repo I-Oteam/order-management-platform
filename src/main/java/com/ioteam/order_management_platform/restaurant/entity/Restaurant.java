@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "p_restaurant")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

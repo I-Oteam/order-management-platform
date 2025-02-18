@@ -1,16 +1,31 @@
 package com.ioteam.order_management_platform.review.entity;
 
-import com.ioteam.order_management_platform.global.entity.BaseEntity;
-import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
-import com.ioteam.order_management_platform.user.entity.User;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import org.hibernate.annotations.ColumnDefault;
+
+import com.ioteam.order_management_platform.global.entity.BaseEntity;
+import com.ioteam.order_management_platform.order.entity.Order;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
+import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.user.entity.User;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -20,38 +35,46 @@ import java.util.UUID;
 @Entity
 public class Review extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID reviewId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID reviewId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_user_id")
-    private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "review_user_id")
+	private User user;
 
-    private int reviewScore;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "review_order_id")
+	private Order order;
 
-    @Column(length = 1000)
-    private String reviewContent;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "review_res_id")
+	private Restaurant restaurant;
 
-    @Column(length = 100)
-    private String reviewImageUrl;
+	private int reviewScore;
 
-    @ColumnDefault("true")
-    private Boolean isPublic;
+	@Column(length = 1000)
+	private String reviewContent;
 
-    private LocalDateTime deletedAt;
+	@Column(length = 100)
+	private String reviewImageUrl;
 
-    private UUID deletedBy;
+	@ColumnDefault("true")
+	private Boolean isPublic;
 
-    public void softDelete() {
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = UUID.randomUUID();
-    }
+	private LocalDateTime deletedAt;
 
-    public void modify(ModifyReviewRequestDto requestDto) {
-        this.reviewScore = requestDto.getReviewScore();
-        this.reviewContent = requestDto.getReviewContent();
-        this.reviewImageUrl = requestDto.getReviewImageUrl();
-        this.isPublic = requestDto.getIsPublic();
-    }
+	private UUID deletedBy;
+
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
+		this.deletedBy = UUID.randomUUID();
+	}
+
+	public void modify(ModifyReviewRequestDto requestDto) {
+		this.reviewScore = requestDto.getReviewScore();
+		this.reviewContent = requestDto.getReviewContent();
+		this.reviewImageUrl = requestDto.getReviewImageUrl();
+		this.isPublic = requestDto.getIsPublic();
+	}
 }

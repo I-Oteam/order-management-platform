@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.review.repository;
 
+import static com.ioteam.order_management_platform.restaurant.entity.QRestaurant.*;
 import static com.ioteam.order_management_platform.review.entity.QReview.*;
 import static com.ioteam.order_management_platform.user.entity.QUser.*;
 
@@ -13,11 +14,11 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.review.dto.AdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.ReviewRestaurantResponseDto;
 import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
+import com.ioteam.order_management_platform.review.dto.ReviewUserResponseDto;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
-import com.ioteam.order_management_platform.user.entity.User;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -34,9 +35,11 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	@Override
 	public Page<AdminReviewResponseDto> searchReviewByCondition(ReviewSearchCondition condition, Pageable pageable) {
 
-		List<Tuple> result = queryFactory.select(review, user)
+		List<AdminReviewResponseDto> dtoList = queryFactory.select(review, user.userId, user.username, user.nickname,
+				restaurant.resId, restaurant.resName)
 			.from(review)
-			.leftJoin(review.user, user)
+			.leftJoin(user).on(user.userId.eq(review.user.userId))
+			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
 				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
 				eqReviewScore(condition.getScore()),
@@ -46,20 +49,28 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
-			.fetch();
-
-		List<AdminReviewResponseDto> dtoList = result.stream()
+			.fetch()
+			.stream()
 			.map(tuple -> {
 				Review review1 = tuple.get(review);
-				User user1 = tuple.get(user);
-				return AdminReviewResponseDto.from(review1, user1);
+				ReviewUserResponseDto reviewUser = ReviewUserResponseDto.builder()
+					.userId(tuple.get(user.userId))
+					.username(tuple.get(user.username))
+					.nickname(tuple.get(user.nickname))
+					.build();
+				ReviewRestaurantResponseDto reviewRestaurant = ReviewRestaurantResponseDto.builder()
+					.restaurantId(tuple.get(restaurant.resId))
+					.restaurantName(tuple.get(restaurant.resName))
+					.build();
+				return AdminReviewResponseDto.from(review1, reviewUser, reviewRestaurant);
 			})
 			.toList();
 
 		JPAQuery<Long> countQuery = queryFactory
 			.select(review.count())
 			.from(review)
-			.leftJoin(review.user)
+			.leftJoin(user).on(user.userId.eq(review.user.userId))
+			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
 				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
 				eqReviewScore(condition.getScore()),
