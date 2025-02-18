@@ -9,7 +9,8 @@ public enum CategoryException implements ExceptionType {
 	INVALID_CATEGORY_INFO(HttpStatus.BAD_REQUEST, "잘못된 카테고리 정보입니다.", "E_VALIDATION"),
 	EMPTY_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "카테고리명은 공백일 수 없습니다.", "E_EMPTY_CATEGORY_NAME"),
 	DUPLICATE_CATEGORY_NAME(HttpStatus.CONFLICT, "중복된 카테고리 이름입니다.", "E_DUPLICATE_CATEGORY_NAME"),
-	NOT_MANAGER_ROLE(HttpStatus.FORBIDDEN, "매니저 역할만 가능합니다.", "E_NOT_MANAGER_ROLE");
+	NOT_AUTHORIZED_ROLE(HttpStatus.FORBIDDEN, "허가받지 않은 역할입니다.", "E_NOT_AUTHORIZED_ROLE"),
+	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다.", "E_CATEGORY_NOT_FOUND");
 
 	private final HttpStatus status;
 	private final String message;
