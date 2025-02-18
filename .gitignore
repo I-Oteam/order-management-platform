@@ -41,3 +41,6 @@ out/
 
 ### postgres data 제외
 postgres-data/
+
+### conventions 제외
+conventions/

@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.global.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -11,21 +10,22 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 @Getter
 public abstract class BaseEntity {
 
-    @CreatedDate
-    protected LocalDateTime createdAt;
+	@CreatedDate
+	protected LocalDateTime createdAt;
 
-    @LastModifiedDate
-    protected LocalDateTime modifiedAt;
+	@LastModifiedDate
+	protected LocalDateTime modifiedAt;
 
-    @CreatedBy
-    protected Long createdBy;
+	@CreatedBy
+	protected UUID createdBy;
 
-    @LastModifiedBy
-    protected Long modifiedBy;
+	@LastModifiedBy
+	protected UUID modifiedBy;
 }
