@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.hibernate.validator.constraints.Length;
 
 import com.ioteam.order_management_platform.menu.entity.Menu;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -31,9 +32,10 @@ public class CreateMenuRequestDto {
 	private String rmDescription;
 	private Boolean isPublic;
 
-	public Menu toEntity(CreateMenuRequestDto requestDto) {
+	public Menu toEntity(CreateMenuRequestDto requestDto, Restaurant restaurant) {
 		return Menu
 			.builder()
+			.restaurant(restaurant)
 			.rmName(requestDto.getRmName())
 			.rmPrice(requestDto.getRmPrice())
 			.rmImageUrl(requestDto.getRmImageUrl())

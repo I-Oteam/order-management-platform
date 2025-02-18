@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
+import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.menu.dto.req.CreateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuListResponseDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
@@ -43,7 +44,7 @@ public class MenuController {
 			.build()
 			.toUri();
 		return ResponseEntity.created(location)
-			.body(new CommonResponse<MenuResponseDto>("메뉴가 성공적으로 등록되었습니다.", responseDto));
+			.body(new CommonResponse<>(SuccessCode.MENU_CREATE, responseDto));
 	}
 
 	@Operation(summary = "상품 전체 조회")
@@ -51,7 +52,6 @@ public class MenuController {
 	public ResponseEntity<CommonResponse<MenuListResponseDto>> getAllMenu(
 		@PathVariable("restaurant_id") UUID restaurantId) {
 		MenuListResponseDto responseDto = menuService.getAllMenus(restaurantId);
-		// return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_LIST_INFO, responseDto));
-		return ResponseEntity.ok(new CommonResponse<>("메뉴 전체 목록이 조회되었습니다.", responseDto));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_LIST_INFO, responseDto));
 	}
 }
