@@ -1,9 +1,11 @@
-package com.ioteam.order_management_platform.review.dto;
+package com.ioteam.order_management_platform.review.dto.req;
 
 import java.util.UUID;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.ioteam.order_management_platform.order.entity.Order;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.user.entity.User;
 
@@ -18,7 +20,9 @@ import lombok.Getter;
 @Getter
 public class CreateReviewRequestDto {
 	@NotNull
-	private UUID reviewOrderId;
+	private UUID orderId;
+	@NotNull
+	private UUID restaurantId;
 	@NotNull
 	@Max(5)
 	private int reviewScore;
@@ -30,9 +34,11 @@ public class CreateReviewRequestDto {
 	@NotNull
 	private Boolean isPublic;
 
-	public Review toEntity(User referenceUser) {
+	public Review toEntity(User referenceUser, Order referenceOrder, Restaurant referenceRestaurant) {
 		return Review.builder()
 			.user(referenceUser)
+			.order(referenceOrder)
+			.restaurant(referenceRestaurant)
 			.reviewScore(this.reviewScore)
 			.reviewContent(this.reviewContent)
 			.reviewImageUrl(this.reviewImageUrl)

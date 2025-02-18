@@ -11,11 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
-import com.ioteam.order_management_platform.review.dto.AdminReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
+import com.ioteam.order_management_platform.order.entity.Order;
+import com.ioteam.order_management_platform.order.enums.OrderStatus;
+import com.ioteam.order_management_platform.order.repository.OrderRepository;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
+import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
+import com.ioteam.order_management_platform.review.dto.req.AdminReviewSearchCondition;
+import com.ioteam.order_management_platform.review.dto.req.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.req.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.res.AdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.res.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
 import com.ioteam.order_management_platform.review.repository.ReviewRepository;
@@ -32,12 +37,23 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final UserRepository userRepository;
+	private final OrderRepository orderRepository;
+	private final RestaurantRepository restaurantRepository;
 
-	public CommonPageResponse<AdminReviewResponseDto> searchReviewsByCondition(
-		ReviewSearchCondition condition, Pageable pageable) {
+	public CommonPageResponse<AdminReviewResponseDto> searchReviewAdminByCondition(
+		AdminReviewSearchCondition condition, Pageable pageable) {
 
-		Page<AdminReviewResponseDto> reviewDtoList = reviewRepository.searchReviewByCondition(condition, pageable);
-		return new CommonPageResponse<>(reviewDtoList);
+		Page<AdminReviewResponseDto> reviewDtoPage = reviewRepository.searchReviewAdminByCondition(condition, pageable);
+		return new CommonPageResponse<>(reviewDtoPage);
+	}
+
+	public CommonPageResponse<ReviewResponseDto> searchReviewByUser(UUID userId, UUID requiredUserId,
+		Pageable pageable) {
+
+		if (!userId.equals(requiredUserId))
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		Page<ReviewResponseDto> reviewDtoPage = reviewRepository.searchReviewByUser(userId, pageable);
+		return new CommonPageResponse<>(reviewDtoPage);
 	}
 
 	public ReviewResponseDto getReview(UUID reviewId, UUID userId, UserRoleEnum role) {
@@ -51,7 +67,7 @@ public class ReviewService {
 		// 2. is_public=false 작성자와 가게 오너, 관리자만 확인 가능
 		if (review.getIsPublic()
 			|| review.getUser().getUserId().equals(userId)
-			// || review.getRestaurant().getOwnerId().equals(userId)
+			//|| review.getRestaurant().getResOwnerId().equals(userId)
 			|| List.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(role)) {
 			return ReviewResponseDto.from(review);
 		}
@@ -62,7 +78,20 @@ public class ReviewService {
 	public ReviewResponseDto createReview(UUID userId, CreateReviewRequestDto requestDto) {
 
 		User referenceUser = userRepository.getReferenceById(userId);
-		Review review = requestDto.toEntity(referenceUser);
+		Order order = orderRepository.findById(requestDto.getOrderId())
+			.orElseThrow(() -> {
+				throw new CustomApiException(ReviewException.INVALID_ORDER_ID);
+			});
+
+		// 리뷰 작성자의 주문 번호가 맞는지 검증 && 완료된 주문인지 검증
+		if (!order.getOrderUserId().toString().equals(userId.toString())
+			&& order.getOrderStatus().equals(OrderStatus.COMPLETED)) {
+			throw new CustomApiException(ReviewException.UNAUTH_ORDER_ID);
+		}
+
+		Restaurant referenceRestaurant = restaurantRepository.getReferenceById(requestDto.getRestaurantId());
+
+		Review review = requestDto.toEntity(referenceUser, order, referenceRestaurant);
 		Review save = reviewRepository.save(review);
 		return ReviewResponseDto.from(save);
 	}
