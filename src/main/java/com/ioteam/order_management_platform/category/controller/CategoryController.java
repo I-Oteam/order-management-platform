@@ -3,6 +3,10 @@ package com.ioteam.order_management_platform.category.controller;
 import java.net.URI;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +54,7 @@ public class CategoryController {
 
 		// 생성은 .created()사용
 		return ResponseEntity.created(location)
-			.body(new CommonResponse<>(SuccessCode.CATEGORY_CREATE.getMessage(), categoryResponseDto));
+			.body(new CommonResponse<>(SuccessCode.CATEGORY_CREATE, categoryResponseDto));
 
 	}
 
@@ -64,7 +68,19 @@ public class CategoryController {
 
 		// 생성을 제외한 조회, 삭제 , 수정은 .ok()사용
 		return ResponseEntity.ok()
-			.body(new CommonResponse<>(SuccessCode.CATEGORY_ONE_SEARCH.getMessage(), categoryResponseDto));
+			.body(new CommonResponse<>(SuccessCode.CATEGORY_ONE_SEARCH, categoryResponseDto));
+	}
+
+	@GetMapping("/categories/all")
+	@Operation(summary = "모든 카테고리 조회", description = "카테고리 조회는 'MANAGER' , 'OWNER' 만 가능")
+	public ResponseEntity<CommonResponse<Page<CategoryResponseDto>>> getAllCategories(
+		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+		Page<CategoryResponseDto> categories = categoryService.readAllCategories(pageable, userDetails);
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.CATEGORY_SEARCH, categories));
 	}
 
 }

@@ -2,6 +2,8 @@ package com.ioteam.order_management_platform.category.service;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,16 @@ public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
+	// 중복된 검증 로직 개선(괜찮은지?)
+	private boolean hasManagerOrOwnerRole(UserDetailsImpl userDetails) {
+		return userDetails.getAuthorities()
+			.stream()
+			.anyMatch(authority ->
+				authority.getAuthority().equals("ROLE_MANAGER") ||
+					authority.getAuthority().equals("ROLE_OWNER")
+			);
+	}
+
 	@Transactional
 	public CategoryResponseDto createCategory(CreateCategoryRequestDto categoryRequestDto,
 		UserDetailsImpl userDetails) {
@@ -40,13 +52,10 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
 		}
 
-		Category category = categoryRepository.save(
-			Category.builder()
-				.rcName(categoryRequestDto.getRcName())
-				.build()
-		);
+		Category category = categoryRequestDto.toCategory(categoryRequestDto);
+		Category savedCategory = categoryRepository.save(category);
 
-		return CategoryResponseDto.fromCategory(category);
+		return CategoryResponseDto.fromCategory(savedCategory);
 	}
 
 	public CategoryResponseDto readOneCategory(UUID rcId, UserDetailsImpl userDetails) {
@@ -63,13 +72,21 @@ public class CategoryService {
 		return CategoryResponseDto.fromCategory(category);
 	}
 
-	// 중복된 검증 로직 개선(괜찮은지?)
-	private boolean hasManagerOrOwnerRole(UserDetailsImpl userDetails) {
-		return userDetails.getAuthorities()
-			.stream()
-			.anyMatch(authority ->
-				authority.getAuthority().equals("ROLE_MANAGER") ||
-					authority.getAuthority().equals("ROLE_OWNER")
-			);
+	public Page<CategoryResponseDto> readAllCategories(Pageable pageable, UserDetailsImpl userDetails) {
+
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
+
+		if (!isAuthorized) {
+			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
+		}
+
+		Page<Category> categories = categoryRepository.findALlByDeletedAtIsNull(pageable);
+
+		if (categories.isEmpty()) {
+			throw new CustomApiException(CategoryException.CATEGORY_NOT_FOUND);
+		}
+
+		return categories.map(CategoryResponseDto::fromCategory);
+
 	}
 }
