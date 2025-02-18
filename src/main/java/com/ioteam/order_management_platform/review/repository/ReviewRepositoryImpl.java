@@ -97,7 +97,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
 				eqUserId(userId),
-				user.deletedAt.isNull()
+				review.deletedAt.isNull()
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
@@ -126,7 +126,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
 				eqUserId(userId),
-				user.deletedAt.isNull()
+				review.deletedAt.isNull()
 			);
 
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());

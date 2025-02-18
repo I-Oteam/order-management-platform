@@ -18,8 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.req.CreateReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.req.ModifyReviewRequestDto;
 import com.ioteam.order_management_platform.utils.security.WithMockCustomUser;
 
 @AutoConfigureMockMvc
@@ -33,9 +33,9 @@ class ReviewIntegrationTest {
 	private ObjectMapper objectMapper;
 
 	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
-	@DisplayName("매니저_리뷰 조회 성공 200")
+	@DisplayName("매니저_리뷰 리스트 조회 성공 200")
 	@Test
-	void searchReviewAll_200() throws Exception {
+	void searchReviewAdmin_200() throws Exception {
 		// given
 		LocalDateTime startCreatedAt = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
 		LocalDateTime endCreatedAt = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
@@ -43,7 +43,7 @@ class ReviewIntegrationTest {
 
 		// when, then
 		mockMvc.perform(
-				get("/api/reviews/all?startCreatedAt={startCreatedAt}&endCreatedAt={endCreatedAt}&score={score}",
+				get("/api/reviews/admin?startCreatedAt={startCreatedAt}&endCreatedAt={endCreatedAt}&score={score}",
 					startCreatedAt, endCreatedAt, score)
 					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
@@ -51,6 +51,24 @@ class ReviewIntegrationTest {
 			.andExpect(jsonPath("$.result.content[0].reviewScore")
 				.value(4))
 			.andExpect(jsonPath("$.result.totalElements")
+				.value(5))
+			.andDo(print());
+	}
+
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@DisplayName("고객_본인 리뷰 리스트 조회 성공 200")
+	@Test
+	void searchReviewsByUser_200() throws Exception {
+		// given
+		UUID userId = UUID.fromString("d2ed72d8-090a-4efb-abe4-7acbdce120e1");
+
+		// when, then
+		mockMvc.perform(
+				get("/api/reviews/users/{userId}", userId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.content[0].reviewScore")
 				.value(5))
 			.andDo(print());
 	}
@@ -80,7 +98,8 @@ class ReviewIntegrationTest {
 	void createReview_201() throws Exception {
 		// given
 		CreateReviewRequestDto request = CreateReviewRequestDto.builder()
-			.reviewOrderId(UUID.fromString("d8ef5ca7-2b3c-49bb-9c6d-425c85036dec"))
+			.orderId(UUID.fromString("d8ef5ca7-2b3c-49bb-9c6d-425c85036d11"))
+			.restaurantId(UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"))
 			.reviewScore(5)
 			.reviewContent("test")
 			.reviewImageUrl("test")

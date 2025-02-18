@@ -83,9 +83,9 @@ public class ReviewService {
 				throw new CustomApiException(ReviewException.INVALID_ORDER_ID);
 			});
 
-		// 리뷰 작성자의 주문 번호가 맞는지 검증
-		if (!order.getOrderUserId().toString().equals(userId.toString()) && order.getOrderStatus()
-			.equals(OrderStatus.COMPLETED)) {
+		// 리뷰 작성자의 주문 번호가 맞는지 검증 && 완료된 주문인지 검증
+		if (!order.getOrderUserId().toString().equals(userId.toString())
+			&& order.getOrderStatus().equals(OrderStatus.COMPLETED)) {
 			throw new CustomApiException(ReviewException.UNAUTH_ORDER_ID);
 		}
 
