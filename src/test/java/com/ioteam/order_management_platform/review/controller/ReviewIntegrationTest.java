@@ -73,6 +73,24 @@ class ReviewIntegrationTest {
 			.andDo(print());
 	}
 
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e2", role = "OWNER")
+	@DisplayName("오너_가게 리뷰 리스트 조회 성공 200")
+	@Test
+	void searchReviewsByRestaurant_200() throws Exception {
+		// given
+		UUID resId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+
+		// when, then
+		mockMvc.perform(
+				get("/api/reviews/restaurants/{resId}", resId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.content[0].reviewScore")
+				.value(5))
+			.andDo(print());
+	}
+
 	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
 	@DisplayName("고객_본인 리뷰 단건 조회 성공 200")
 	@Test

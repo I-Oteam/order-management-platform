@@ -73,8 +73,7 @@ public class ReviewService {
 		// 2. is_public=false 작성자와 가게 오너, 관리자만 확인 가능
 		if (review.getIsPublic()
 			|| review.getUser().getUserId().equals(userId)
-			// todo. owner 설정되면 주석 풀고 수정
-			//|| review.getRestaurant().getResOwnerId().equals(userId)
+			|| review.getRestaurant().getOwner().getUserId().equals(userId) // todo. 보완 필요
 			|| List.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(role)) {
 			return ReviewResponseDto.from(review);
 		}
