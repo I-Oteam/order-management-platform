@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
+import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.user.dto.AdminUserResponseDto;
 import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
@@ -42,14 +43,14 @@ public class UserController {
 	@Operation(summary = "회원가입", description = "회원가입은 인증/비인증 회원 모두 사용 가능")
 	public ResponseEntity<CommonResponse<Void>> signup(@RequestBody @Validated SignupRequestDto requestDto) {
 		userService.signup(requestDto);
-		return ResponseEntity.ok(new CommonResponse<>("회원가입이 성공적으로 완료되었습니다.", null));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_SIGNUP, null));
 	}
 
 	@PostMapping("/login")
 	@Operation(summary = "로그인", description = "로그인은 인증/비인증 회원 모두 사용 가능")
 	public ResponseEntity<CommonResponse<String>> login(@RequestBody @Validated LoginRequestDto requestDto) {
 		String token = userService.login(requestDto);
-		return ResponseEntity.ok(new CommonResponse<>("로그인이 되었습니다.", token));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_LOGIN, token));
 	}
 
 	@GetMapping("/{userId}")
@@ -58,7 +59,7 @@ public class UserController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID userId) {
 		UserInfoResponseDto userInfo = userService.getUserByUserId(userDetails, userId);
-		return ResponseEntity.ok(new CommonResponse<>("사용자 조회 성공", userInfo));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_DETAILS_INFO, userInfo));
 	}
 
 	@GetMapping("/all")
@@ -70,8 +71,6 @@ public class UserController {
 	) {
 		CommonPageResponse<AdminUserResponseDto> pageResponse = userService.searchUsersByCondition(userDetails,
 			condition, pageable);
-		return ResponseEntity.ok(new CommonResponse<>(
-			"전체 사용자 조회 성공",
-			pageResponse));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_INFO, pageResponse));
 	}
 }
