@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.review.dto.CreateReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
-import com.ioteam.order_management_platform.utils.security.WithMockCustomer;
+import com.ioteam.order_management_platform.utils.security.WithMockCustomUser;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -32,7 +32,8 @@ class ReviewIntegrationTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@DisplayName("리뷰 조회 성공 200")
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
+	@DisplayName("매니저_리뷰 조회 성공 200")
 	@Test
 	void searchReviewAll_200() throws Exception {
 		// given
@@ -54,12 +55,12 @@ class ReviewIntegrationTest {
 			.andDo(print());
 	}
 
-	@WithMockCustomer
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
 	@DisplayName("고객_본인 리뷰 단건 조회 성공 200")
 	@Test
 	void customer_getReview_200() throws Exception {
 		// given
-		String reviewId = "1c114e8f-ccd0-42b8-a7fa-67fee61d4d15"; //"1c114e8f-ccd0-42b8-a7fa-67fee61d4d18";
+		String reviewId = "1c114e8f-ccd0-42b8-a7fa-67fee61d4d18";
 
 		// when, then
 		mockMvc.perform(get("/api/reviews/{reviewId}", reviewId)
@@ -67,14 +68,14 @@ class ReviewIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.result.reviewScore")
-				.value(4)) //5))
+				.value(5))
 			.andExpect(jsonPath("$.result.reviewContent")
 				.value("test"))
 			.andDo(print());
 	}
 
-	//@WithMockCustomer
-	@DisplayName("리뷰 생성 성공 201")
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@DisplayName("고객_리뷰 생성 성공 201")
 	@Test
 	void createReview_201() throws Exception {
 		// given
@@ -104,7 +105,8 @@ class ReviewIntegrationTest {
 			.andDo(print());
 	}
 
-	@DisplayName("리뷰 삭제 성공 200")
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
+	@DisplayName("매니저_리뷰 삭제 성공 200")
 	@Test
 	void deleteReview_200() throws Exception {
 		// given
@@ -118,7 +120,8 @@ class ReviewIntegrationTest {
 			.andDo(print());
 	}
 
-	@DisplayName("리뷰 수정 성공 200")
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@DisplayName("고객_본인 리뷰 수정 성공 200")
 	@Test
 	void modifyReview_200() throws Exception {
 		// given

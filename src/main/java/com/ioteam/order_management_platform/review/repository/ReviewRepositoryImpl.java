@@ -1,102 +1,124 @@
 package com.ioteam.order_management_platform.review.repository;
 
-import com.ioteam.order_management_platform.global.exception.CustomApiException;
-import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
-import com.ioteam.order_management_platform.review.entity.Review;
-import com.ioteam.order_management_platform.review.exception.ReviewException;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import static com.ioteam.order_management_platform.review.entity.QReview.*;
+import static com.ioteam.order_management_platform.user.entity.QUser.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.review.dto.AdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.ReviewSearchCondition;
+import com.ioteam.order_management_platform.review.entity.Review;
+import com.ioteam.order_management_platform.review.exception.ReviewException;
+import com.ioteam.order_management_platform.user.entity.User;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import static com.ioteam.order_management_platform.review.entity.QReview.review;
-
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
-    private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    @Override
-    public Page<Review> searchReviewByCondition(ReviewSearchCondition condition, Pageable pageable) {
+	@Override
+	public Page<AdminReviewResponseDto> searchReviewByCondition(ReviewSearchCondition condition, Pageable pageable) {
 
-        List<Review> content = queryFactory.select(review)
-                .from(review)
-                .where(
-                        betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-                        eqReviewScore(condition.getScore()),
-                        isPublic(condition.getIsPublic()),
-                        isDeleted(condition.getIsDeleted())
-                )
-                .orderBy(createOrderSpecifiers(pageable.getSort()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+		List<Tuple> result = queryFactory.select(review, user)
+			.from(review)
+			.leftJoin(review.user, user)
+			.where(
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				eqReviewScore(condition.getScore()),
+				isPublic(condition.getIsPublic()),
+				isDeleted(condition.getIsDeleted())
+			)
+			.orderBy(createOrderSpecifiers(pageable.getSort()))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
 
-        JPAQuery<Long> countQuery = queryFactory
-                .select(review.count())
-                .from(review)
-                .where(
-                        betweenPeriod(condition.getEndCreatedAt(), condition.getEndCreatedAt()),
-                        eqReviewScore(condition.getScore()),
-                        isPublic(condition.getIsPublic()),
-                        isDeleted(condition.getIsDeleted())
-                );
+		List<AdminReviewResponseDto> dtoList = result.stream()
+			.map(tuple -> {
+				Review review1 = tuple.get(review);
+				User user1 = tuple.get(user);
+				return AdminReviewResponseDto.from(review1, user1);
+			})
+			.toList();
 
-        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchOne());
+		JPAQuery<Long> countQuery = queryFactory
+			.select(review.count())
+			.from(review)
+			.leftJoin(review.user)
+			.where(
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				eqReviewScore(condition.getScore()),
+				isPublic(condition.getIsPublic()),
+				isDeleted(condition.getIsDeleted())
+			);
 
-    }
+		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 
-    private BooleanExpression eqReviewScore(Integer score) {
+	}
 
-        if (score == null) return null;
-        return review.reviewScore.eq(score);
-    }
+	private BooleanExpression eqReviewScore(Integer score) {
 
-    private BooleanExpression betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
+		if (score == null)
+			return null;
+		return review.reviewScore.eq(score);
+	}
 
-        if (startCreatedAt == null || endCreatedAt == null)  return null;
-        if (startCreatedAt.isAfter(endCreatedAt)) throw new CustomApiException(ReviewException.INVALID_PERIOD);
-        return review.createdAt.between(startCreatedAt, endCreatedAt);
-    }
+	private BooleanExpression betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
 
-    private BooleanExpression isPublic(Boolean isPublic) {
+		if (startCreatedAt == null || endCreatedAt == null)
+			return null;
+		if (startCreatedAt.isAfter(endCreatedAt))
+			throw new CustomApiException(ReviewException.INVALID_PERIOD);
+		return review.createdAt.between(startCreatedAt, endCreatedAt);
+	}
 
-        if (isPublic == null) return null;
-        return review.isPublic.eq(isPublic);
-    }
+	private BooleanExpression isPublic(Boolean isPublic) {
 
-    private BooleanExpression isDeleted(Boolean isDeleted) {
+		if (isPublic == null)
+			return null;
+		return review.isPublic.eq(isPublic);
+	}
 
-        if (isDeleted == null) return null;
-        if (isDeleted) return review.deletedAt.isNotNull();
-        if (!isDeleted) return review.deletedAt.isNull();
-        return null;
-    }
+	private BooleanExpression isDeleted(Boolean isDeleted) {
 
-    private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
+		if (isDeleted == null)
+			return null;
+		if (isDeleted)
+			return review.deletedAt.isNotNull();
+		if (!isDeleted)
+			return review.deletedAt.isNull();
+		return null;
+	}
 
-        return sort.stream()
-                .filter(order -> List.of("score", "createdAt").contains(order.getProperty()))
-                .map(order -> {
-                    Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-                    switch(order.getProperty()) {
-                        case "score":
-                            return new OrderSpecifier(direction, review.reviewScore);
-                        case "createdAt":
-                            return new OrderSpecifier(direction, review.createdAt);
-                    }
-                    return null;
-                })
-                .toArray(OrderSpecifier[]::new);
-    }
+	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
+
+		return sort.stream()
+			.filter(order -> List.of("score", "createdAt").contains(order.getProperty()))
+			.map(order -> {
+				Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+				switch (order.getProperty()) {
+					case "score":
+						return new OrderSpecifier(direction, review.reviewScore);
+					case "createdAt":
+						return new OrderSpecifier(direction, review.createdAt);
+				}
+				return null;
+			})
+			.toArray(OrderSpecifier[]::new);
+	}
 }

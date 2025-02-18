@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
+import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.menu.dto.req.CreateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuListResponseDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
@@ -34,7 +35,7 @@ public class MenuController {
 
 	@Operation(summary = "상품 등록")
 	@PostMapping()
-	@PreAuthorize("hasRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','MANAGER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> createMenu(
 		@RequestBody @Validated CreateMenuRequestDto requestDto) {
 		MenuResponseDto responseDto = menuService.createMenu(requestDto);
@@ -43,15 +44,21 @@ public class MenuController {
 			.build()
 			.toUri();
 		return ResponseEntity.created(location)
-			.body(new CommonResponse<MenuResponseDto>("메뉴가 성공적으로 등록되었습니다.", responseDto));
+			.body(new CommonResponse<>(SuccessCode.MENU_CREATE, responseDto));
 	}
 
-	@Operation(summary = "상품 전체 조회")
-	@GetMapping("/{restaurant_id}")
+	@Operation(summary = "특정 가게 상품 전체 조회")
+	@GetMapping("restaurant/{restaurant_id}")
 	public ResponseEntity<CommonResponse<MenuListResponseDto>> getAllMenu(
 		@PathVariable("restaurant_id") UUID restaurantId) {
 		MenuListResponseDto responseDto = menuService.getAllMenus(restaurantId);
-		// return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_LIST_INFO, responseDto));
-		return ResponseEntity.ok(new CommonResponse<>("메뉴 전체 목록이 조회되었습니다.", responseDto));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_LIST_INFO, responseDto));
+	}
+
+	@Operation(summary = "상품 상세 조회")
+	@GetMapping("/{menu_id}")
+	public ResponseEntity<CommonResponse<MenuResponseDto>> getMenuDetail(@PathVariable("menu_id") UUID menuId) {
+		MenuResponseDto responseDto = menuService.getMenuDetail(menuId);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_DETAIL_INFO, responseDto));
 	}
 }
