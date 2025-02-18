@@ -1,7 +1,6 @@
 package com.ioteam.order_management_platform.menu.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -47,6 +46,5 @@ public class Menu extends BaseEntity {
 	private String rmDescription;
 	@ColumnDefault("true")
 	private Boolean isPublic;
-	private LocalDateTime deletedAt;
-	private UUID deletedBy;
+
 }

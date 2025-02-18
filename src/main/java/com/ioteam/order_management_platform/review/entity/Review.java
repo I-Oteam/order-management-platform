@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.review.entity;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -61,15 +60,6 @@ public class Review extends BaseEntity {
 
 	@ColumnDefault("true")
 	private Boolean isPublic;
-
-	private LocalDateTime deletedAt;
-
-	private UUID deletedBy;
-
-	public void softDelete() {
-		this.deletedAt = LocalDateTime.now();
-		this.deletedBy = UUID.randomUUID();
-	}
 
 	public void modify(ModifyReviewRequestDto requestDto) {
 		this.reviewScore = requestDto.getReviewScore();
