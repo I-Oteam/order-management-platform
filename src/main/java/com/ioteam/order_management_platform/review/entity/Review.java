@@ -8,7 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
-import com.ioteam.order_management_platform.review.dto.ModifyReviewRequestDto;
+import com.ioteam.order_management_platform.review.dto.req.ModifyReviewRequestDto;
 import com.ioteam.order_management_platform.user.entity.User;
 
 import jakarta.persistence.Column;
