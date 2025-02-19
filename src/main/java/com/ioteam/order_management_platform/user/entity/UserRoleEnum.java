@@ -1,7 +1,5 @@
 package com.ioteam.order_management_platform.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Getter;
 
 @Getter
@@ -17,7 +15,6 @@ public enum UserRoleEnum {
 		this.authority = authority;
 	}
 
-	@JsonValue // JSON 변환 시 문자열 값으로 반환
 	public String getAuthority() {
 		return authority;
 	}
