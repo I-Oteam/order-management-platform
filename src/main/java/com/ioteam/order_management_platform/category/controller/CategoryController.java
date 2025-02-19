@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -106,6 +107,19 @@ public class CategoryController {
 		return ResponseEntity
 			.ok()
 			.body(new CommonResponse<>(SuccessCode.CATEGORY_MODIFY, categoryResponseDto));
+	}
+
+	@DeleteMapping("/categories/{rcId}")
+	@Operation(summary = "카테고리 소프트 삭제", description = "카테고리 삭제는 'MANAGER'만 가능")
+	public ResponseEntity<CommonResponse<CategoryResponseDto>> softDeleteCategory(
+		@PathVariable UUID rcId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		categoryService.softDeleteCategory(rcId, userDetails);
+
+		return ResponseEntity
+			.ok()
+			.body(new CommonResponse<>(SuccessCode.CATEGORY_DELETE, null));
 	}
 
 }

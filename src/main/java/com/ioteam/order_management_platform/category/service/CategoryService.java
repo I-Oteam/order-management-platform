@@ -123,4 +123,19 @@ public class CategoryService {
 
 		return CategoryResponseDto.fromCategory(targetCategory);
 	}
+
+	@Transactional
+	public void softDeleteCategory(UUID rcId, UserDetailsImpl userDetails) {
+
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
+
+		if (!isAuthorized) {
+			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
+		}
+
+		Category targetCategory = categoryRepository.findByRcIdAndDeletedAtIsNull(rcId)
+			.orElseThrow(() -> new CustomApiException(CategoryException.CATEGORY_NOT_FOUND));
+
+		targetCategory.softDelete(userDetails.getUserId());
+	}
 }
