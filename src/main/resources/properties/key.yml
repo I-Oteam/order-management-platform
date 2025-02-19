@@ -1,21 +1,5 @@
 spring:
-  config.import: file:.env[.properties]
-
----
-# local 환경
-spring:
-  config.activate.on-profile: local
-jwt:
-  secret:
-    key: ${JWT_SECRET_KEY}
-    master: ${MASTER_TOKEN}
-    manager: ${MANAGER_TOKEN}
-    owner: ${OWNER_TOKEN}
-
----
-# test 환경
-spring:
-  config.activate.on-profile: test
+  config.activate.on-profile: key
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}

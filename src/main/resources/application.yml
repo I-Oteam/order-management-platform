@@ -6,6 +6,10 @@ spring:
       - classpath:./properties/jpa.yml
       - classpath:./properties/key.yml
   profiles:
+    group:
+      local: local, key
+      test: test, key
+      prod: prod, key
     active: ${ACTIVE_VAL}
   application:
     name: order-management-platform
@@ -25,3 +29,11 @@ spring:
 # test 환경
 spring:
   config.activate.on-profile: test
+
+---
+# prod 환경
+spring:
+  config.activate.on-profile: prod
+logging:
+  file:
+    path: logs
