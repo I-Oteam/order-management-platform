@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
+import com.ioteam.order_management_platform.menu.dto.req.UpdateMenuRequestDto;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 
 import jakarta.persistence.Column;
@@ -46,5 +47,19 @@ public class Menu extends BaseEntity {
 	private String rmDescription;
 	@ColumnDefault("true")
 	private Boolean isPublic;
+
+	public Menu updateMenu(UpdateMenuRequestDto requestDto) {
+		if (requestDto.getRmName() != null)
+			this.rmName = requestDto.getRmName();
+		if (requestDto.getRmPrice() != null)
+			this.rmPrice = requestDto.getRmPrice();
+		if (requestDto.getRmImageUrl() != null)
+			this.rmImageUrl = requestDto.getRmImageUrl();
+		if (requestDto.getRmDescription() != null)
+			this.rmDescription = requestDto.getRmDescription();
+		if (requestDto.getIsPublic() != null)
+			this.isPublic = requestDto.getIsPublic();
+		return this;
+	}
 
 }

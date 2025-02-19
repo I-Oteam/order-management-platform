@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.category.dto;
+package com.ioteam.order_management_platform.category.dto.req;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -18,8 +18,9 @@ public class CreateCategoryRequestDto {
 	@Length(max = 100)
 	private String rcName;
 
-	public Category toCategory(CreateCategoryRequestDto categoryRequestDto) {
-		return Category.builder()
+	public static Category toCategory(CreateCategoryRequestDto categoryRequestDto) {
+		return Category
+			.builder()
 			.rcName(categoryRequestDto.getRcName())
 			.build();
 	}

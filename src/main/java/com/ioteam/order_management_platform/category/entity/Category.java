@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.category.entity;
 
 import java.util.UUID;
 
+import com.ioteam.order_management_platform.category.dto.req.UpdateCategoryRequestDto;
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -31,4 +32,7 @@ public class Category extends BaseEntity {
 	@Column(nullable = false, unique = true, length = 100)
 	private String rcName;
 
+	public void update(UpdateCategoryRequestDto updateCategoryDto) {
+		rcName = updateCategoryDto.getRcName();
+	}
 }

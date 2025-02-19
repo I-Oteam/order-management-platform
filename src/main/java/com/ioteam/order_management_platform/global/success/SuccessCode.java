@@ -1,8 +1,9 @@
 package com.ioteam.order_management_platform.global.success;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public enum SuccessCode {
 	CATEGORY_SEARCH(HttpStatus.OK, "모든 카테고리 조회가 완료되었습니다.", "S_CATEGORY_SEARCH"),
 	CATEGORY_DELETE(HttpStatus.ACCEPTED, "카테고리가 성공적으로 삭제되었습니다.", "S_CATEGORY_DELETE"),
 	// 응답 본문이 필요없어서 ok대신 no_content
-	CATEGORY_MODIFY(HttpStatus.NO_CONTENT, "카테고리가 성공적으로 삭제되었습니다.", "S_CATEGORY_MODIFY"),
+	CATEGORY_MODIFY(HttpStatus.NO_CONTENT, "카테고리가 성공적으로 수정되었습니다.", "S_CATEGORY_MODIFY"),
 
 	// order
 	ORDER_CREATE(HttpStatus.OK, "주문이 성공적으로 생성되었습니다.", "S_ORDER_CREATE"),
@@ -41,6 +42,7 @@ public enum SuccessCode {
 	MENU_LIST_INFO(HttpStatus.OK, "메뉴 목록을 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
 	MENU_DETAIL_INFO(HttpStatus.OK, "메뉴 상세정보를 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
 	MENU_CREATE(HttpStatus.OK, "메뉴를 성공적으로 등록하였습니다.", "S_MENU_LIST_INFO"),
+	MENU_MODIFY(HttpStatus.OK, "메뉴를 성공적으로 수정하였습니다.", "S_MENU_MODIFY"),
 
 	// payment
 

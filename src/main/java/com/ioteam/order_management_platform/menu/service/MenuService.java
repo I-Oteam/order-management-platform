@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.menu.dto.req.CreateMenuRequestDto;
+import com.ioteam.order_management_platform.menu.dto.req.UpdateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuListResponseDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.menu.entity.Menu;
@@ -40,6 +41,7 @@ public class MenuService {
 	public MenuListResponseDto getAllMenus(UUID restaurantId) {
 		validRestaurantExist(restaurantId);
 		List<Menu> menuList = menuRepository.findByRestaurant_ResId(restaurantId);
+		// TODO: isPublic 조회 조건에 추가
 		return MenuListResponseDto.of(menuList);
 	}
 
@@ -47,6 +49,14 @@ public class MenuService {
 		Menu menu = menuRepository.findById(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
 		return MenuResponseDto.fromEntity(menu);
+	}
+
+	@Transactional
+	public MenuResponseDto modifyMenu(UUID menuId, UpdateMenuRequestDto requestDto) {
+		Menu menu = menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
+		Menu updatedMenu = menu.updateMenu(requestDto);
+		return MenuResponseDto.fromEntity(updatedMenu);
 	}
 
 	private void validRestaurantExist(UUID restaurantId) {
