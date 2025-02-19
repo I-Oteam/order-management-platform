@@ -3,12 +3,14 @@ package com.ioteam.order_management_platform.restaurant.repository;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.ioteam.order_management_platform.restaurant.entity.RestaurantScore;
 
 public interface RestaurantScoreRepository extends JpaRepository<RestaurantScore, UUID> {
 
+	@Modifying
 	@Query("update RestaurantScore rs set rs.rsScore = "
 		+ "(select round(avg(r.reviewScore), 1) "
 		+ "from Review r "

@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.restaurant.scheduling;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantScoreRepository;
 
@@ -15,10 +16,11 @@ public class RestaurantScoreScheduler {
 
 	private final RestaurantScoreRepository restaurantScoreRepository;
 
-	@Scheduled(cron = "0 0 3 * * *") //fixedDelay = 10000L)
+	@Scheduled(cron = "0 0 3 * * *") // fixedDelay = 10000L)
+	@Transactional
 	public void run() {
 		log.info("레스토랑 평점 업데이트 시작");
-		//restaurantScoreRepository.bulkUpdateRestaurantScore();
+		restaurantScoreRepository.bulkUpdateRestaurantScore();
 		log.info("레스토랑 평점 업데이트 종료");
 	}
 }
