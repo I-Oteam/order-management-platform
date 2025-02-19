@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.category.dto;
+package com.ioteam.order_management_platform.category.dto.res;
 
 import java.util.UUID;
 

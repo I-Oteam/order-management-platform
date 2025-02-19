@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ioteam.order_management_platform.category.dto.CategoryResponseDto;
-import com.ioteam.order_management_platform.category.dto.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.req.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.res.CategoryResponseDto;
 import com.ioteam.order_management_platform.category.service.CategoryService;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;

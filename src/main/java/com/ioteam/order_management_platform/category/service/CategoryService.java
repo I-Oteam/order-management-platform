@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ioteam.order_management_platform.category.dto.CategoryResponseDto;
-import com.ioteam.order_management_platform.category.dto.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.req.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.res.CategoryResponseDto;
 import com.ioteam.order_management_platform.category.entity.Category;
 import com.ioteam.order_management_platform.category.execption.CategoryException;
 import com.ioteam.order_management_platform.category.repository.CategoryRepository;
