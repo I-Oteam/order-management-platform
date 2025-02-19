@@ -1,24 +1,18 @@
 package com.ioteam.order_management_platform.order.entity;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
+import com.ioteam.order_management_platform.order.dto.req.ModifyOrderRequestDto;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "p_order")
@@ -55,6 +49,38 @@ public class Order extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
 	private String orderRequest;
 
-	//주문 메뉴 추가 필요
+//	@Column
+//	private LocalDateTime deletedAt;
+//
+//	@Column
+//	private UUID deletedBy;
+
+	//주문 상태
+	//5분 초과 시 취소
+	public void orderCancel() {
+		if (this.orderStatus == OrderStatus.WAITING && this.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+			this.orderStatus = OrderStatus.CANCELED;
+		}
+	}
+
+	//주문 성공
+	public void orderConfirm() {
+		if (this.orderStatus == OrderStatus.WAITING) {
+			this.orderStatus = OrderStatus.CONFIRMED;
+		}
+	}
+
+	//취소
+	public void modify(ModifyOrderRequestDto requestDto) {
+		this.orderId = requestDto.getOrderId();
+		this.orderUserId = requestDto.getUserId();
+		this.orderResId = requestDto.getResId();
+		this.orderResTotal = requestDto.getResTotal();
+		this.orderStatus = requestDto.getStatus();
+		this.orderType = requestDto.getType();
+		this.orderLocation = requestDto.getOrderLocation();
+		this.orderRequest = requestDto.getOrderRequest();
+	}
+
 
 }

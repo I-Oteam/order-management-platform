@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,8 +26,9 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@Operation(summary = "주문 생성")
+	//@PreAuthorize("hasRole('CUSTOMER')")
 	@PostMapping()
-	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(@RequestBody CreateOrderRequestDto requestDto) {
+	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(@Validated @RequestBody CreateOrderRequestDto requestDto) {
 
 		OrderResponseDto responseDto = orderService.createOrder(requestDto);
 
@@ -40,6 +42,7 @@ public class OrderController {
 	}
 
 	@Operation(summary = "전체 주문 조회")
+	//@PreAuthorize("hasRole('MANAGER')")
 	@GetMapping("/all")
 	public ResponseEntity<CommonResponse<OrderListResponseDto>> getAllOrders() {
 		OrderListResponseDto responseDto = orderService.getAllOrders();
@@ -47,11 +50,19 @@ public class OrderController {
 	}
 
 	@Operation(summary = "주문 상세 조회")
+	//@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
 	@GetMapping("/{order_id}")
 	public ResponseEntity<CommonResponse<OrderResponseDto>> getOrderDetail(@PathVariable("order_id") UUID orderId) {
 		OrderResponseDto responseDto = orderService.getOrderDetail(orderId);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_DETAIL_INFO, responseDto));
 	}
 
+	@Operation(summary = "주문 취소")
+	@PatchMapping("/{order_id}")
+	public ResponseEntity<CommonResponse<OrderResponseDto>> modifyOrder(
+			@PathVariable("order_id") UUID orderId) {
+		OrderResponseDto responseDto = orderService.getOrderDetail(orderId);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_MODIFY, responseDto));
+	}
 
 }
