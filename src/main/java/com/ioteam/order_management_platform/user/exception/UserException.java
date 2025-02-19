@@ -6,22 +6,19 @@ import com.ioteam.order_management_platform.global.exception.type.ExceptionType;
 
 public enum UserException implements ExceptionType {
 	INVALID_USER_INFO(HttpStatus.BAD_REQUEST, "잘못된 사용자 정보입니다.", "E_VALIDATION"),
-	EMPTY_NICKNAME(HttpStatus.BAD_REQUEST, "nickname은 공백일 수 없습니다.", "E_EMPTY_NICKNAME"),
-	EMPTY_USERNAME(HttpStatus.BAD_REQUEST, "username은 공백일 수 없습니다.", "E_EMPTY_USERNAME"),
-	EMPTY_PASSWORD(HttpStatus.BAD_REQUEST, "password는 공백일 수 없습니다.", "E_EMPTY_PASSWORD"),
-	EMPTY_EMAIL(HttpStatus.BAD_REQUEST, "email은 공백일 수 없습니다.", "E_EMPTY_EMAIL"),
-	INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "email 형식이 올바르지 않습니다.", "E_INVALID_EMAIL"),
-	DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "중복된 닉네임이 존재합니다.", "E_DUPLICATE_NICKNAME"),
-	DUPLICATE_USER(HttpStatus.CONFLICT, "중복된 사용자가 존재합니다.", "E_DUPLICATE_USER"),
-	DUPLICATE_EMAIL(HttpStatus.CONFLICT, "중복된 Email 입니다.", "E_DUPLICATE_EMAIL"),
-	INVALID_ADMIN_TOKEN(HttpStatus.UNAUTHORIZED, "관리자 암호가 틀려 등록이 불가능합니다.", "E_INVALID_ADMIN_TOKEN"),
+	DUPLICATE_FIELD(HttpStatus.CONFLICT, "중복된 필드가 존재합니다.", "E_DUPLICATE_FIELD"),
+	INVALID_ROLE(HttpStatus.BAD_REQUEST, "잘못된 권한입니다.", "E_INVALID"),
+	INVALID_MASTER_TOKEN(HttpStatus.UNAUTHORIZED, "MASTER 암호가 틀려 등록이 불가능합니다.", "E_INVALID_MASTER_TOKEN"),
+	INVALID_MANAGER_TOKEN(HttpStatus.UNAUTHORIZED, "관리자 암호가 틀려 등록이 불가능합니다.", "E_INVALID_MANAGER_TOKEN"),
 	INVALID_OWNER_TOKEN(HttpStatus.UNAUTHORIZED, "점주 인증 암호가 틀려 등록이 불가능합니다.", "E_INVALID_OWNER_TOKEN"),
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 ID가 존재하지 않습니다.", "E_USER_NOT_FOUND"),
+	USER_DELETED(HttpStatus.NOT_FOUND, "삭제된 사용자입니다.", "E_USER_DELETED"),
 	UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "로그인한 유저와 일치하지 않습니다.", "E_UNAUTHORIZED_ACCESS"),
 	INVALID_USERNAME(HttpStatus.UNAUTHORIZED, "사용자 정보가 없습니다.", "E_INVALID_USERNAME"),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "암호가 틀렸습니다.", "E_INVALID_PASSWORD"),
 	INVALID_PERIOD(HttpStatus.UNPROCESSABLE_ENTITY, "기간 검색 조건이 적합하지 않습니다.", "E_INVALID_P"),
-	NO_PERMISSION(HttpStatus.UNAUTHORIZED, "관리자 권한이 필요합니다.", "E_NO_PERMISSION");
+	NO_PERMISSION(HttpStatus.UNAUTHORIZED, "관리자 권한이 필요합니다.", "E_NO_PERMISSION"),
+	INVALID_USER_ID(HttpStatus.NOT_FOUND, "user 아이디가 유효하지 않습니다.", "E_INVALID_USER_ID");
 
 	private final HttpStatus status;
 	private final String message;

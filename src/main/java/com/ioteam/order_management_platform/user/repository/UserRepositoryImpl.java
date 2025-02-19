@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
-import com.ioteam.order_management_platform.user.dto.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.req.UserSearchCondition;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.exception.UserException;

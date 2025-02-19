@@ -6,8 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
-import com.ioteam.order_management_platform.user.dto.AdminUserResponseDto;
-import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
-import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
-import com.ioteam.order_management_platform.user.dto.UserInfoResponseDto;
-import com.ioteam.order_management_platform.user.dto.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.req.LoginRequestDto;
+import com.ioteam.order_management_platform.user.dto.req.SignupRequestDto;
+import com.ioteam.order_management_platform.user.dto.req.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.res.AdminUserResponseDto;
+import com.ioteam.order_management_platform.user.dto.res.UserInfoResponseDto;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 import com.ioteam.order_management_platform.user.service.UserService;
 
@@ -72,5 +74,15 @@ public class UserController {
 		CommonPageResponse<AdminUserResponseDto> pageResponse = userService.searchUsersByCondition(userDetails,
 			condition, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_INFO, pageResponse));
+	}
+
+	@Operation(summary = "사용자 탈퇴", description = "사용자 탈퇴는 인증된 사용자만 가능")
+	@PreAuthorize("isAuthenticated()")
+	@DeleteMapping("/{userId}")
+	public ResponseEntity<CommonResponse<Void>> softDeleteUser(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable UUID userId) {
+		userService.softDeleteUser(userId, userDetails);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_DELETE, null));
 	}
 }

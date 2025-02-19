@@ -1,6 +1,6 @@
 spring:
   config.import: file:.env[.properties]
-  
+
 ---
 # local 환경
 spring:
@@ -8,7 +8,8 @@ spring:
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
-    admin: ${ADMIN_TOKEN}
+    master: ${MASTER_TOKEN}
+    manager: ${MANAGER_TOKEN}
     owner: ${OWNER_TOKEN}
 
 ---
@@ -18,5 +19,6 @@ spring:
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
-    admin: ${ADMIN_TOKEN}
+    master: ${MASTER_TOKEN}
+    manager: ${MANAGER_TOKEN}
     owner: ${OWNER_TOKEN}

@@ -1,10 +1,11 @@
-package com.ioteam.order_management_platform.user.dto;
+package com.ioteam.order_management_platform.user.dto.req;
 
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,9 +23,10 @@ public class SignupRequestDto {
 	@Email(message = "올바른 이메일 형식이 아닙니다.")
 	@NotBlank(message = "email은 공백일 수 없습니다.")
 	private String email;
-	private boolean admin = false;
-	private boolean owner = false;
-	private String adminToken = "";
+	@NotNull(message = "권한을 선택해주세요.")
+	private String role;
+	private String masterToken = "";
+	private String managerToken = "";
 	private String ownerToken = "";
 
 	public User toEntity(String password, UserRoleEnum role) {

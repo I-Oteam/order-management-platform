@@ -2,18 +2,20 @@ package com.ioteam.order_management_platform.user.service;
 
 import java.util.UUID;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
-import com.ioteam.order_management_platform.user.dto.AdminUserResponseDto;
-import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
-import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
-import com.ioteam.order_management_platform.user.dto.UserInfoResponseDto;
-import com.ioteam.order_management_platform.user.dto.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.req.LoginRequestDto;
+import com.ioteam.order_management_platform.user.dto.req.SignupRequestDto;
+import com.ioteam.order_management_platform.user.dto.req.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.res.AdminUserResponseDto;
+import com.ioteam.order_management_platform.user.dto.res.UserInfoResponseDto;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.exception.UserException;
@@ -33,18 +35,19 @@ public class UserService {
 	private final TokenConfig tokenConfig;
 	private final JwtUtil jwtUtil;
 
+	@Transactional
 	public void signup(SignupRequestDto requestDto) {
-		// 예외 처리
-		validateDuplicateFields(requestDto);
-
 		// 비밀번호 암호화 및 권한 부여
 		String password = passwordEncoder.encode(requestDto.getPassword());
 		UserRoleEnum role = getUserRoleEnum(requestDto);
 
-		// 사용자 등록
-		User user = requestDto.toEntity(password, role);
-
-		userRepository.save(user);
+		// DB 저장 시 중복 검사를 통해 저장 시점에 중복 검사로 동시성 문제 해결
+		try {
+			User user = requestDto.toEntity(password, role);
+			userRepository.save(user);
+		} catch (DataIntegrityViolationException e) {
+			throw new CustomApiException(UserException.DUPLICATE_FIELD);
+		}
 	}
 
 	public String login(LoginRequestDto requestDto) {
@@ -53,21 +56,31 @@ public class UserService {
 
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new CustomApiException(UserException.INVALID_USERNAME));
+
+		if (user.getDeletedAt() != null) {
+			throw new CustomApiException(UserException.USER_DELETED);
+		}
+
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new CustomApiException(UserException.INVALID_PASSWORD);
 		}
 		return jwtUtil.createToken(username, user.getRole());
 	}
 
+	@Transactional(readOnly = true)
 	public UserInfoResponseDto getUserByUserId(UserDetailsImpl userDetails, UUID userId) {
 		if (!userDetails.getUserId().equals(userId)) {
 			throw new CustomApiException(UserException.UNAUTHORIZED_ACCESS);
 		}
 		User user = userRepository.findByUserId(userId)
 			.orElseThrow(() -> new CustomApiException(UserException.USER_NOT_FOUND));
+		if (user.getDeletedAt() != null) {
+			throw new CustomApiException(UserException.USER_DELETED); // 삭제된 사용자
+		}
 		return UserInfoResponseDto.from(user);
 	}
 
+	@Transactional(readOnly = true)
 	public CommonPageResponse<AdminUserResponseDto> searchUsersByCondition(UserDetailsImpl userDetails,
 		UserSearchCondition condition,
 		Pageable pageable) {
@@ -80,32 +93,39 @@ public class UserService {
 		return new CommonPageResponse<>(userDtoList);
 	}
 
-	private void validateDuplicateFields(SignupRequestDto requestDto) {
-		if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_NICKNAME);
+	@Transactional
+	public void softDeleteUser(UUID userId, UserDetailsImpl userDetails) {
+		if (userDetails.getRole() == UserRoleEnum.CUSTOMER || userDetails.getRole() == UserRoleEnum.OWNER) {
+			if (!userId.equals(userDetails.getUserId())) {
+				throw new CustomApiException(UserException.UNAUTHORIZED_ACCESS); // 본인이 아닌 다른 사용자가 탈퇴 시도
+			}
 		}
-		if (userRepository.findByUsername(requestDto.getUsername()).isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_USER);
-		}
-		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_EMAIL);
-		}
+		User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+			.orElseThrow(() -> new CustomApiException(UserException.INVALID_USER_ID));
+		user.softDelete(userId);
 	}
 
 	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
-		UserRoleEnum role = UserRoleEnum.CUSTOMER;
-		if (requestDto.isAdmin()) {
-			if (!tokenConfig.getAdminToken().equals(requestDto.getAdminToken())) {
-				throw new CustomApiException(UserException.INVALID_ADMIN_TOKEN);
+		try {
+			UserRoleEnum role = UserRoleEnum.valueOf(requestDto.getRole().toUpperCase());
+			if (role == UserRoleEnum.MASTER) {
+				if (!tokenConfig.getMasterToken().equals(requestDto.getMasterToken())) {
+					throw new CustomApiException(UserException.INVALID_MASTER_TOKEN);
+				}
+				role = UserRoleEnum.MANAGER;
+			} else if (role == UserRoleEnum.MANAGER) {
+				if (!tokenConfig.getManagerToken().equals(requestDto.getManagerToken())) {
+					throw new CustomApiException(UserException.INVALID_MANAGER_TOKEN);
+				}
+			} else if (role == UserRoleEnum.OWNER) {
+				if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())) {
+					throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
+				}
 			}
-			role = UserRoleEnum.MANAGER;
+			return role;
+		} catch (IllegalArgumentException e) {
+			throw new CustomApiException(UserException.INVALID_ROLE);
 		}
-		if (requestDto.isOwner()) {
-			if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())) {
-				throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
-			}
-			role = UserRoleEnum.OWNER;
-		}
-		return role;
+
 	}
 }
