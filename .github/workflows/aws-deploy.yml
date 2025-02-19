@@ -13,6 +13,5 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.AWS_PRIVATE_KEY }}
-          script_stop: true
           script: |
             sh ${{ secrets.BACK_DEPLOY }}
