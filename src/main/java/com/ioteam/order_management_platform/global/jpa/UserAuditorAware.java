@@ -15,11 +15,17 @@ public class UserAuditorAware implements AuditorAware<UUID> {
 	public Optional<UUID> getCurrentAuditor() {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (null == authentication || !authentication.isAuthenticated()) {
-			return null;
+		if (authentication == null || !authentication.isAuthenticated()) {
+			// 인증되지않으면 빈값 반환
+			return Optional.empty();
 		}
-		UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
-		return Optional.of(userDetails.getUserId());
-	}
 
+		if (authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
+			return Optional.of(userDetails.getUserId());
+		} else {
+			// 인증된사용자 정보가 UserDetailsImpl이 아닌경우 빈값 반환
+			return Optional.empty();
+		}
+
+	}
 }
