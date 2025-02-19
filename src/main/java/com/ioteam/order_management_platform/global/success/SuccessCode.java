@@ -40,6 +40,7 @@ public enum SuccessCode {
 	MENU_LIST_INFO(HttpStatus.OK, "메뉴 목록을 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
 	MENU_DETAIL_INFO(HttpStatus.OK, "메뉴 상세정보를 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
 	MENU_CREATE(HttpStatus.OK, "메뉴를 성공적으로 등록하였습니다.", "S_MENU_LIST_INFO"),
+	MENU_MODIFY(HttpStatus.OK, "메뉴를 성공적으로 수정하였습니다.", "S_MENU_MODIFY"),
 
 	// payment
 
