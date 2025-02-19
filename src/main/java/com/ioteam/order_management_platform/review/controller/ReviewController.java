@@ -129,7 +129,7 @@ public class ReviewController {
 	}
 
 	@Operation(summary = "리뷰 삭제", description = "리뷰 삭제는 'MANAGER', 'CUSTOMER' 만 가능")
-	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
+	@PreAuthorize("hasAnyRole('MASTER', 'MANAGER', 'CUSTOMER')")
 	@DeleteMapping("/reviews/{reviewId}")
 	public ResponseEntity<CommonResponse<Void>> softDeleteReview(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,

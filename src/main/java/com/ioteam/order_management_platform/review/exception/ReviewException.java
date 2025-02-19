@@ -9,7 +9,8 @@ public enum ReviewException implements ExceptionType {
 	INVALID_REVIEW_ID(HttpStatus.NOT_FOUND, "review 아이디가 유효하지 않습니다.", "E_INVALID_REVIEW_ID"),
 	INVALID_PERIOD(HttpStatus.UNPROCESSABLE_ENTITY, "기간 검색 조건이 부적합합니다.", "E_INVALID_PERIOD"),
 	INVALID_ORDER_ID(HttpStatus.NOT_FOUND, "order 아이디가 유효하지 않습니다.", "E_INVALID_ORDER_ID"),
-	UNAUTH_ORDER_ID(HttpStatus.FORBIDDEN, "order 아이디에 권한이 없습니다.", "E_UNAUTH_ORDER_ID");
+	UNAUTH_ORDER_ID(HttpStatus.FORBIDDEN, "order 아이디에 권한이 없습니다.", "E_UNAUTH_ORDER_ID"),
+	INVALID_IDS(HttpStatus.NOT_FOUND, "order, user, restaurant 아이디가 적합하지 않습니다.", "E_INVALID_IDS");
 
 	private final HttpStatus status;
 	private final String message;
