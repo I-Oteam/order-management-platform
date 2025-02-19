@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.category.entity;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
@@ -31,11 +30,5 @@ public class Category extends BaseEntity {
 
 	@Column(nullable = false, unique = true, length = 100)
 	private String rcName;
-
-	@Column
-	private LocalDateTime deletedAt;
-
-	@Column
-	private UUID deletedBy;
 
 }

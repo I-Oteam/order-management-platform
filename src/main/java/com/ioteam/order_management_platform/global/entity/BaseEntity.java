@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.global.entity;
 
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,16 +21,24 @@ public abstract class BaseEntity {
 
 	@CreatedDate
 	@Column(updatable = false)
-	protected LocalDateTime createdAt;
+	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	protected LocalDateTime modifiedAt;
+	private LocalDateTime modifiedAt;
 
 	@CreatedBy
 	@Column(updatable = false)
-	protected UUID createdBy;
+	private UUID createdBy;
 
 	@LastModifiedBy
-	protected UUID modifiedBy;
+	private UUID modifiedBy;
 
+	private LocalDateTime deletedAt;
+
+	private UUID deletedBy;
+
+	public void softDelete(UUID userId) {
+		this.deletedAt = LocalDateTime.now();
+		this.deletedBy = userId;
+	}
 }

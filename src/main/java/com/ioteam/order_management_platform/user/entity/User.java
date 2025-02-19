@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.user.entity;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
@@ -46,19 +45,11 @@ public class User extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private UserRoleEnum role;
 
-	private LocalDateTime deletedAt;
-	private UUID deletedBy;
-
 	public User(String nickname, String username, String password, String email, UserRoleEnum role) {
 		this.nickname = nickname;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.role = role;
-	}
-
-	public void softDelete() {
-		this.deletedAt = LocalDateTime.now();
-		this.deletedBy = UUID.randomUUID();
 	}
 }

@@ -126,7 +126,7 @@ public class ReviewService {
 		if (!role.equals(UserRoleEnum.MANAGER) && !review.getUser().getUserId().equals(userId)) {
 			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 		}
-		review.softDelete();
+		review.softDelete(userId);
 	}
 
 }
