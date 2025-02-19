@@ -56,6 +56,11 @@ public class UserService {
 
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new CustomApiException(UserException.INVALID_USERNAME));
+
+		if (user.getDeletedAt() != null) {
+			throw new CustomApiException(UserException.USER_DELETED);
+		}
+
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new CustomApiException(UserException.INVALID_PASSWORD);
 		}
@@ -69,6 +74,9 @@ public class UserService {
 		}
 		User user = userRepository.findByUserId(userId)
 			.orElseThrow(() -> new CustomApiException(UserException.USER_NOT_FOUND));
+		if (user.getDeletedAt() != null) {
+			throw new CustomApiException(UserException.USER_DELETED); // 삭제된 사용자
+		}
 		return UserInfoResponseDto.from(user);
 	}
 
@@ -83,6 +91,18 @@ public class UserService {
 		Page<AdminUserResponseDto> userDtoList = userRepository.searchUserByCondition(condition, pageable)
 			.map(AdminUserResponseDto::from);
 		return new CommonPageResponse<>(userDtoList);
+	}
+
+	@Transactional
+	public void softDeleteUser(UUID userId, UserDetailsImpl userDetails) {
+		if (userDetails.getRole() == UserRoleEnum.CUSTOMER || userDetails.getRole() == UserRoleEnum.OWNER) {
+			if (!userId.equals(userDetails.getUserId())) {
+				throw new CustomApiException(UserException.UNAUTHORIZED_ACCESS); // 본인이 아닌 다른 사용자가 탈퇴 시도
+			}
+		}
+		User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+			.orElseThrow(() -> new CustomApiException(UserException.INVALID_USER_ID));
+		user.softDelete(userId);
 	}
 
 	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {

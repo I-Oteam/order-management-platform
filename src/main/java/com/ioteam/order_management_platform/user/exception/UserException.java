@@ -12,11 +12,13 @@ public enum UserException implements ExceptionType {
 	INVALID_MANAGER_TOKEN(HttpStatus.UNAUTHORIZED, "관리자 암호가 틀려 등록이 불가능합니다.", "E_INVALID_MANAGER_TOKEN"),
 	INVALID_OWNER_TOKEN(HttpStatus.UNAUTHORIZED, "점주 인증 암호가 틀려 등록이 불가능합니다.", "E_INVALID_OWNER_TOKEN"),
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 ID가 존재하지 않습니다.", "E_USER_NOT_FOUND"),
+	USER_DELETED(HttpStatus.NOT_FOUND, "삭제된 사용자입니다.", "E_USER_DELETED"),
 	UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "로그인한 유저와 일치하지 않습니다.", "E_UNAUTHORIZED_ACCESS"),
 	INVALID_USERNAME(HttpStatus.UNAUTHORIZED, "사용자 정보가 없습니다.", "E_INVALID_USERNAME"),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "암호가 틀렸습니다.", "E_INVALID_PASSWORD"),
 	INVALID_PERIOD(HttpStatus.UNPROCESSABLE_ENTITY, "기간 검색 조건이 적합하지 않습니다.", "E_INVALID_P"),
-	NO_PERMISSION(HttpStatus.UNAUTHORIZED, "관리자 권한이 필요합니다.", "E_NO_PERMISSION");
+	NO_PERMISSION(HttpStatus.UNAUTHORIZED, "관리자 권한이 필요합니다.", "E_NO_PERMISSION"),
+	INVALID_USER_ID(HttpStatus.NOT_FOUND, "user 아이디가 유효하지 않습니다.", "E_INVALID_USER_ID");
 
 	private final HttpStatus status;
 	private final String message;

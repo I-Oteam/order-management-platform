@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<User, UUID>, UserRepositor
 	Optional<User> findByUsername(String username);
 
 	Optional<User> findByUserId(UUID userId);
+
+	Optional<User> findByUserIdAndDeletedAtIsNull(UUID userId);
 }
