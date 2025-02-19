@@ -96,7 +96,7 @@ public class ReviewController {
 		ReviewResponseDto responseDto = reviewService.getReview(reviewId, userDetails.getUserId(),
 			userDetails.getRole());
 		return ResponseEntity.ok(new CommonResponse<>(
-			SuccessCode.REVIEW_CREATE,
+			SuccessCode.REVIEW_SEARCH,
 			responseDto));
 	}
 

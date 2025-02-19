@@ -91,8 +91,8 @@ class ReviewIntegrationTest {
 			.andDo(print());
 	}
 
-	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
-	@DisplayName("고객_본인 리뷰 단건 조회 성공 200")
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e2", role = "OWNER")
+	@DisplayName("오너_소유 가게 비공개 리뷰 단건 조회 성공 200")
 	@Test
 	void customer_getReview_200() throws Exception {
 		// given
@@ -142,8 +142,8 @@ class ReviewIntegrationTest {
 			.andDo(print());
 	}
 
-	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
-	@DisplayName("매니저_리뷰 삭제 성공 200")
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@DisplayName("유저_리뷰 삭제 성공 200")
 	@Test
 	void deleteReview_200() throws Exception {
 		// given

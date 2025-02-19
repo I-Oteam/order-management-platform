@@ -3,6 +3,7 @@ package com.ioteam.order_management_platform.review.dto.req;
 import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +15,8 @@ import lombok.Getter;
 public class ModifyReviewRequestDto {
 	@NotNull
 	@Max(5)
-	private int reviewScore;
-	@NotNull
+	private Integer reviewScore;
+	@NotBlank
 	@Length(max = 1000)
 	private String reviewContent;
 	@Length(max = 100)
