@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.payment.dto;
+package com.ioteam.order_management_platform.payment.dto.res;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

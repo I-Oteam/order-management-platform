@@ -12,8 +12,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
-import com.ioteam.order_management_platform.payment.dto.CreatePaymentRequestDto;
-import com.ioteam.order_management_platform.payment.dto.PaymentResponseDto;
+import com.ioteam.order_management_platform.payment.dto.req.CreatePaymentRequestDto;
+import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.service.PaymentService;
 
 import io.swagger.v3.oas.annotations.Operation;
