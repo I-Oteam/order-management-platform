@@ -18,8 +18,9 @@ public class CreateCategoryRequestDto {
 	@Length(max = 100)
 	private String rcName;
 
-	public Category toCategory(CreateCategoryRequestDto categoryRequestDto) {
-		return Category.builder()
+	public static Category toCategory(CreateCategoryRequestDto categoryRequestDto) {
+		return Category
+			.builder()
 			.rcName(categoryRequestDto.getRcName())
 			.build();
 	}

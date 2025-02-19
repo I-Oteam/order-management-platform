@@ -17,7 +17,8 @@ public class CategoryResponseDto {
 	private String rcName;
 
 	public static CategoryResponseDto fromCategory(Category category) {
-		return CategoryResponseDto.builder()
+		return CategoryResponseDto
+			.builder()
 			.rcId(category.getRcId())
 			.rcName(category.getRcName())
 			.build();
