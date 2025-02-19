@@ -12,6 +12,7 @@ import com.ioteam.order_management_platform.category.dto.res.CategoryResponseDto
 import com.ioteam.order_management_platform.category.entity.Category;
 import com.ioteam.order_management_platform.category.execption.CategoryException;
 import com.ioteam.order_management_platform.category.repository.CategoryRepository;
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
@@ -72,7 +73,7 @@ public class CategoryService {
 		return CategoryResponseDto.fromCategory(category);
 	}
 
-	public Page<CategoryResponseDto> readAllCategories(Pageable pageable, UserDetailsImpl userDetails) {
+	public CommonPageResponse<CategoryResponseDto> readAllCategories(Pageable pageable, UserDetailsImpl userDetails) {
 
 		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
 
@@ -86,7 +87,9 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.CATEGORY_NOT_FOUND);
 		}
 
-		return categories.map(CategoryResponseDto::fromCategory);
+		Page<CategoryResponseDto> categoryResponseDtoPage = categories.map(CategoryResponseDto::fromCategory);
+
+		return new CommonPageResponse<>(categoryResponseDtoPage);
 
 	}
 }
