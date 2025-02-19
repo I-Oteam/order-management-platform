@@ -1,7 +1,7 @@
 name: docker deploy
 on:
   push:
-    branches: feat/#82_infra
+    branches: main
 jobs:
   deploy:
     runs-on: self-hosted
