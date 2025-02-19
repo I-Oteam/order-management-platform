@@ -56,6 +56,16 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
 		}
 
+		// 삭제되었는데 다시 부활시키는 방향도?
+		if (categoryRepository.existsByRcNameAndDeletedAtIsNull(
+			categoryRequestDto
+				.getRcName()
+				.trim()
+		)
+		) {
+			throw new CustomApiException(CategoryException.DUPLICATE_CATEGORY_NAME);
+		}
+
 		Category category = CreateCategoryRequestDto.toCategory(categoryRequestDto);
 		Category savedCategory = categoryRepository.save(category);
 
@@ -122,5 +132,20 @@ public class CategoryService {
 		targetCategory.update(updateCategoryDto);
 
 		return CategoryResponseDto.fromCategory(targetCategory);
+	}
+
+	@Transactional
+	public void softDeleteCategory(UUID rcId, UserDetailsImpl userDetails) {
+
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
+
+		if (!isAuthorized) {
+			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
+		}
+
+		Category targetCategory = categoryRepository.findByRcIdAndDeletedAtIsNull(rcId)
+			.orElseThrow(() -> new CustomApiException(CategoryException.CATEGORY_NOT_FOUND));
+
+		targetCategory.softDelete(userDetails.getUserId());
 	}
 }
