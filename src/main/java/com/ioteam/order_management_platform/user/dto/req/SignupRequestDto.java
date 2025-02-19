@@ -24,7 +24,7 @@ public class SignupRequestDto {
 	@NotBlank(message = "email은 공백일 수 없습니다.")
 	private String email;
 	@NotNull(message = "권한을 선택해주세요.")
-	private String role;
+	private UserRoleEnum role;
 	private String masterToken = "";
 	private String managerToken = "";
 	private String ownerToken = "";

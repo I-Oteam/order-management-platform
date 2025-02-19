@@ -107,7 +107,7 @@ public class UserService {
 
 	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
 		try {
-			UserRoleEnum role = UserRoleEnum.valueOf(requestDto.getRole().toUpperCase());
+			UserRoleEnum role = requestDto.getRole();
 			if (role == UserRoleEnum.MASTER) {
 				if (!tokenConfig.getMasterToken().equals(requestDto.getMasterToken())) {
 					throw new CustomApiException(UserException.INVALID_MASTER_TOKEN);
