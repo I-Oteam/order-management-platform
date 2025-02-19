@@ -2,10 +2,12 @@ package com.ioteam.order_management_platform.user.service;
 
 import java.util.UUID;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
@@ -33,20 +35,21 @@ public class UserService {
 	private final TokenConfig tokenConfig;
 	private final JwtUtil jwtUtil;
 
+	@Transactional
 	public void signup(SignupRequestDto requestDto) {
-		// 예외 처리
-		validateDuplicateFields(requestDto);
-
 		// 비밀번호 암호화 및 권한 부여
 		String password = passwordEncoder.encode(requestDto.getPassword());
 		UserRoleEnum role = getUserRoleEnum(requestDto);
 
-		// 사용자 등록
-		User user = requestDto.toEntity(password, role);
-
-		userRepository.save(user);
+		// DB 저장 시 중복 검사를 통해 저장 시점에 중복 검사로 동시성 문제 해결
+		try {
+			User user = requestDto.toEntity(password, role);
+			userRepository.save(user);
+		} catch (DataIntegrityViolationException e) {
+			throw new CustomApiException(UserException.DUPLICATE_FIELD);
+		}
 	}
-
+	
 	public String login(LoginRequestDto requestDto) {
 		String username = requestDto.getUsername();
 		String password = requestDto.getPassword();
@@ -59,6 +62,7 @@ public class UserService {
 		return jwtUtil.createToken(username, user.getRole());
 	}
 
+	@Transactional(readOnly = true)
 	public UserInfoResponseDto getUserByUserId(UserDetailsImpl userDetails, UUID userId) {
 		if (!userDetails.getUserId().equals(userId)) {
 			throw new CustomApiException(UserException.UNAUTHORIZED_ACCESS);
@@ -68,6 +72,7 @@ public class UserService {
 		return UserInfoResponseDto.from(user);
 	}
 
+	@Transactional(readOnly = true)
 	public CommonPageResponse<AdminUserResponseDto> searchUsersByCondition(UserDetailsImpl userDetails,
 		UserSearchCondition condition,
 		Pageable pageable) {
@@ -78,18 +83,6 @@ public class UserService {
 		Page<AdminUserResponseDto> userDtoList = userRepository.searchUserByCondition(condition, pageable)
 			.map(AdminUserResponseDto::from);
 		return new CommonPageResponse<>(userDtoList);
-	}
-
-	private void validateDuplicateFields(SignupRequestDto requestDto) {
-		if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_NICKNAME);
-		}
-		if (userRepository.findByUsername(requestDto.getUsername()).isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_USER);
-		}
-		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
-			throw new CustomApiException(UserException.DUPLICATE_EMAIL);
-		}
 	}
 
 	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
