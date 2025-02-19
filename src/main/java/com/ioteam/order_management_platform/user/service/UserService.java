@@ -49,7 +49,7 @@ public class UserService {
 			throw new CustomApiException(UserException.DUPLICATE_FIELD);
 		}
 	}
-	
+
 	public String login(LoginRequestDto requestDto) {
 		String username = requestDto.getUsername();
 		String password = requestDto.getPassword();
@@ -86,19 +86,26 @@ public class UserService {
 	}
 
 	private UserRoleEnum getUserRoleEnum(SignupRequestDto requestDto) {
-		UserRoleEnum role = UserRoleEnum.CUSTOMER;
-		if (requestDto.isAdmin()) {
-			if (!tokenConfig.getAdminToken().equals(requestDto.getAdminToken())) {
-				throw new CustomApiException(UserException.INVALID_ADMIN_TOKEN);
+		try {
+			UserRoleEnum role = UserRoleEnum.valueOf(requestDto.getRole().toUpperCase());
+			if (role == UserRoleEnum.MASTER) {
+				if (!tokenConfig.getMasterToken().equals(requestDto.getMasterToken())) {
+					throw new CustomApiException(UserException.INVALID_MASTER_TOKEN);
+				}
+				role = UserRoleEnum.MANAGER;
+			} else if (role == UserRoleEnum.MANAGER) {
+				if (!tokenConfig.getManagerToken().equals(requestDto.getManagerToken())) {
+					throw new CustomApiException(UserException.INVALID_MANAGER_TOKEN);
+				}
+			} else if (role == UserRoleEnum.OWNER) {
+				if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())) {
+					throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
+				}
 			}
-			role = UserRoleEnum.MANAGER;
+			return role;
+		} catch (IllegalArgumentException e) {
+			throw new CustomApiException(UserException.INVALID_ROLE);
 		}
-		if (requestDto.isOwner()) {
-			if (!tokenConfig.getOwnerToken().equals(requestDto.getOwnerToken())) {
-				throw new CustomApiException(UserException.INVALID_OWNER_TOKEN);
-			}
-			role = UserRoleEnum.OWNER;
-		}
-		return role;
+
 	}
 }
