@@ -23,8 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ioteam.order_management_platform.category.dto.CategoryResponseDto;
-import com.ioteam.order_management_platform.category.dto.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.req.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.res.CategoryResponseDto;
 import com.ioteam.order_management_platform.category.entity.Category;
 import com.ioteam.order_management_platform.category.service.CategoryService;
 import com.ioteam.order_management_platform.user.entity.User;

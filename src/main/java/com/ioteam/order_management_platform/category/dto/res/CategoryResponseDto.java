@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.category.dto;
+package com.ioteam.order_management_platform.category.dto.res;
 
 import java.util.UUID;
 
@@ -17,7 +17,8 @@ public class CategoryResponseDto {
 	private String rcName;
 
 	public static CategoryResponseDto fromCategory(Category category) {
-		return CategoryResponseDto.builder()
+		return CategoryResponseDto
+			.builder()
 			.rcId(category.getRcId())
 			.rcName(category.getRcName())
 			.build();
