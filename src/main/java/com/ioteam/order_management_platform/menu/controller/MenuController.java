@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,6 +23,7 @@ import com.ioteam.order_management_platform.menu.dto.req.UpdateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuListResponseDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.menu.service.MenuService;
+import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +37,7 @@ public class MenuController {
 
 	private final MenuService menuService;
 
-	@Operation(summary = "상품 등록")
+	@Operation(summary = "상품 등록", description = "상품 수정은 OWNER와 MANAGER만 가능")
 	@PostMapping()
 	@PreAuthorize("hasAnyRole('OWNER','MANAGER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> createMenu(
@@ -68,8 +70,9 @@ public class MenuController {
 	@PatchMapping("/{menu_id}")
 	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> modifyMenu(@PathVariable("menu_id") UUID menuId,
-		@RequestBody @Validated UpdateMenuRequestDto requestDto) {
-		MenuResponseDto responseDto = menuService.modifyMenu(menuId, requestDto);
+		@RequestBody @Validated UpdateMenuRequestDto requestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		MenuResponseDto responseDto = menuService.modifyMenu(menuId, requestDto, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_MODIFY, responseDto));
 	}
 }

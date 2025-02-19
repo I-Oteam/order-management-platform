@@ -16,6 +16,7 @@ import com.ioteam.order_management_platform.menu.exception.MenuException;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
+import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,11 +53,31 @@ public class MenuService {
 	}
 
 	@Transactional
-	public MenuResponseDto modifyMenu(UUID menuId, UpdateMenuRequestDto requestDto) {
+	public MenuResponseDto modifyMenu(UUID menuId, UpdateMenuRequestDto requestDto, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findById(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
+		hasModificationPermission(userDetails, menu);
 		Menu updatedMenu = menu.updateMenu(requestDto);
 		return MenuResponseDto.fromEntity(updatedMenu);
+	}
+
+	private void hasModificationPermission(UserDetailsImpl userDetails, Menu menu) {
+		String authority = userDetails.getAuthorities().iterator().next().getAuthority();
+
+		if (authority.equals("ROLE_MANAGER")) {
+			return;
+		}
+		if (authority.equals("ROLE_OWNER")) {
+			UUID requestUser = userDetails.getUserId();
+			UUID ownerUser = menu.getRestaurant().getOwner().getUserId();
+			log.info(
+				"Updating menu with menuId: " + menu.getRmId() + " with ownerUser: " + ownerUser + " with requestUser: "
+					+ requestUser);
+			if (requestUser.equals(ownerUser)) {
+				return;
+			}
+		}
+		throw new CustomApiException(MenuException.INVALID_MODIFY_ROLE);
 	}
 
 	private void validRestaurantExist(UUID restaurantId) {
