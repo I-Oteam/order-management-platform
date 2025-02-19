@@ -14,4 +14,6 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
 	Optional<Category> findByRcIdAndDeletedAtIsNull(UUID rcId);
 
 	Page<Category> findAllByDeletedAtIsNull(Pageable pageable);
+
+	boolean existsByRcNameAndDeletedAtIsNull(String rcName);
 }
