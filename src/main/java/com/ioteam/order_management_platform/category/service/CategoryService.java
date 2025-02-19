@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ioteam.order_management_platform.category.dto.req.CreateCategoryRequestDto;
+import com.ioteam.order_management_platform.category.dto.req.UpdateCategoryRequestDto;
 import com.ioteam.order_management_platform.category.dto.res.CategoryResponseDto;
 import com.ioteam.order_management_platform.category.entity.Category;
 import com.ioteam.order_management_platform.category.execption.CategoryException;
@@ -27,7 +28,8 @@ public class CategoryService {
 
 	// 중복된 검증 로직 개선(괜찮은지?)
 	private boolean hasManagerOrOwnerRole(UserDetailsImpl userDetails) {
-		return userDetails.getAuthorities()
+		return userDetails
+			.getAuthorities()
 			.stream()
 			.anyMatch(authority ->
 				authority.getAuthority().equals("ROLE_MANAGER") ||
@@ -47,13 +49,14 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
 		}
 
-		if (categoryRequestDto.getRcName()
+		if (categoryRequestDto
+			.getRcName()
 			.trim()
 			.isEmpty()) {
 			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
 		}
 
-		Category category = categoryRequestDto.toCategory(categoryRequestDto);
+		Category category = CreateCategoryRequestDto.toCategory(categoryRequestDto);
 		Category savedCategory = categoryRepository.save(category);
 
 		return CategoryResponseDto.fromCategory(savedCategory);
@@ -67,8 +70,11 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
 		}
 
-		Category category = categoryRepository.findByRcIdAndDeletedAtIsNull(rcId)
-			.orElseThrow(() -> new CustomApiException(CategoryException.CATEGORY_NOT_FOUND));
+		Category category = categoryRepository
+			.findByRcIdAndDeletedAtIsNull(rcId)
+			.orElseThrow(
+				() -> new CustomApiException(CategoryException.CATEGORY_NOT_FOUND)
+			);
 
 		return CategoryResponseDto.fromCategory(category);
 	}
@@ -91,5 +97,30 @@ public class CategoryService {
 
 		return new CommonPageResponse<>(categoryResponseDtoPage);
 
+	}
+
+	@Transactional
+	public CategoryResponseDto updateCategory(UUID rcId, UpdateCategoryRequestDto updateCategoryDto,
+		UserDetailsImpl userDetails) {
+
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
+
+		if (!isAuthorized) {
+			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
+		}
+
+		Category targetCategory = categoryRepository.findByRcIdAndDeletedAtIsNull(rcId)
+			.orElseThrow(() -> new CustomApiException(CategoryException.CATEGORY_NOT_FOUND));
+
+		if (updateCategoryDto
+			.getRcName()
+			.trim()
+			.isEmpty()) {
+			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
+		}
+
+		targetCategory.update(updateCategoryDto);
+
+		return CategoryResponseDto.fromCategory(targetCategory);
 	}
 }
