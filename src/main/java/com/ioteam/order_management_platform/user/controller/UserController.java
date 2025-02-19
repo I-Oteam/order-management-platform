@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
-import com.ioteam.order_management_platform.user.dto.AdminUserResponseDto;
-import com.ioteam.order_management_platform.user.dto.LoginRequestDto;
-import com.ioteam.order_management_platform.user.dto.SignupRequestDto;
-import com.ioteam.order_management_platform.user.dto.UserInfoResponseDto;
-import com.ioteam.order_management_platform.user.dto.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.req.LoginRequestDto;
+import com.ioteam.order_management_platform.user.dto.req.SignupRequestDto;
+import com.ioteam.order_management_platform.user.dto.req.UserSearchCondition;
+import com.ioteam.order_management_platform.user.dto.res.AdminUserResponseDto;
+import com.ioteam.order_management_platform.user.dto.res.UserInfoResponseDto;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 import com.ioteam.order_management_platform.user.service.UserService;
 

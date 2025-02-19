@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.user.dto;
+package com.ioteam.order_management_platform.user.dto.req;
 
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;

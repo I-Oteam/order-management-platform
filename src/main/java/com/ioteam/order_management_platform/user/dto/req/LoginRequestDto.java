@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.user.dto;
+package com.ioteam.order_management_platform.user.dto.req;
 
 import lombok.Getter;
 
