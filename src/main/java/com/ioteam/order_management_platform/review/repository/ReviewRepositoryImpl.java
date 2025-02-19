@@ -132,6 +132,69 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
 
+	@Override
+	public Page<ReviewResponseDto> searchReviewByRestaurant(UUID userId, UUID resId, Pageable pageable) {
+
+		// 유저가 가게 오너인지 확인
+		boolean isOwner = queryFactory
+			.selectFrom(restaurant)
+			.where(
+				restaurant.resId.eq(resId),
+				restaurant.owner.userId.eq(userId)
+			)
+			.fetchCount() > 0;
+
+		List<ReviewResponseDto> dtoList = queryFactory.select(review, user.userId, user.username, user.nickname,
+				restaurant.resId, restaurant.resName)
+			.from(review)
+			.leftJoin(user).on(user.userId.eq(review.user.userId))
+			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
+			.where(
+				ifNotOwnerOnlyPublic(isOwner),
+				review.restaurant.resId.eq(resId),
+				review.deletedAt.isNull()
+			)
+			.orderBy(createOrderSpecifiers(pageable.getSort()))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch()
+			.stream()
+			.map(tuple -> {
+				Review review1 = tuple.get(review);
+				ReviewUserResponseDto reviewUser = ReviewUserResponseDto.builder()
+					.userId(tuple.get(user.userId))
+					.username(tuple.get(user.username))
+					.nickname(tuple.get(user.nickname))
+					.build();
+				ReviewRestaurantResponseDto reviewRestaurant = ReviewRestaurantResponseDto.builder()
+					.restaurantId(tuple.get(restaurant.resId))
+					.restaurantName(tuple.get(restaurant.resName))
+					.build();
+				return ReviewResponseDto.from(review1, reviewUser, reviewRestaurant);
+			})
+			.toList();
+
+		JPAQuery<Long> countQuery = queryFactory
+			.select(review.count())
+			.from(review)
+			.leftJoin(user).on(user.userId.eq(review.user.userId))
+			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
+			.where(
+				ifNotOwnerOnlyPublic(isOwner),
+				review.restaurant.resId.eq(resId),
+				review.deletedAt.isNull()
+			);
+
+		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
+	}
+
+	private BooleanExpression ifNotOwnerOnlyPublic(boolean isOwner) {
+
+		if (isOwner)
+			return null;
+		return review.isPublic.eq(true);
+	}
+
 	private BooleanExpression eqReviewScore(Integer score) {
 
 		if (score == null)

@@ -56,6 +56,12 @@ public class ReviewService {
 		return new CommonPageResponse<>(reviewDtoPage);
 	}
 
+	public CommonPageResponse<ReviewResponseDto> searchReviewByRestaurant(UUID userId, UUID resId, Pageable pageable) {
+
+		Page<ReviewResponseDto> reviewDtoPage = reviewRepository.searchReviewByRestaurant(userId, resId, pageable);
+		return new CommonPageResponse<>(reviewDtoPage);
+	}
+
 	public ReviewResponseDto getReview(UUID reviewId, UUID userId, UserRoleEnum role) {
 
 		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
@@ -67,7 +73,7 @@ public class ReviewService {
 		// 2. is_public=false 작성자와 가게 오너, 관리자만 확인 가능
 		if (review.getIsPublic()
 			|| review.getUser().getUserId().equals(userId)
-			//|| review.getRestaurant().getResOwnerId().equals(userId)
+			|| review.getRestaurant().getOwner().getUserId().equals(userId) // todo. 보완 필요
 			|| List.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(role)) {
 			return ReviewResponseDto.from(review);
 		}
@@ -122,4 +128,5 @@ public class ReviewService {
 		}
 		review.softDelete();
 	}
+
 }

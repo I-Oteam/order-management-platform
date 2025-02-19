@@ -14,4 +14,6 @@ public interface ReviewRepositoryCustom {
 	Page<AdminReviewResponseDto> searchReviewAdminByCondition(AdminReviewSearchCondition condition, Pageable pageable);
 
 	Page<ReviewResponseDto> searchReviewByUser(UUID userId, Pageable pageable);
+
+	Page<ReviewResponseDto> searchReviewByRestaurant(UUID userId, UUID resId, Pageable pageable);
 }

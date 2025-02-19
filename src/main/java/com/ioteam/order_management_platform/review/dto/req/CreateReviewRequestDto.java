@@ -34,10 +34,10 @@ public class CreateReviewRequestDto {
 	@NotNull
 	private Boolean isPublic;
 
-	public Review toEntity(User referenceUser, Order referenceOrder, Restaurant referenceRestaurant) {
+	public Review toEntity(User referenceUser, Order order, Restaurant referenceRestaurant) {
 		return Review.builder()
 			.user(referenceUser)
-			.order(referenceOrder)
+			.order(order)
 			.restaurant(referenceRestaurant)
 			.reviewScore(this.reviewScore)
 			.reviewContent(this.reviewContent)

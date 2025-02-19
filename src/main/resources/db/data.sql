@@ -8,8 +8,8 @@ VALUES
     (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'test4@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'MASTER', 'testMaster', 'nickname4');
 
 -- p_restaurant 테이블 목데이터 추가
-INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_adress, res_name, res_image_url)
-VALUES (now(), now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '02-0000-0000', '서울시 스파르타 스파르타동 스번지', '스파르타파스타', null);
+INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_address, res_name, res_image_url, res_owner_id)
+VALUES (now(), now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '02-0000-0000', '서울시 스파르타 스파르타동 스번지', '스파르타파스타', null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid);
 
 -- p_restaurant_menu 테이블 목데이터 추가
 INSERT INTO p_restaurant_menu (is_public, rm_price, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_id, rm_id, rm_description, rm_name, rm_image_url)

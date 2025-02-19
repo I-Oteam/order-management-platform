@@ -72,6 +72,20 @@ public class ReviewController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_SEARCH, pageResponse));
 	}
 
+	@Operation(summary = "가게별 리뷰 조회", description = "가게별 리뷰 조회는 인증된 사용자들 모두 가능")
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/reviews/restaurants/{resId}")
+	public ResponseEntity<CommonResponse<CommonPageResponse<ReviewResponseDto>>> searchReviewsByRestaurant(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable UUID resId,
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+
+		CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewByRestaurant(
+			userDetails.getUserId(), resId, pageable);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_SEARCH, pageResponse));
+	}
+
 	@Operation(summary = "리뷰 조회", description = "리뷰 조회는 인증된 사용자만 가능")
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/reviews/{reviewId}")
