@@ -17,6 +17,9 @@ spring:
   devtools:
     livereload:
       enabled: true
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
 
 ---
 # test 환경
