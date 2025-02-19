@@ -16,6 +16,7 @@ import com.ioteam.order_management_platform.menu.exception.MenuException;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
+import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -62,14 +63,13 @@ public class MenuService {
 	}
 
 	private void hasModificationPermission(UserDetailsImpl userDetails, Menu menu) {
-		String authority = userDetails.getAuthorities().iterator().next().getAuthority();
-
-		if (authority.equals("ROLE_MANAGER")) {
+		UserRoleEnum role = userDetails.getRole();
+		if (role.equals(UserRoleEnum.MANAGER)) {
 			return;
 		}
-		if (authority.equals("ROLE_OWNER")) {
+		if (role.equals(UserRoleEnum.OWNER)) {
 			UUID requestUser = userDetails.getUserId();
-			UUID ownerUser = menu.getRestaurant().getOwner().getUserId();
+			UUID ownerUser = menuRepository.getRestaurantOwnerId(menu.getRmId());
 			log.info(
 				"Updating menu with menuId: " + menu.getRmId() + " with ownerUser: " + ownerUser + " with requestUser: "
 					+ requestUser);
