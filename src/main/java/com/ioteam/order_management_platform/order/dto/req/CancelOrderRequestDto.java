@@ -15,15 +15,22 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 
-public class ModifyOrderRequestDto {
+public class CancelOrderRequestDto {
 
 	@NotNull
 	private UUID orderId;
+
 	private String userId;
+
 	private String resId;
+
 	private BigDecimal resTotal;
+
 	private OrderStatus status;
+
 	private OrderType type;
+
 	private String orderLocation;
+
 	private String orderRequest;
 }

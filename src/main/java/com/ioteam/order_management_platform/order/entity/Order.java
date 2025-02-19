@@ -1,7 +1,7 @@
 package com.ioteam.order_management_platform.order.entity;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
-import com.ioteam.order_management_platform.order.dto.req.ModifyOrderRequestDto;
+import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
 import jakarta.persistence.*;
@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -55,31 +54,19 @@ public class Order extends BaseEntity {
 //	@Column
 //	private UUID deletedBy;
 
+
 	//주문 상태
-	//5분 초과 시 취소
-	public void orderCancel() {
-		if (this.orderStatus == OrderStatus.WAITING && this.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
-			this.orderStatus = OrderStatus.CANCELED;
-		}
+
+	//주문 취소(5분 안에)
+	public void orderCancel(CancelOrderRequestDto requestDto) {
+		this.orderStatus = OrderStatus.CANCELED;
 	}
 
 	//주문 성공
 	public void orderConfirm() {
 		if (this.orderStatus == OrderStatus.WAITING) {
-			this.orderStatus = OrderStatus.CONFIRMED;
+			this.orderStatus = OrderStatus.COMPLETED;
 		}
-	}
-
-	//취소
-	public void modify(ModifyOrderRequestDto requestDto) {
-		this.orderId = requestDto.getOrderId();
-		this.orderUserId = requestDto.getUserId();
-		this.orderResId = requestDto.getResId();
-		this.orderResTotal = requestDto.getResTotal();
-		this.orderStatus = requestDto.getStatus();
-		this.orderType = requestDto.getType();
-		this.orderLocation = requestDto.getOrderLocation();
-		this.orderRequest = requestDto.getOrderRequest();
 	}
 
 

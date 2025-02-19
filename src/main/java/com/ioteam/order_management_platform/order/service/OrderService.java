@@ -2,8 +2,8 @@ package com.ioteam.order_management_platform.order.service;
 
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
-import com.ioteam.order_management_platform.order.dto.req.ModifyOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.entity.Order;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,11 +75,17 @@ public class OrderService {
 
 	//주문 취소하기
 	@Transactional
-	public OrderResponseDto modifyOrder(UUID orderId, ModifyOrderRequestDto requestDto) {
+	public OrderResponseDto cancelOrder(UUID orderId, CancelOrderRequestDto requestDto) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
 
-		order.modify(requestDto);
+		//5분이 지나면 취소 불가능
+		if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+			throw new CustomApiException("취소 가능 시간이 지났습니다.");
+		}
+
+		order.orderCancel(requestDto);
+		orderRepository.save(order);
 		return OrderResponseDto.fromEntity(order);
 	}
 

@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.order.controller;
 
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
+import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
@@ -59,10 +60,10 @@ public class OrderController {
 
 	@Operation(summary = "주문 취소")
 	@PatchMapping("/{order_id}")
-	public ResponseEntity<CommonResponse<OrderResponseDto>> modifyOrder(
-			@PathVariable("order_id") UUID orderId) {
-		OrderResponseDto responseDto = orderService.getOrderDetail(orderId);
-		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_MODIFY, responseDto));
+	public ResponseEntity<CommonResponse<OrderResponseDto>> cancelOrder(@PathVariable("order_id") UUID orderId, @RequestBody CancelOrderRequestDto requestDto) {
+
+		OrderResponseDto responseDto = orderService.cancelOrder(orderId, requestDto);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_CANCEL, responseDto));
 	}
 
 }

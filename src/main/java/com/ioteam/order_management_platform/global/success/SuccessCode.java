@@ -1,9 +1,8 @@
 package com.ioteam.order_management_platform.global.success;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public enum SuccessCode {
 	ORDER_CREATE(HttpStatus.OK, "주문이 성공적으로 생성되었습니다.", "S_ORDER_CREATE"),
 	ORDER_ALL_INFO(HttpStatus.OK, "전체 주문을 조회하는데에 성공하였습니다.", "S_ORDER_LIST_INFO"),
 	ORDER_DETAIL_INFO(HttpStatus.OK, "주문 상세정보를 조회하는데에 성공하였습니다.", "S_ORDER_LIST_INFO"),
-	ORDER_MODIFY(HttpStatus.OK, "주문이 성공적으로 취소되었습니다.", "S_ORDER_MODIFY"),
+	ORDER_CANCEL(HttpStatus.OK, "주문이 성공적으로 취소되었습니다.", "S_ORDER_CANCEL"),
 	ORDER_DELETE(HttpStatus.OK, "주문이 성공적으로 삭제되었습니다.", "S_ORDER_DELETE"),
 
 	// menu
