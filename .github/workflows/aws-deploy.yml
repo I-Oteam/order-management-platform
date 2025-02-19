@@ -1,7 +1,7 @@
 name: docker deploy
 on:
   push:
-    branches: feat/#82_infra
+    branches: self-hosted
 jobs:
   deploy:
     runs-on: ubuntu-latest #self-hosted
