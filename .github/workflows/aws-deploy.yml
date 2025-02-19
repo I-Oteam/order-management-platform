@@ -8,12 +8,11 @@ jobs:
     runs-on: ubuntu-latest #self-hosted
     steps:
       - name: Execute Server Restart through SSH
-        uses: appleboy/ssh-action@v1.2.1
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.USERNAME }}
-          port: ${{ secrets.PORT }}
-          key: ${{ secrets.PASSWORD }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
           script_stop: true
           script: |
             sh ${{ secrets.BACK_DEPLOY }}
