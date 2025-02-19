@@ -1,10 +1,10 @@
 name: docker deploy
 on:
   push:
-    branches: self-hosted
+    branches: feat/#82_infra
 jobs:
   deploy:
-    runs-on: ubuntu-latest #self-hosted
+    runs-on: self-hosted
     steps:
       - name: Execute Server Restart through SSH
         uses: appleboy/ssh-action@master
