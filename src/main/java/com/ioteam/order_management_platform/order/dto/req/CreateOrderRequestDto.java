@@ -1,4 +1,4 @@
-package com.ioteam.order_management_platform.order.dto;
+package com.ioteam.order_management_platform.order.dto.req;
 
 
 import com.ioteam.order_management_platform.order.enums.OrderType;

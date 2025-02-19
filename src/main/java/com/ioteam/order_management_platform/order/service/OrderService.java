@@ -1,18 +1,20 @@
 package com.ioteam.order_management_platform.order.service;
 
 
-import com.ioteam.order_management_platform.order.dto.CreateOrderRequestDto;
-import com.ioteam.order_management_platform.order.dto.OrderListResponseDto;
-import com.ioteam.order_management_platform.order.dto.OrderResponseDto;
+import com.ioteam.order_management_platform.global.exception.CustomApiException;
+import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
+import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
+import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
+import com.ioteam.order_management_platform.order.exception.OrderException;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +33,7 @@ public class OrderService {
 				.orderType(requestDto.getOrderType())
 				.orderLocation(requestDto.getOrderLocation())
 				.orderRequest(requestDto.getOrderRequest())
-				.orderResTotal(requestDto.getOrderResTotal() != null ? requestDto.getOrderResTotal() : BigDecimal.ZERO)
+				.orderResTotal(requestDto.getOrderResTotal())
 				.orderStatus(OrderStatus.WAITING)
 				.build();
 
@@ -49,14 +51,14 @@ public class OrderService {
 		return new OrderListResponseDto(responseDtos);
 	}
 
-//	//주문 상세 조회하기
-//	public OrderListResponseDto getAllOrders(UUID orderId) {
-//		orderRepository.findById(orderId)
-//				.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
-//
+	//주문 상세 조회하기
+	public OrderResponseDto getOrderDetail(UUID orderId) {
+		Order order = orderRepository.findById(orderId)
+				.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
+
 //		List<Order> orderList = orderRepository.findByOrder_OrderId(orderId);
-//		return OrderListResponseDto.of(orderList);
-//	}
+		return OrderResponseDto.fromEntity(order);
+	}
 
 }
 
