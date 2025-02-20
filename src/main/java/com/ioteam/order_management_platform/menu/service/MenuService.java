@@ -61,6 +61,15 @@ public class MenuService {
 		return MenuResponseDto.fromEntity(updatedMenu);
 	}
 
+	@Transactional
+	public MenuResponseDto hiddenMenu(UUID menuId, UserDetailsImpl userDetails) {
+		Menu menu = menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
+		hasModificationPermission(userDetails, menu);
+		Menu hiddenMenu = menu.hiddenMenu();
+		return MenuResponseDto.fromEntity(hiddenMenu);
+	}
+
 	private void hasModificationPermission(UserDetailsImpl userDetails, Menu menu) {
 		UserRoleEnum role = userDetails.getRole();
 		if (role.equals(UserRoleEnum.MANAGER)) {
