@@ -21,6 +21,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "p_restaurant")
+@Table(name = "p_restaurant",
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uk_res_phone", columnNames = "res_phone")
+	})
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,10 +59,10 @@ public class Restaurant extends BaseEntity {
 	@Column(length = 100, nullable = false)
 	private String resName;
 
-	@Column(length = 100, nullable = false, unique = true)
+	@Column(length = 100, nullable = false)
 	private String resAddress;
 
-	@Column(length = 20, nullable = false, unique = true)
+	@Column(length = 20, nullable = false)
 	private String resPhone;
 
 	private String resImageUrl;
