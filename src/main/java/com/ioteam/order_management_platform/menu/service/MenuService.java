@@ -40,10 +40,9 @@ public class MenuService {
 		return MenuResponseDto.fromEntity(savedMenu);
 	}
 
-	public MenuListResponseDto getAllMenus(UUID restaurantId) {
-		validRestaurantExist(restaurantId);
-		List<Menu> menuList = menuRepository.findByRestaurant_ResId(restaurantId);
-		// TODO: isPublic 조회 조건에 추가
+	public MenuListResponseDto getAllMenus(UUID resId, UserDetailsImpl userDetails) {
+		validRestaurantExist(resId);
+		List<Menu> menuList = menuRepository.findMenusByResIdAndRole(resId, userDetails);
 		return MenuListResponseDto.of(menuList);
 	}
 
