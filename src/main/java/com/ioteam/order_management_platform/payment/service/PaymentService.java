@@ -13,7 +13,6 @@ import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.entity.Payment;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.ioteam.order_management_platform.payment.repository.PaymentRepository;
-import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
@@ -25,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final OrderRepository orderRepository;
-	private final RestaurantRepository restaurantRepository;
 
 	@Transactional
 	public PaymentResponseDto createPayment(CreatePaymentRequestDto requestDto) {
