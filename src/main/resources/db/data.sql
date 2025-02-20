@@ -86,3 +86,14 @@ VALUES (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624444'::uuid, null, 
         '합정동' , '1234' , '서울특별시 마포구'),
        (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624554'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624655'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624756'::uuid,
         '한남동' , '1234' , '서울특별시 마포구');
+
+-- p_restaurant_category 테이블 더미데이터 추가
+insert into p_restaurant_category (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, rc_id,
+                                   rc_name)
+values (now(),null,now(), 'd78dfdc2-edc6-4bec-f158-a7e055dcfc71'::uuid, null, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc72'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid, '한식' );
+-- p_restaurant 테이블 더미데이터 추가
+insert into p_restaurant (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_category_id,
+                          res_district_id, res_id, res_owner_id, res_phone, res_address, res_name, res_image_url)
+values (now(),null,now(),'768f5a3b-e6d8-46d6-f953-b9c425ab1cf9'::uuid, null, '768f5a3b-e6d8-46d6-f953-b9c425ab1cf0'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
+       'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'768f5a3b-e6d8-46d6-f953-b9c425ab1cf1'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-1234-5678' ,
+        '재현건물1층1호', '건물주', null);
