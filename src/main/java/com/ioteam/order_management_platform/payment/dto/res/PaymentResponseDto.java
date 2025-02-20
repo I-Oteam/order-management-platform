@@ -15,17 +15,21 @@ import lombok.Getter;
 @Builder
 public class PaymentResponseDto {
 
-	private UUID paymentId;
-	private BigDecimal paymentTotal;
-	private String paymentStatus;
-	private LocalDateTime createDate;
-	private LocalDateTime succeedDate;
-	private LocalDateTime failedDate;
+	private final UUID paymentId;
+	private final String resName;
+	private final BigDecimal paymentTotal;
+	private final String paymentMethod;
+	private final String paymentStatus;
+	private final LocalDateTime createDate;
+	private final LocalDateTime succeedDate;
+	private final LocalDateTime failedDate;
 
-	public static PaymentResponseDto fromEntity(Payment payment) {
+	public static PaymentResponseDto from(Payment payment) {
 		return PaymentResponseDto.builder()
 			.paymentId(payment.getPaymentId())
+			.resName(payment.getOrder().getRestaurant().getResName())
 			.paymentTotal(payment.getPaymentTotal())
+			.paymentMethod(payment.getPaymentMethod())
 			.paymentStatus(payment.getPaymentStatus())
 			.createDate(payment.getCreatedAt())
 			.succeedDate(payment.getPaymentCompletedAt())

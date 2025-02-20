@@ -2,6 +2,8 @@ package com.ioteam.order_management_platform.payment.repository;
 
 import static com.ioteam.order_management_platform.order.entity.QOrder.*;
 import static com.ioteam.order_management_platform.payment.entity.QPayment.*;
+import static com.ioteam.order_management_platform.restaurant.entity.QRestaurant.*;
+import static com.ioteam.order_management_platform.user.entity.QUser.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,20 +11,22 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.payment.dto.req.AdminPaymentSearchCondition;
+import com.ioteam.order_management_platform.payment.dto.req.CustomerPaymentSearchCondition;
+import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -35,19 +39,12 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 	@Override
 	public Page<AdminPaymentResponseDto> searchPaymentAdminByCondition(AdminPaymentSearchCondition condition,
 		Pageable pageable) {
-		List<Tuple> results = queryFactory
-			.select(
-				payment.paymentId,
-				order.user.userId, // customerId 매핑
-				order.restaurant.resId, // restaurantId 매핑
-				payment.paymentTotal,
-				payment.paymentMethod,
-				payment.paymentNumber,
-				payment.paymentStatus,
-				payment.createdAt
-			)
+		List<AdminPaymentResponseDto> dtoList = queryFactory
+			.select(payment)
 			.from(payment)
-			.leftJoin(order).on(order.orderId.eq(payment.order.orderId))
+			.join(payment.order, order).fetchJoin()
+			.join(order.user, user).fetchJoin()
+			.join(order.restaurant, restaurant).fetchJoin()
 			.where(
 				eqOrderId(condition.getOrderId()),
 				eqCustomerId(condition.getCustomerId()),
@@ -61,13 +58,15 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
-			.fetch();
+			.fetch()
+			.stream()
+			.map(AdminPaymentResponseDto::from) // DTO 변환을 from() 메서드에서 처리
+			.toList();
 
-		// Fetch the total count
-		Long totalCount = queryFactory
+		JPAQuery<Long> countQuery = queryFactory
 			.select(payment.count())
 			.from(payment)
-			.leftJoin(order).on(order.orderId.eq(payment.order.orderId))
+			.join(payment.order, order)
 			.where(
 				eqOrderId(condition.getOrderId()),
 				eqCustomerId(condition.getCustomerId()),
@@ -77,36 +76,92 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 				eqPaymentMethod(condition.getPaymentMethod()),
 				eqPaymentStatus(condition.getPaymentStatus()),
 				isDeleted(condition.getIsDeleted())
-			)
-			.fetchOne();
-		// 총 개수 가져오기
-		long total = (totalCount != null) ? totalCount : 0L;
+			);
 
-		List<AdminPaymentResponseDto> dtoList = results.stream()
-			.map(tuple -> AdminPaymentResponseDto.builder()
-				.paymentId(tuple.get(payment.paymentId))
-				.customerId(tuple.get(order.user.userId)) // 주문한 고객 ID
-				.restaurantId(tuple.get(order.restaurant.resId)) // 가게 ID
-				.paymentTotal(tuple.get(payment.paymentTotal))
-				.paymentMethod(tuple.get(payment.paymentMethod))
-				.paymentNumber(tuple.get(payment.paymentNumber))
-				.paymentStatus(tuple.get(payment.paymentStatus))
-				.createdAt(tuple.get(payment.createdAt))
-				.build())
+		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
+	}
+
+	@Override
+	public Page<PaymentResponseDto> searchPaymentByUser(CustomerPaymentSearchCondition condition, UUID userId,
+		Pageable pageable) {
+		List<PaymentResponseDto> dtoList = queryFactory
+			.select(payment)
+			.from(payment)
+			.join(payment.order, order).fetchJoin()
+			.join(order.restaurant, restaurant).fetchJoin()
+			.where(
+				order.user.userId.eq(userId),
+				eqRestaurantName(condition.getRestaurantName()),
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				betweenPaymentTotal(condition.getMinPaymentTotal(), condition.getMaxPaymentTotal()),
+				eqPaymentMethod(condition.getPaymentMethod()),
+				eqPaymentStatus(condition.getPaymentStatus()),
+				payment.deletedAt.isNull()
+			)
+			.orderBy(createOrderSpecifiers(pageable.getSort()))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch()
+			.stream()
+			.map(PaymentResponseDto::from)
 			.toList();
 
-		return new PageImpl<>(dtoList, pageable, total);
+		JPAQuery<Long> countQuery = queryFactory
+			.select(payment.count())
+			.from(payment)
+			.join(payment.order, order)
+			.where(
+				order.user.userId.eq(userId),
+				eqRestaurantName(condition.getRestaurantName()),
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				betweenPaymentTotal(condition.getMinPaymentTotal(), condition.getMaxPaymentTotal()),
+				eqPaymentMethod(condition.getPaymentMethod()),
+				eqPaymentStatus(condition.getPaymentStatus()),
+				payment.deletedAt.isNull()
+			);
+
+		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
 
 	@Override
-	public Page<PaymentResponseDto> searchPaymentByUser(UUID userId, Pageable pageable) {
+	public Page<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition, UUID userId,
+		UUID restaurantId, Pageable pageable) {
+		List<PaymentResponseDto> dtoList = queryFactory
+			.select(payment)
+			.from(payment)
+			.join(payment.order, order).fetchJoin()
+			.join(order.user, user).fetchJoin()
+			.join(order.restaurant, restaurant).fetchJoin()
+			.where(
+				order.restaurant.resId.eq(restaurantId),
+				eqNickname(condition.getNickname()),
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				betweenPaymentTotal(condition.getMinPaymentTotal(), condition.getMaxPaymentTotal()),
+				eqPaymentStatus(condition.getPaymentStatus()),
+				payment.deletedAt.isNull()
+			)
+			.orderBy(createOrderSpecifiers(pageable.getSort()))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch()
+			.stream()
+			.map(PaymentResponseDto::from)
+			.toList();
 
-		return null;
-	}
+		JPAQuery<Long> countQuery = queryFactory
+			.select(payment.count())
+			.from(payment)
+			.join(payment.order, order)
+			.where(
+				order.restaurant.resId.eq(restaurantId),
+				eqNickname(condition.getNickname()),
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				betweenPaymentTotal(condition.getMinPaymentTotal(), condition.getMaxPaymentTotal()),
+				eqPaymentStatus(condition.getPaymentStatus()),
+				payment.deletedAt.isNull()
+			);
 
-	@Override
-	public Page<PaymentResponseDto> searchPaymentByRestaurant(UUID userId, UUID restaurantId, Pageable pageable) {
-		return null;
+		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
 
 	private BooleanExpression eqOrderId(UUID orderId) {
@@ -121,6 +176,14 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 
 	private BooleanExpression eqRestaurantId(UUID restaurantId) {
 		return restaurantId == null ? null : order.restaurant.resId.eq(restaurantId);
+	}
+
+	private BooleanExpression eqRestaurantName(String restaurantName) {
+		return restaurantName == null ? null : order.restaurant.resName.eq(restaurantName);
+	}
+
+	private BooleanExpression eqNickname(String nickname) {
+		return nickname == null ? null : order.user.nickname.eq(nickname);
 	}
 
 	private BooleanExpression betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {

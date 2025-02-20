@@ -13,11 +13,14 @@ import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
 import com.ioteam.order_management_platform.payment.dto.req.AdminPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.req.CreatePaymentRequestDto;
+import com.ioteam.order_management_platform.payment.dto.req.CustomerPaymentSearchCondition;
+import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.entity.Payment;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.ioteam.order_management_platform.payment.repository.PaymentRepository;
+import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
@@ -29,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final OrderRepository orderRepository;
+	private final RestaurantRepository restaurantRepository;
 
 	@Transactional
 	public PaymentResponseDto createPayment(CreatePaymentRequestDto requestDto) {
@@ -41,7 +45,7 @@ public class PaymentService {
 
 		Payment savedPayment = paymentRepository.save(requestDto.toEntity(order));
 
-		return PaymentResponseDto.fromEntity(savedPayment);
+		return PaymentResponseDto.from(savedPayment);
 	}
 
 	public PaymentResponseDto getPayment(UUID paymentId, UserDetailsImpl userDetails) {
@@ -49,14 +53,14 @@ public class PaymentService {
 		if (userDetails.getRole() == UserRoleEnum.MASTER || userDetails.getRole() == UserRoleEnum.MANAGER) {
 			Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
 				.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
-			return PaymentResponseDto.fromEntity(payment);
+			return PaymentResponseDto.from(payment);
 		}
 
 		// CUSTOMER: 본인이 주문한 결제 내역만 조회 가능
 		if (userDetails.getRole() == UserRoleEnum.CUSTOMER) {
 			Payment payment = paymentRepository.findPaymentForCustomer(paymentId, userDetails.getUserId())
 				.orElseThrow(() -> new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS));
-			return PaymentResponseDto.fromEntity(payment);
+			return PaymentResponseDto.from(payment);
 		}
 
 		// OWNER: 본인 가게의 주문 결제 내역만 조회 가능
@@ -68,7 +72,7 @@ public class PaymentService {
 			if (!payment.getOrder().getRestaurant().getOwner().getUserId().equals(userDetails.getUserId())) {
 				throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
 			}
-			return PaymentResponseDto.fromEntity(payment);
+			return PaymentResponseDto.from(payment);
 		}
 
 		throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
@@ -81,17 +85,23 @@ public class PaymentService {
 		return new CommonPageResponse<>(paymentDtoPage);
 	}
 
-	public CommonPageResponse<PaymentResponseDto> searchPaymentByUser(UUID userId, UUID requiredUserId,
+	public CommonPageResponse<PaymentResponseDto> searchPaymentByUser(CustomerPaymentSearchCondition condition,
+		UUID userId, UUID requiredUserId,
 		Pageable pageable) {
 		if (!userId.equals(requiredUserId))
 			throw new CustomApiException(PaymentException.UNAUTHORIZED_REQ);
-		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByUser(userId, pageable);
+		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByUser(condition, userId, pageable);
 		return new CommonPageResponse<>(paymentDtoPage);
 	}
 
-	public CommonPageResponse<PaymentResponseDto> searchPaymentByRestaurant(UUID userId, UUID resId,
+	public CommonPageResponse<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition,
+		UUID userId, UUID resId,
 		Pageable pageable) {
-		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByRestaurant(userId, resId, pageable);
+		UUID resUserId = restaurantRepository.getReferenceById(resId).getOwner().getUserId();
+		if (!userId.equals(resUserId))
+			throw new CustomApiException(PaymentException.UNAUTHORIZED_REQ);
+		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByRestaurant(condition, userId, resId,
+			pageable);
 		return new CommonPageResponse<>(paymentDtoPage);
 	}
 

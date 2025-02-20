@@ -18,10 +18,10 @@ public class AdminPaymentResponseDto {
 	private final UUID paymentId;
 	private final UUID customerId;
 	private final UUID restaurantId;
-	private BigDecimal paymentTotal;
-	private String paymentMethod;
-	private String paymentNumber;
-	private String paymentStatus;
+	private final BigDecimal paymentTotal;
+	private final String paymentMethod;
+	private final String paymentNumber;
+	private final String paymentStatus;
 	private final LocalDateTime createdAt;
 
 	public static AdminPaymentResponseDto from(Payment payment) {

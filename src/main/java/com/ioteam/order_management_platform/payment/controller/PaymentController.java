@@ -22,6 +22,8 @@ import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.payment.dto.req.AdminPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.req.CreatePaymentRequestDto;
+import com.ioteam.order_management_platform.payment.dto.req.CustomerPaymentSearchCondition;
+import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.service.PaymentService;
@@ -78,11 +80,12 @@ public class PaymentController {
 	@PreAuthorize("hasAnyRole('CUSTOMER','MANAGER','MASTER')")
 	@GetMapping("users/{userId}")
 	public ResponseEntity<CommonResponse<CommonPageResponse<PaymentResponseDto>>> searchPaymentByUser(
+		CustomerPaymentSearchCondition condition,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID userId,
 		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByUser(
-			userDetails.getUserId(), userId, pageable);
+			condition, userDetails.getUserId(), userId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
 	}
 
@@ -90,11 +93,12 @@ public class PaymentController {
 	@PreAuthorize("hasAnyRole('OWNER','MANAGER','MASTER')")
 	@GetMapping("restaurants/{resId}")
 	public ResponseEntity<CommonResponse<CommonPageResponse<PaymentResponseDto>>> searchPaymentByRestaurant(
+		OwnerPaymentSearchCondition condition,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID resId,
 		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
-			userDetails.getUserId(), resId, pageable);
+			condition, userDetails.getUserId(), resId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
 	}
 }
