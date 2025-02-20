@@ -67,7 +67,9 @@ public class MenuService {
 	public MenuResponseDto hiddenMenu(UUID menuId, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findById(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
-		hasModificationPermission(userDetails, menu);
+		if (!canModifyOrDelete(userDetails, menu)) {
+			throw new CustomApiException(MenuException.INVALID_HIDDEN_ROLE);
+		}
 		Menu hiddenMenu = menu.hiddenMenu();
 		return MenuResponseDto.fromEntity(hiddenMenu);
 	}
