@@ -4,6 +4,8 @@ import com.ioteam.order_management_platform.global.entity.BaseEntity;
 import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
+import com.ioteam.order_management_platform.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,11 +29,17 @@ public class Order extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID orderId;
 
-	@Column(nullable = false, length = 100)
-	private String orderUserId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "order_user_id")
+	private User user;
 
-	@Column(nullable = false, length = 100)
-	private String orderResId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "order_res_id")
+	private Restaurant restaurant;
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<OrderMenu> orderMenus = new ArrayList<>();
 
 	@Column(nullable = false)
 	private BigDecimal orderResTotal;
@@ -47,12 +57,6 @@ public class Order extends BaseEntity {
 
 	@Column(columnDefinition = "TEXT")
 	private String orderRequest;
-
-//	@Column
-//	private LocalDateTime deletedAt;
-//
-//	@Column
-//	private UUID deletedBy;
 
 
 	//주문 상태

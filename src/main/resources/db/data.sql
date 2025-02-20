@@ -20,8 +20,11 @@ VALUES
 
 
 -- p_restaurant_menu 테이블 목데이터 추가
-INSERT INTO p_restaurant_menu (is_public, rm_price, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_id, rm_id, rm_description, rm_name, rm_image_url)
-VALUES (true, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d5'::uuid, '맛있는 열정 가득 파스타입니다.', '열파르타', 'imageurl');
+INSERT INTO p_restaurant_menu
+    (is_public, rm_price, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_id, rm_id, rm_description, rm_name, rm_image_url)
+VALUES
+    (true, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d5'::uuid, '맛있는 열정 가득 파스타입니다.', '열파르타', 'imageurl'),
+    (true, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d6'::uuid, '맛있는 열정 가득 열리오올리오입니다.', '열리오올리오', 'imageurl');
 
 -- p_order 테이블 목데이터 추가
 INSERT INTO p_order

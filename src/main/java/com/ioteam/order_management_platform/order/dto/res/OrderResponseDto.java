@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -16,9 +17,10 @@ import java.util.UUID;
 public class OrderResponseDto {
 
 	private UUID orderId;
-	private String orderUserId;
-	private String orderResId;
+	private UUID orderUserId;
+	private UUID orderResId;
 	private BigDecimal orderResTotal;
+	private List<OrderMenuResponseDto> orderMenuList;
 	private OrderType orderType;
 	private OrderStatus orderStatus;
 	private String orderLocation;
@@ -26,11 +28,13 @@ public class OrderResponseDto {
 
 	public static OrderResponseDto fromEntity(Order order) {
 
-		System.out.println("Order ID Type: " + order.getOrderId().getClass().getName());
 		return OrderResponseDto.builder()
 				.orderId(order.getOrderId())
-				.orderUserId(order.getOrderUserId())
-				.orderResId(order.getOrderResId())
+				.orderUserId(order.getUser().getUserId())
+				.orderResId(order.getRestaurant().getResId())
+				.orderMenuList(order.getOrderMenus().stream()
+						.map(OrderMenuResponseDto::fromEntity)
+						.toList())
 				.orderResTotal(order.getOrderResTotal())
 				.orderType(order.getOrderType())
 				.orderStatus(order.getOrderStatus())

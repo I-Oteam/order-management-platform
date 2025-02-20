@@ -7,10 +7,12 @@ import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.service.OrderService;
+import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,9 +31,11 @@ public class OrderController {
 	@Operation(summary = "주문 생성")
 	//@PreAuthorize("hasRole('CUSTOMER')")
 	@PostMapping()
-	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(@Validated @RequestBody CreateOrderRequestDto requestDto) {
+	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(
+			@AuthenticationPrincipal UserDetailsImpl userDetails,
+			@Validated @RequestBody CreateOrderRequestDto requestDto) {
 
-		OrderResponseDto responseDto = orderService.createOrder(requestDto);
+		OrderResponseDto responseDto = orderService.createOrder(userDetails.getUserId(), userDetails.getRole(), requestDto);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
 				.path("/api/orders/" + responseDto.getOrderId().toString())

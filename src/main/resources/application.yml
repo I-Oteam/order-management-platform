@@ -20,7 +20,7 @@ spring:
   config.activate.on-profile: local
   devtools:
     livereload:
-      enabled: true
+      enabled: false
   jackson:
     mapper:
       accept-case-insensitive-enums: true

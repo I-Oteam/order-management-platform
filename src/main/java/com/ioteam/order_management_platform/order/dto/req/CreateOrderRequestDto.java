@@ -9,18 +9,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderRequestDto {
 
-	private String orderUserId;
+	@NotNull
+	private UUID orderResId;
 
-	private String orderResId;
+	private List<OrderMenuRequestDto> orderMenuList = new ArrayList<>();
 
 	@NotNull
-	@Min(value = 1, message = "총 주문 금액은 0원 이상이어야 합니다.")
+	@Min(value = 0, message = "총 주문 금액은 0원 이상이어야 합니다.")
 	private BigDecimal orderResTotal;
 
 	private OrderType orderType;
