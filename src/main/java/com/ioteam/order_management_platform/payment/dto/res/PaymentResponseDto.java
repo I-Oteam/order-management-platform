@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.payment.dto.res;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,12 +14,14 @@ import lombok.Getter;
 public class PaymentResponseDto {
 
 	private UUID paymentId;
+	private BigDecimal paymentTotal;
 	private String paymentStatus;
 	private LocalDateTime paymentDate;
 
 	public static PaymentResponseDto fromEntity(Payment payment) {
 		return new PaymentResponseDto(
 			payment.getPaymentId(),
+			payment.getPaymentTotal(),
 			payment.getPaymentStatus(),
 			payment.getCreatedAt()
 		);
