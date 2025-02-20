@@ -1,10 +1,8 @@
-package com.ioteam.order_management_platform.category.entity;
+package com.ioteam.order_management_platform.district.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.ioteam.order_management_platform.category.dto.req.UpdateCategoryRequestDto;
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 
@@ -18,29 +16,30 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "p_district")
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@Table(name = "p_restaurant_category")
-public class Category extends BaseEntity {
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class District extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID rcId;
+	private UUID districtId;
 
-	@Column(nullable = false, unique = true, length = 100)
-	private String rcName;
+	@Column(length = 20, nullable = false)
+	private String districtSigunguCode;
 
-	@OneToMany(mappedBy = "category", cascade = CascadeType.MERGE)
-	private List<Restaurant> restaurants = new ArrayList<>();
+	@Column(length = 100, nullable = false)
+	private String districtSigunguName;
 
-	public void update(UpdateCategoryRequestDto updateCategoryDto) {
-		rcName = updateCategoryDto.getRcName();
-	}
+	@Column(length = 20, nullable = false)
+	private String districtDongName;
+
+	@OneToMany(mappedBy = "district", cascade = CascadeType.MERGE)
+	private List<Restaurant> restaurants;
+
 }

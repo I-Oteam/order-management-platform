@@ -42,10 +42,10 @@ public class CategoryService {
 		UserDetailsImpl userDetails) {
 
 		// Role이 Manager 인지 검증
-		boolean isManager = hasManagerOrOwnerRole(userDetails);
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
 
 		// 카테고리 커스텀 익셉션 발생
-		if (!isManager) {
+		if (!isAuthorized) {
 			throw new CustomApiException(CategoryException.NOT_AUTHORIZED_ROLE);
 		}
 

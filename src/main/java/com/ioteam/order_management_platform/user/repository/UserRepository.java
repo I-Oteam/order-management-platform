@@ -10,7 +10,5 @@ import com.ioteam.order_management_platform.user.entity.User;
 public interface UserRepository extends JpaRepository<User, UUID>, UserRepositoryCustom {
 	Optional<User> findByUsername(String username);
 
-	Optional<User> findByUserId(UUID userId);
-
 	Optional<User> findByUserIdAndDeletedAtIsNull(UUID userId);
 }

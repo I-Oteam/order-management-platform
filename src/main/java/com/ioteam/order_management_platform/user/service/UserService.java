@@ -72,7 +72,7 @@ public class UserService {
 		if (!userDetails.getUserId().equals(userId)) {
 			throw new CustomApiException(UserException.UNAUTHORIZED_ACCESS);
 		}
-		User user = userRepository.findByUserId(userId)
+		User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
 			.orElseThrow(() -> new CustomApiException(UserException.USER_NOT_FOUND));
 		if (user.getDeletedAt() != null) {
 			throw new CustomApiException(UserException.USER_DELETED); // 삭제된 사용자
