@@ -1,0 +1,25 @@
+services:
+  be1:
+    container_name: omp_be1
+    image: ${DOCKER_REGISTRY}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/logs
+      - ./.env:/.env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+  be2:
+    container_name: omp_be2
+    image: ${DOCKER_REGISTRY}
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./logs:/logs
+      - ./.env:/.env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+networks:
+  default:
+    external: true
+    name: omp
