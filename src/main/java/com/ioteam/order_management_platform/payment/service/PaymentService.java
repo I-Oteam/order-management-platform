@@ -105,4 +105,11 @@ public class PaymentService {
 		return new CommonPageResponse<>(paymentDtoPage);
 	}
 
+	@Transactional
+	public void softDeletePayment(UUID paymentId, UserDetailsImpl userDetails) {
+		Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
+			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
+
+		payment.softDelete(userDetails.getUserId());
+	}
 }

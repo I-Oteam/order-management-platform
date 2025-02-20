@@ -49,6 +49,7 @@ public enum SuccessCode {
 	// payment
 	PAYMENT_CREATE(HttpStatus.CREATED, "결제가 성공적으로 요청되었습니다.", "S_PAYMENT_CREATE"),
 	PAYMENT_SEARCH(HttpStatus.OK, "결제가 성공적으로 조회되었습니다.", "S_PAYMENT_SEARCH"),
+	PAYMENT_DELETE(HttpStatus.OK, "결제가 성공적으로 삭제되었습니다.", "S_PAYMENT_DELETE"),
 	// ai
 	;
 	private final HttpStatus statusCode;

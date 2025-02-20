@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -100,5 +101,15 @@ public class PaymentController {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
 			condition, userDetails.getUserId(), resId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
+	}
+
+	@Operation(summary = "결제 삭제하기", description = "결제 삭제는 'MANAGER', 'MASTER' 만 가능")
+	@PreAuthorize("hasAnyRole('MANAGER','MASTER')")
+	@DeleteMapping("/{paymentId}")
+	public ResponseEntity<CommonResponse<PaymentResponseDto>> softDeletePayment(
+		@PathVariable UUID paymentId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		paymentService.softDeletePayment(paymentId, userDetails);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_DELETE, null));
 	}
 }
