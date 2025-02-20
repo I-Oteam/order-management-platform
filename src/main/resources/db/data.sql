@@ -55,3 +55,12 @@ VALUES
     ('d8ef5ca7-2b3c-49bb-9c6d-425c85036de9'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, true, 2, now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '1c114e8f-ccd0-42b8-a7fa-67fee61d4d67'::uuid, 'test', 'test'),
     ('d8ef5ca7-2b3c-49bb-9c6d-425c85036de0'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, true, 1, now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '1c114e8f-ccd0-42b8-a7fa-67fee61d4d13'::uuid, 'test', 'test');
 
+-- p_district 테이블 더미데이터 추가
+INSERT INTO p_district (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, district_id,
+                        district_dong_name, district_sigungu_code, district_sigungu_name)
+VALUES (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624444'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624445'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,
+        '망원동' , '1234' , '서울특별시 마포구'),
+       (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624454'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624455'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624456'::uuid,
+        '합정동' , '1234' , '서울특별시 마포구'),
+       (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624554'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624655'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624756'::uuid,
+        '한남동' , '1234' , '서울특별시 마포구');
