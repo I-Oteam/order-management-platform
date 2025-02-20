@@ -21,6 +21,7 @@ public class CreateOrderRequestDto {
 	@NotNull
 	private UUID orderResId;
 
+	@NotNull
 	private List<OrderMenuRequestDto> orderMenuList = new ArrayList<>();
 
 	@NotNull
