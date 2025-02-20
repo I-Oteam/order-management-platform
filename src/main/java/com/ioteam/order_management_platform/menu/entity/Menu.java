@@ -62,4 +62,9 @@ public class Menu extends BaseEntity {
 		return this;
 	}
 
+	public Menu hiddenMenu() {
+		this.isPublic = !isPublic;
+		return this;
+	}
+
 }

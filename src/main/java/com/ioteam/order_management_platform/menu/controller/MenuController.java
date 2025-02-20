@@ -75,4 +75,13 @@ public class MenuController {
 		MenuResponseDto responseDto = menuService.modifyMenu(menuId, requestDto, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_MODIFY, responseDto));
 	}
+
+	@Operation(summary = "상품 숨김 처리", description = "상품 숨김처리는 OWNER와 MANAGER만 가능")
+	@PatchMapping("/{menu_id}/hidden")
+	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
+	public ResponseEntity<CommonResponse<MenuResponseDto>> hiddenMenu(@PathVariable("menu_id") UUID menuId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		MenuResponseDto responseDto = menuService.hiddenMenu(menuId, userDetails);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_MODIFY, responseDto));
+	}
 }
