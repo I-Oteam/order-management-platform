@@ -8,7 +8,8 @@ public enum MenuException implements ExceptionType {
 
 	INVALID_RESTAURANT_ID(HttpStatus.NOT_FOUND, "restaurant 아이디가 유효하지 않습니다.", "E_INVALID_REVIEW_ID"),
 	INVALID_MENU(HttpStatus.NOT_FOUND, "조회하려는 상품이 존재하지 않습니다.", "E_INVALID_MENU_ID"),
-	INVALID_MODIFY_ROLE(HttpStatus.NOT_FOUND, "해당 상품에 대한 수정 권한이 없습니다.", "E_INVALID_MODIFY_ROLE");
+	INVALID_MODIFY_ROLE(HttpStatus.NOT_FOUND, "해당 상품에 대한 수정 권한이 없습니다.", "E_INVALID_MODIFY_ROLE"),
+	INVALID_DELETE_ROLE(HttpStatus.NOT_FOUND, "해당 상품에 대한 삭제 권한이 없습니다.", "E_INVALID_MODIFY_ROLE");
 
 	private final HttpStatus status;
 	private final String message;
