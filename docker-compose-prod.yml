@@ -5,8 +5,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./logs:/logs
-      - ./.env:/.env
+      - ./logs_8080:/logs
+      - ./.env.8080:/.env
     environment:
       SPRING_PROFILES_ACTIVE: prod
   be2:
@@ -15,8 +15,8 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      - ./logs:/logs
-      - ./.env:/.env
+      - ./logs_8081:/logs
+      - ./.env.8081:/.env
     environment:
       SPRING_PROFILES_ACTIVE: prod
 networks:
