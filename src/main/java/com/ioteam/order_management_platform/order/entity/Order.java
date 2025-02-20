@@ -1,24 +1,17 @@
 package com.ioteam.order_management_platform.order.entity;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
+import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "p_order")
@@ -55,6 +48,26 @@ public class Order extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
 	private String orderRequest;
 
-	//주문 메뉴 추가 필요
+//	@Column
+//	private LocalDateTime deletedAt;
+//
+//	@Column
+//	private UUID deletedBy;
+
+
+	//주문 상태
+
+	//주문 취소(5분 안에)
+	public void orderCancel(CancelOrderRequestDto requestDto) {
+		this.orderStatus = OrderStatus.CANCELED;
+	}
+
+	//주문 성공
+	public void orderConfirm() {
+		if (this.orderStatus == OrderStatus.WAITING) {
+			this.orderStatus = OrderStatus.COMPLETED;
+		}
+	}
+
 
 }

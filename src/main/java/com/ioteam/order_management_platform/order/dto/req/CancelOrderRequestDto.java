@@ -1,29 +1,34 @@
 package com.ioteam.order_management_platform.order.dto.req;
 
 
+import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-@Getter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class CreateOrderRequestDto {
+@Getter
 
-	private String orderUserId;
-
-	private String orderResId;
+public class CancelOrderRequestDto {
 
 	@NotNull
-	@Min(value = 1, message = "총 주문 금액은 0원 이상이어야 합니다.")
-	private BigDecimal orderResTotal;
+	private UUID orderId;
 
-	private OrderType orderType;
+	private String userId;
+
+	private String resId;
+
+	private BigDecimal resTotal;
+
+	private OrderStatus status;
+
+	private OrderType type;
 
 	private String orderLocation;
 
