@@ -54,8 +54,9 @@ public class MenuController {
 	@Operation(summary = "특정 가게 상품 전체 조회")
 	@GetMapping("restaurant/{restaurant_id}")
 	public ResponseEntity<CommonResponse<MenuListResponseDto>> getAllMenu(
-		@PathVariable("restaurant_id") UUID restaurantId) {
-		MenuListResponseDto responseDto = menuService.getAllMenus(restaurantId);
+		@PathVariable("restaurant_id") UUID restaurantId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		MenuListResponseDto responseDto = menuService.getAllMenus(restaurantId, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_LIST_INFO, responseDto));
 	}
 
