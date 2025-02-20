@@ -10,30 +10,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
 @Builder
-public class PaymentResponseDto {
+@AllArgsConstructor
+@Getter
+public class AdminPaymentResponseDto {
 
 	private final UUID paymentId;
-	private final String resName;
+	private final UUID customerId;
+	private final UUID restaurantId;
 	private final BigDecimal paymentTotal;
 	private final String paymentMethod;
+	private final String paymentNumber;
 	private final String paymentStatus;
-	private final LocalDateTime createDate;
-	private final LocalDateTime succeedDate;
-	private final LocalDateTime failedDate;
+	private final LocalDateTime createdAt;
 
-	public static PaymentResponseDto from(Payment payment) {
-		return PaymentResponseDto.builder()
+	public static AdminPaymentResponseDto from(Payment payment) {
+		return AdminPaymentResponseDto
+			.builder()
 			.paymentId(payment.getPaymentId())
-			.resName(payment.getOrder().getRestaurant().getResName())
+			.customerId(payment.getOrder().getUser().getUserId())
+			.restaurantId(payment.getOrder().getRestaurant().getResId())
 			.paymentTotal(payment.getPaymentTotal())
 			.paymentMethod(payment.getPaymentMethod())
+			.paymentNumber(payment.getPaymentNumber())
 			.paymentStatus(payment.getPaymentStatus())
-			.createDate(payment.getCreatedAt())
-			.succeedDate(payment.getPaymentCompletedAt())
-			.failedDate(payment.getPaymentFailedAt())
 			.build();
 	}
 }

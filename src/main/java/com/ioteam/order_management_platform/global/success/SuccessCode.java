@@ -47,7 +47,8 @@ public enum SuccessCode {
 	MENU_DELETE(HttpStatus.NO_CONTENT, "메뉴를 성공적으로 삭제하였습니다.", "S_MENU_DELETE"),
 
 	// payment
-	PAYMENT_CREATE(HttpStatus.OK, "결제가 성공적으로 요청되었습니다.", "S_PAYMENT_CREATE"),
+	PAYMENT_CREATE(HttpStatus.CREATED, "결제가 성공적으로 요청되었습니다.", "S_PAYMENT_CREATE"),
+	PAYMENT_SEARCH(HttpStatus.OK, "결제가 성공적으로 조회되었습니다.", "S_PAYMENT_SEARCH"),
 	// ai
 	;
 	private final HttpStatus statusCode;
