@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
 
-	Optional<Restaurant> findByIdAndDeletedAtIsNull(@NotNull UUID resId);
+	Optional<Restaurant> findByResIdAndDeletedAtIsNull(@NotNull UUID resId);
 
-	boolean existsByIdAndDeletedAtIsNull(UUID restaurantId);
+	boolean existsByResIdAndDeletedAtIsNull(UUID restaurantId);
 }
