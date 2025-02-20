@@ -10,6 +10,8 @@ import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.user.entity.User;
 
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +26,10 @@ public class CreateReviewRequestDto {
 	@NotNull
 	private UUID restaurantId;
 	@NotNull
+	@Min(0)
 	@Max(5)
-	private int reviewScore;
-	@NotNull
+	private Integer reviewScore;
+	@NotBlank
 	@Length(max = 1000)
 	private String reviewContent;
 	@Length(max = 100)

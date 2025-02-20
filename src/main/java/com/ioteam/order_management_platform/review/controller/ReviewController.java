@@ -96,7 +96,7 @@ public class ReviewController {
 		ReviewResponseDto responseDto = reviewService.getReview(reviewId, userDetails.getUserId(),
 			userDetails.getRole());
 		return ResponseEntity.ok(new CommonResponse<>(
-			SuccessCode.REVIEW_CREATE,
+			SuccessCode.REVIEW_SEARCH,
 			responseDto));
 	}
 
@@ -128,8 +128,8 @@ public class ReviewController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.REVIEW_MODIFY, responseDto));
 	}
 
-	@Operation(summary = "리뷰 삭제", description = "리뷰 삭제는 'MANAGER', 'CUSTOMER' 만 가능")
-	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
+	@Operation(summary = "리뷰 삭제", description = "리뷰 삭제는 'MASTER', 'MANAGER', 'CUSTOMER' 만 가능")
+	@PreAuthorize("hasAnyRole('MASTER', 'MANAGER', 'CUSTOMER')")
 	@DeleteMapping("/reviews/{reviewId}")
 	public ResponseEntity<CommonResponse<Void>> softDeleteReview(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
