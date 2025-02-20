@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import com.ioteam.order_management_platform.global.exception.type.ExceptionType;
 
 public enum DistrictException implements ExceptionType {
-	DISTRICT_NOT_FOUND(HttpStatus.BAD_REQUEST, "지역을 찾을 수 없습니다.", "E_DISTRICT_NOT_FOUND");
+	DISTRICT_NOT_FOUND(HttpStatus.NOT_FOUND, "지역을 찾을 수 없습니다.", "E_DISTRICT_NOT_FOUND");
 
 	private final HttpStatus Status;
 	private final String message;

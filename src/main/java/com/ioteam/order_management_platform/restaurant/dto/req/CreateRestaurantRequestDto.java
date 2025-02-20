@@ -37,7 +37,7 @@ public class CreateRestaurantRequestDto {
 	private String resAddress;
 
 	@NotNull
-	@Length()
+	@Length(min = 1, max = 100)
 	private String resPhone;
 
 	private String resImageUrl;
