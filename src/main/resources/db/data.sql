@@ -5,7 +5,8 @@ VALUES
     (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'test1@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'CUSTOMER', 'testCustomer', 'nickname1'),
     (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'test2@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'OWNER', 'testOwner', 'nickname2'),
     (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e3'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e3'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e3'::uuid, 'test3@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'MANAGER', 'testManager', 'nickname3'),
-    (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'test4@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'MASTER', 'testMaster', 'nickname4');
+    (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'test4@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'MASTER', 'testMaster', 'nickname4'),
+    (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e5'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e5'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e5'::uuid, 'test5@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'OWNER', 'testOwner2', 'nickname5');
 
 -- p_restaurant 테이블 목데이터 추가
 INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_address, res_name, res_image_url, res_owner_id)
