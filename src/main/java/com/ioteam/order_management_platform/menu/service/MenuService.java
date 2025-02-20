@@ -70,6 +70,14 @@ public class MenuService {
 		return MenuResponseDto.fromEntity(hiddenMenu);
 	}
 
+	@Transactional
+	public void deleteMenu(UUID menuId, UserDetailsImpl userDetails) {
+		Menu menu = menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
+		hasModificationPermission(userDetails, menu);
+		menu.softDelete(userDetails.getUserId());
+	}
+
 	private void hasModificationPermission(UserDetailsImpl userDetails, Menu menu) {
 		UserRoleEnum role = userDetails.getRole();
 		if (role.equals(UserRoleEnum.MANAGER)) {

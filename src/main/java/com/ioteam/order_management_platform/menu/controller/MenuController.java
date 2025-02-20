@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,5 +85,14 @@ public class MenuController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		MenuResponseDto responseDto = menuService.hiddenMenu(menuId, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_MODIFY, responseDto));
+	}
+
+	@Operation(summary = "상품 삭제", description = "상품 삭제는 OWNER와 MANAGER만 가능")
+	@DeleteMapping("/{menu_id}")
+	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
+	public ResponseEntity<CommonResponse<MenuResponseDto>> deleteMenu(@PathVariable("menu_id") UUID menuId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		menuService.deleteMenu(menuId, userDetails);
+		return ResponseEntity.noContent().build();
 	}
 }

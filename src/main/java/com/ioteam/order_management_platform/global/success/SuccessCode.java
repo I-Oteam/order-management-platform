@@ -1,8 +1,9 @@
 package com.ioteam.order_management_platform.global.success;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -41,8 +42,9 @@ public enum SuccessCode {
 	// menu
 	MENU_LIST_INFO(HttpStatus.OK, "메뉴 목록을 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
 	MENU_DETAIL_INFO(HttpStatus.OK, "메뉴 상세정보를 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
-	MENU_CREATE(HttpStatus.OK, "메뉴를 성공적으로 등록하였습니다.", "S_MENU_LIST_INFO"),
+	MENU_CREATE(HttpStatus.CREATED, "메뉴를 성공적으로 등록하였습니다.", "S_MENU_LIST_INFO"),
 	MENU_MODIFY(HttpStatus.OK, "메뉴를 성공적으로 수정하였습니다.", "S_MENU_MODIFY"),
+	MENU_DELETE(HttpStatus.NO_CONTENT, "메뉴를 성공적으로 삭제하였습니다.", "S_MENU_DELETE"),
 
 	// payment
 	PAYMENT_CREATE(HttpStatus.OK, "결제가 성공적으로 요청되었습니다.", "S_PAYMENT_CREATE"),
