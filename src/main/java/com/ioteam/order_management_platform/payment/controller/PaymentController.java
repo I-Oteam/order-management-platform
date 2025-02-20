@@ -74,13 +74,27 @@ public class PaymentController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
 	}
 
-	// @Operation(summary = "CUSTOMER 별 결제 조회", description = "'CUSTOMER' 별 결제 조회는 'CUSTOMER', 'MASTER', 'MANAGER' 만 가능")
-	// @PreAuthorize("hasAnyRole('CUSTOMER','MANAGER','MASTER')")
-	// @GetMapping("users/{userId}")
-	// public ResponseEntity<CommonResponse<PaymentResponseDto>> getUserPayment(
-	// 	@AuthenticationPrincipal UserDetailsImpl userDetails,
-	// 	@PathVariable UUID userId) {
-	// 	PaymentResponseDto responseDto = paymentService.getUserPayment(userId, userDetails);
-	// 	return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, responseDto));
-	// }
+	@Operation(summary = "유저별 결제 조회", description = "유저별 결제 조회는 'CUSTOMER', 'MASTER', 'MANAGER' 만 가능")
+	@PreAuthorize("hasAnyRole('CUSTOMER','MANAGER','MASTER')")
+	@GetMapping("users/{userId}")
+	public ResponseEntity<CommonResponse<CommonPageResponse<PaymentResponseDto>>> searchPaymentByUser(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable UUID userId,
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByUser(
+			userDetails.getUserId(), userId, pageable);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
+	}
+
+	@Operation(summary = "가게별 결제 조회", description = "가게별 결제 조회는 'OWNER', 'MASTER', 'MANAGER' 만 가능")
+	@PreAuthorize("hasAnyRole('OWNER','MANAGER','MASTER')")
+	@GetMapping("restaurants/{resId}")
+	public ResponseEntity<CommonResponse<CommonPageResponse<PaymentResponseDto>>> searchPaymentByRestaurant(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable UUID resId,
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
+			userDetails.getUserId(), resId, pageable);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
+	}
 }

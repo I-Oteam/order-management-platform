@@ -100,6 +100,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 
 	@Override
 	public Page<PaymentResponseDto> searchPaymentByUser(UUID userId, Pageable pageable) {
+
 		return null;
 	}
 

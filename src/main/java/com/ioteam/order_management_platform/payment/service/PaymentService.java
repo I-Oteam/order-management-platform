@@ -81,4 +81,18 @@ public class PaymentService {
 		return new CommonPageResponse<>(paymentDtoPage);
 	}
 
+	public CommonPageResponse<PaymentResponseDto> searchPaymentByUser(UUID userId, UUID requiredUserId,
+		Pageable pageable) {
+		if (!userId.equals(requiredUserId))
+			throw new CustomApiException(PaymentException.UNAUTHORIZED_REQ);
+		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByUser(userId, pageable);
+		return new CommonPageResponse<>(paymentDtoPage);
+	}
+
+	public CommonPageResponse<PaymentResponseDto> searchPaymentByRestaurant(UUID userId, UUID resId,
+		Pageable pageable) {
+		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByRestaurant(userId, resId, pageable);
+		return new CommonPageResponse<>(paymentDtoPage);
+	}
+
 }

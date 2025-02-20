@@ -1,6 +1,7 @@
 package com.ioteam.order_management_platform.payment.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
@@ -47,4 +48,9 @@ public class Payment extends BaseEntity {
 	@Column(length = 100)
 	private String paymentStatus;
 
+	@Column
+	private LocalDateTime paymentCompletedAt;
+
+	@Column
+	private LocalDateTime paymentFailedAt;
 }
