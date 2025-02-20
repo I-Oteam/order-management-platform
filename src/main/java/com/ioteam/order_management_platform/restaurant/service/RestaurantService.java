@@ -1,5 +1,7 @@
 package com.ioteam.order_management_platform.restaurant.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,5 +74,13 @@ public class RestaurantService {
 		Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
 		return RestaurantResponseDto.fromRestaurant(savedRestaurant);
+	}
+
+	public RestaurantResponseDto searchOneRestaurant(UUID resId) {
+
+		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
+			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
+
+		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
 	}
 }

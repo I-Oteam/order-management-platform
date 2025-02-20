@@ -6,6 +6,7 @@ import com.ioteam.order_management_platform.global.exception.type.ExceptionType;
 
 public enum RestaurantException implements ExceptionType {
 	NOT_AUTHORIZED_ROLE(HttpStatus.FORBIDDEN, "허가받지 않은 역할입니다.", "E_NOT_AUTHORIZED_ROLE"),
+	NOT_FOUND_RESTAURANT(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다.", "E_NOT_FOUND_RESTAURANT"),
 	;
 
 	private final HttpStatus status;

@@ -1,10 +1,12 @@
 package com.ioteam.order_management_platform.restaurant.controller;
 
 import java.net.URI;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +52,16 @@ public class RestaurantController {
 		return ResponseEntity
 			.created(location)
 			.body(new CommonResponse<>(SuccessCode.RESTAURANT_CREATE, restaurantResponseDto));
+	}
+
+	@GetMapping("/restaurants/{resId}")
+	@Operation(summary = "가게 단건 조회", description = "아무나 조회 가능")
+	public ResponseEntity<CommonResponse<RestaurantResponseDto>> getOneRestaurant(UUID resId) {
+
+		RestaurantResponseDto restaurantResponseDto = restaurantService.searchOneRestaurant(resId);
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_ONE_SEARCH, restaurantResponseDto));
 	}
 
 }
