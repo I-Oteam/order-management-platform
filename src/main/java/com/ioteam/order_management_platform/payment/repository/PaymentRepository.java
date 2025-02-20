@@ -27,7 +27,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>, Payment
 	@Query("SELECT p FROM Payment p " +
 		"JOIN FETCH p.order o " +
 		"WHERE p.paymentId = :paymentId " +
-		"AND o.orderUserId = :userId " +
+		"AND o.user.userId = :userId " +
 		"AND p.deletedAt IS NULL")
 	Optional<Payment> findPaymentForCustomer(@Param("paymentId") UUID paymentId, @Param("userId") UUID userId);
 

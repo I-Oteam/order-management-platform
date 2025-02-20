@@ -28,7 +28,7 @@ public class AdminPaymentResponseDto {
 		return AdminPaymentResponseDto
 			.builder()
 			.paymentId(payment.getPaymentId())
-			.customerId(payment.getOrder().getOrderUserId())
+			.customerId(payment.getOrder().getUser().getUserId())
 			.restaurantId(payment.getOrder().getRestaurant().getResId())
 			.paymentTotal(payment.getPaymentTotal())
 			.paymentMethod(payment.getPaymentMethod())

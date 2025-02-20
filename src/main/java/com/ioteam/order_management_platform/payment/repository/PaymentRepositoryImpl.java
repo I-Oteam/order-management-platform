@@ -38,7 +38,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 		List<Tuple> results = queryFactory
 			.select(
 				payment.paymentId,
-				order.orderUserId, // customerId 매핑
+				order.user.userId, // customerId 매핑
 				order.restaurant.resId, // restaurantId 매핑
 				payment.paymentTotal,
 				payment.paymentMethod,
@@ -85,7 +85,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 		List<AdminPaymentResponseDto> dtoList = results.stream()
 			.map(tuple -> AdminPaymentResponseDto.builder()
 				.paymentId(tuple.get(payment.paymentId))
-				.customerId(tuple.get(order.orderUserId)) // 주문한 고객 ID
+				.customerId(tuple.get(order.user.userId)) // 주문한 고객 ID
 				.restaurantId(tuple.get(order.restaurant.resId)) // 가게 ID
 				.paymentTotal(tuple.get(payment.paymentTotal))
 				.paymentMethod(tuple.get(payment.paymentMethod))
@@ -116,7 +116,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 	}
 
 	private BooleanExpression eqCustomerId(UUID customerId) {
-		return customerId == null ? null : order.orderUserId.eq(customerId);
+		return customerId == null ? null : order.user.userId.eq(customerId);
 	}
 
 	private BooleanExpression eqRestaurantId(UUID restaurantId) {
