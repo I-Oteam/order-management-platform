@@ -33,7 +33,7 @@ public class MenuService {
 
 	@Transactional
 	public MenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
-		Restaurant restaurant = restaurantRepository.findById(requestDto.getResId())
+		Restaurant restaurant = restaurantRepository.findByIdAndDeletedAtIsNull(requestDto.getResId())
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
 		Menu menu = requestDto.toEntity(requestDto, restaurant);
 		Menu savedMenu = menuRepository.save(menu);
@@ -47,14 +47,14 @@ public class MenuService {
 	}
 
 	public MenuResponseDto getMenuDetail(UUID menuId) {
-		Menu menu = menuRepository.findById(menuId)
+		Menu menu = menuRepository.findByIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
 		return MenuResponseDto.fromEntity(menu);
 	}
 
 	@Transactional
 	public MenuResponseDto modifyMenu(UUID menuId, UpdateMenuRequestDto requestDto, UserDetailsImpl userDetails) {
-		Menu menu = menuRepository.findById(menuId)
+		Menu menu = menuRepository.findByIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
 		if (!canModifyOrDelete(userDetails, menu)) {
 			throw new CustomApiException(MenuException.INVALID_MODIFY_ROLE);
@@ -65,7 +65,7 @@ public class MenuService {
 
 	@Transactional
 	public MenuResponseDto hiddenMenu(UUID menuId, UserDetailsImpl userDetails) {
-		Menu menu = menuRepository.findById(menuId)
+		Menu menu = menuRepository.findByIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
 		if (!canModifyOrDelete(userDetails, menu)) {
 			throw new CustomApiException(MenuException.INVALID_HIDDEN_ROLE);
@@ -76,7 +76,7 @@ public class MenuService {
 
 	@Transactional
 	public void deleteMenu(UUID menuId, UserDetailsImpl userDetails) {
-		Menu menu = menuRepository.findById(menuId)
+		Menu menu = menuRepository.findByIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
 		if (!canModifyOrDelete(userDetails, menu)) {
 			throw new CustomApiException(MenuException.INVALID_DELETE_ROLE);
@@ -103,7 +103,7 @@ public class MenuService {
 	}
 
 	private void validRestaurantExist(UUID restaurantId) {
-		if (!restaurantRepository.existsById(restaurantId)) {
+		if (!restaurantRepository.existsByIdAndDeletedAtIsNull(restaurantId)) {
 			throw new CustomApiException(MenuException.INVALID_RESTAURANT_ID);
 		}
 	}

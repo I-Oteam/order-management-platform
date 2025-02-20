@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.menu.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,6 @@ public interface MenuRepository extends JpaRepository<Menu, UUID>, MenuCustomRep
 
 	@Query("Select u.userId from User u join Restaurant r on r.owner.userId = u.userId join Menu m on m.restaurant.resId = r.resId where m.rmId = :rmId ")
 	UUID getRestaurantOwnerId(@Param("rmId") UUID rmId);
+
+	Optional<Menu> findByIdAndDeletedAtIsNull(UUID menuId);
 }

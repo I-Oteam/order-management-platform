@@ -27,7 +27,7 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 		UUID userId = userDetails.getUserId();
 		boolean isOwner = isOwner(userId, resId);
 
-		BooleanExpression condition = menu.restaurant.resId.eq(resId);
+		BooleanExpression condition = menu.restaurant.resId.eq(resId).and(menu.deletedAt.isNull());
 
 		// role과 OWNER id 일치 여부에 따른 condition 추가
 		if (role.equals(UserRoleEnum.CUSTOMER) || (role.equals(UserRoleEnum.OWNER) && !isOwner)) {
