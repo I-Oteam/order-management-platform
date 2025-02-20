@@ -24,11 +24,16 @@ spring:
   jackson:
     mapper:
       accept-case-insensitive-enums: true
+scheduled.enabled: ${SCHEDULED_ENABLED}
 
 ---
 # test 환경
 spring:
   config.activate.on-profile: test
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+scheduled.enabled: ${SCHEDULED_ENABLED}
 
 ---
 # prod 환경
@@ -37,3 +42,7 @@ spring:
 logging:
   file:
     path: logs
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+scheduled.enabled: ${SCHEDULED_ENABLED}
