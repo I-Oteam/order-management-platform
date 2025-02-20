@@ -44,7 +44,7 @@ public enum SuccessCode {
 	MENU_MODIFY(HttpStatus.OK, "메뉴를 성공적으로 수정하였습니다.", "S_MENU_MODIFY"),
 
 	// payment
-
+	PAYMENT_CREATE(HttpStatus.OK, "결제가 성공적으로 요청되었습니다.", "S_PAYMENT_CREATE"),
 	// ai
 	;
 	private final HttpStatus statusCode;
