@@ -56,7 +56,9 @@ public class MenuService {
 	public MenuResponseDto modifyMenu(UUID menuId, UpdateMenuRequestDto requestDto, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findById(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
-		hasModificationPermission(userDetails, menu);
+		if (!canModifyOrDelete(userDetails, menu)) {
+			throw new CustomApiException(MenuException.INVALID_MODIFY_ROLE);
+		}
 		Menu updatedMenu = menu.updateMenu(requestDto);
 		return MenuResponseDto.fromEntity(updatedMenu);
 	}
@@ -65,15 +67,27 @@ public class MenuService {
 	public MenuResponseDto hiddenMenu(UUID menuId, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findById(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
-		hasModificationPermission(userDetails, menu);
+		if (!canModifyOrDelete(userDetails, menu)) {
+			throw new CustomApiException(MenuException.INVALID_HIDDEN_ROLE);
+		}
 		Menu hiddenMenu = menu.hiddenMenu();
 		return MenuResponseDto.fromEntity(hiddenMenu);
 	}
 
-	private void hasModificationPermission(UserDetailsImpl userDetails, Menu menu) {
+	@Transactional
+	public void deleteMenu(UUID menuId, UserDetailsImpl userDetails) {
+		Menu menu = menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
+		if (!canModifyOrDelete(userDetails, menu)) {
+			throw new CustomApiException(MenuException.INVALID_DELETE_ROLE);
+		}
+		menu.softDelete(userDetails.getUserId());
+	}
+
+	private boolean canModifyOrDelete(UserDetailsImpl userDetails, Menu menu) {
 		UserRoleEnum role = userDetails.getRole();
 		if (role.equals(UserRoleEnum.MANAGER)) {
-			return;
+			return true;
 		}
 		if (role.equals(UserRoleEnum.OWNER)) {
 			UUID requestUser = userDetails.getUserId();
@@ -82,10 +96,10 @@ public class MenuService {
 				"Updating menu with menuId: " + menu.getRmId() + " with ownerUser: " + ownerUser + " with requestUser: "
 					+ requestUser);
 			if (requestUser.equals(ownerUser)) {
-				return;
+				return true;
 			}
 		}
-		throw new CustomApiException(MenuException.INVALID_MODIFY_ROLE);
+		return false;
 	}
 
 	private void validRestaurantExist(UUID restaurantId) {
