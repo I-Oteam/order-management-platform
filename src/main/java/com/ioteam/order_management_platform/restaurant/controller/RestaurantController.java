@@ -6,7 +6,9 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +64,18 @@ public class RestaurantController {
 
 		return ResponseEntity.ok()
 			.body(new CommonResponse<>(SuccessCode.RESTAURANT_ONE_SEARCH, restaurantResponseDto));
+	}
+
+	@DeleteMapping("/restaurants/{resId}")
+	@Operation(summary = "가게 소프트 삭제", description = "가게 삭제는 'MANAGER' , 'OWNER' 만 가능")
+	public ResponseEntity<CommonResponse<RestaurantResponseDto>> softDeleteRestaurant(
+		@PathVariable UUID resId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		restaurantService.softDeleteRestaurant(resId, userDetails);
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_DELETE, null));
 	}
 
 }

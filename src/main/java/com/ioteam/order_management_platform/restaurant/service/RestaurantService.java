@@ -83,4 +83,19 @@ public class RestaurantService {
 
 		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
 	}
+
+	@Transactional
+	public void softDeleteRestaurant(UUID resId, UserDetailsImpl userDetails) {
+
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
+
+		if (!isAuthorized) {
+			throw new CustomApiException(RestaurantException.NOT_AUTHORIZED_ROLE);
+		}
+
+		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
+			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
+
+		targetRestaurant.softDelete(resId);
+	}
 }
