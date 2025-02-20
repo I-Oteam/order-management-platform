@@ -2,13 +2,18 @@ package com.ioteam.order_management_platform.payment.service;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
+import com.ioteam.order_management_platform.payment.dto.req.AdminPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.req.CreatePaymentRequestDto;
+import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.entity.Payment;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
@@ -40,7 +45,6 @@ public class PaymentService {
 	}
 
 	public PaymentResponseDto getPayment(UUID paymentId, UserDetailsImpl userDetails) {
-
 		// MASTER, MANAGER: 모든 결제 내역 조회 가능
 		if (userDetails.getRole() == UserRoleEnum.MASTER || userDetails.getRole() == UserRoleEnum.MANAGER) {
 			Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
@@ -69,4 +73,12 @@ public class PaymentService {
 
 		throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
 	}
+
+	public CommonPageResponse<AdminPaymentResponseDto> searchPaymentAdminByCondition(
+		AdminPaymentSearchCondition condition, Pageable pageable) {
+		Page<AdminPaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentAdminByCondition(condition,
+			pageable);
+		return new CommonPageResponse<>(paymentDtoPage);
+	}
+
 }

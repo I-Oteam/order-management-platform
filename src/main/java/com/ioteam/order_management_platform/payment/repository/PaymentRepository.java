@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.ioteam.order_management_platform.payment.entity.Payment;
 
-public interface PaymentRepository extends JpaRepository<Payment, UUID> {
+public interface PaymentRepository extends JpaRepository<Payment, UUID>, PaymentRepositoryCustom {
 	boolean existsByOrderOrderId(UUID orderId);
 
 	Optional<Payment> findByPaymentIdAndDeletedAtIsNull(UUID paymentId);
@@ -30,4 +30,5 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 		"AND o.orderUserId = :userId " +
 		"AND p.deletedAt IS NULL")
 	Optional<Payment> findPaymentForCustomer(@Param("paymentId") UUID paymentId, @Param("userId") UUID userId);
+
 }
