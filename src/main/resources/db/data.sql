@@ -59,8 +59,8 @@ VALUES
 INSERT INTO p_order
     (order_res_total, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, order_id, order_location, order_res_id, order_user_id, order_request, order_status, order_type)
 VALUES
-    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
-    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
+    (25500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
+    (25500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de3'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de4'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de5'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
@@ -70,6 +70,16 @@ VALUES
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de9'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de0'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036d11'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY');
+
+-- p_order_menu 테이블 목데이터 추가
+INSERT INTO p_order_menu
+    (order_count, order_price, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, order_id, order_menu_id, order_rm_id)
+VALUES
+    (1, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed30'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d5'::uuid),
+    (2, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed31'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d6'::uuid),
+    (1, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed32'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d5'::uuid),
+    (2, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed33'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d6'::uuid);
+
 
 -- p_payment 테이블 목데이터 추가
 INSERT INTO p_payment

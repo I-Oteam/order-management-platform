@@ -38,6 +38,7 @@ public enum SuccessCode {
 	ORDER_DETAIL_INFO(HttpStatus.OK, "주문 상세정보를 조회하는데에 성공하였습니다.", "S_ORDER_LIST_INFO"),
 	ORDER_CANCEL(HttpStatus.OK, "주문이 성공적으로 취소되었습니다.", "S_ORDER_CANCEL"),
 	ORDER_DELETE(HttpStatus.OK, "주문이 성공적으로 삭제되었습니다.", "S_ORDER_DELETE"),
+	ORDER_SEARCH(HttpStatus.OK, "주문이 성공적으로 조회되었습니다.", "S_ORDER_SEARCH"),
 
 	// menu
 	MENU_LIST_INFO(HttpStatus.OK, "메뉴 목록을 조회하는데에 성공하였습니다.", "S_MENU_LIST_INFO"),
@@ -50,6 +51,7 @@ public enum SuccessCode {
 	PAYMENT_CREATE(HttpStatus.CREATED, "결제가 성공적으로 요청되었습니다.", "S_PAYMENT_CREATE"),
 	PAYMENT_SEARCH(HttpStatus.OK, "결제가 성공적으로 조회되었습니다.", "S_PAYMENT_SEARCH"),
 	PAYMENT_DELETE(HttpStatus.OK, "결제가 성공적으로 삭제되었습니다.", "S_PAYMENT_DELETE"),
+	PAYMENT_STATUS_CHANGED(HttpStatus.OK, "결제 상태가 성공적으로 변경되었습니다.", " S_PAYMENT_STATUS_CHANGED"),
 
 	// restaurant
 	RESTAURANT_CREATE(HttpStatus.OK, "가게가 성공적으로 생성되었습니다.", "S_RESTAURANT_CREATE"),
@@ -60,6 +62,7 @@ public enum SuccessCode {
 
 	// ai
 	AI_CREATE_MENU_DESCRIPTION(HttpStatus.OK, "메뉴 설명이 성공적으로 추천되었습니다.", "S_AI_CREATE_MENU_DESCRIPTION");
+
 
 	private final HttpStatus statusCode;
 	private final String message;
