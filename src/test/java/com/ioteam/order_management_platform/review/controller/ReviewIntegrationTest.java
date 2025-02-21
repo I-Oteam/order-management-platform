@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.review.dto.req.CreateReviewRequestDto;
@@ -40,11 +42,15 @@ class ReviewIntegrationTest {
 		LocalDateTime startCreatedAt = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
 		LocalDateTime endCreatedAt = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
 		Integer score = 4;
+		MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+		param.add("startCreatedAt", startCreatedAt.toString());
+		param.add("endCreatedAt", endCreatedAt.toString());
+		param.add("score", score.toString());
 
 		// when, then
 		mockMvc.perform(
-				get("/api/reviews/admin?startCreatedAt={startCreatedAt}&endCreatedAt={endCreatedAt}&score={score}",
-					startCreatedAt, endCreatedAt, score)
+				get("/api/reviews/admin")
+					.params(param)
 					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
