@@ -57,7 +57,7 @@ public class Payment extends BaseEntity {
 	@Column
 	private LocalDateTime paymentFailedAt;
 
-	public void setPaymentStatus(PaymentStatusEnum newStatus) {
+	public void updatePaymentDate(PaymentStatusEnum newStatus) {
 		// 결제 상태가 'PENDING'에서 'COMPLETED'로 변경될 때 결제 완료 시간을 설정
 		if (newStatus == PaymentStatusEnum.COMPLETED && this.paymentStatus != PaymentStatusEnum.COMPLETED) {
 			this.paymentCompletedAt = LocalDateTime.now();
