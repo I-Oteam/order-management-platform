@@ -18,6 +18,7 @@ import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCo
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.entity.Payment;
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.ioteam.order_management_platform.payment.repository.PaymentRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
@@ -37,11 +38,11 @@ public class PaymentService {
 
 	@Transactional
 	public PaymentResponseDto createPayment(UserDetailsImpl userDetails, CreatePaymentRequestDto requestDto) {
-		Order order = orderRepository.findById(requestDto.getOrderId())
-			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_USERNAME));
-		if (!order.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
-			throw new CustomApiException(PaymentException.INVALID_USER);
-		}
+		// 주문이 유효한지, 주문자가 본인인지, 주문이 삭제되지 않았는지 확인
+		Order order = orderRepository.findValidOrderForPayment(requestDto.getOrderId(),
+				userDetails.getUser().getUserId())
+			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_ORDER_OR_USER));
+		// 이미 결제된 내역이 있는지 확인
 		if (paymentRepository.existsByOrderOrderId(requestDto.getOrderId())) {
 			throw new CustomApiException(PaymentException.PAYMENT_ALREADY_COMPLETED);
 		}
@@ -124,5 +125,18 @@ public class PaymentService {
 			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
 
 		payment.softDelete(userDetails.getUserId());
+	}
+
+	@Transactional
+	public PaymentResponseDto changePaymentStatus(UUID paymentId, PaymentStatusEnum newStatus) {
+		Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
+			.orElseThrow(() -> new CustomApiException(PaymentException.PAYMENT_NOT_FOUND));
+		if (payment.getPaymentStatus() == PaymentStatusEnum.PENDING && payment.getPaymentStatus() != newStatus) {
+			payment.setPaymentStatus(newStatus);
+			Payment updatedPayment = paymentRepository.save(payment);
+			return PaymentResponseDto.from(updatedPayment);
+		} else {
+			throw new CustomApiException(PaymentException.PAYMENT_ALREADY_COMPLETED);
+		}
 	}
 }

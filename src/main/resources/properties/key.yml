@@ -6,3 +6,7 @@ jwt:
     master: ${MASTER_TOKEN}
     manager: ${MANAGER_TOKEN}
     owner: ${OWNER_TOKEN}
+gemini:
+  api:
+    url: ${GEMINI_API_URL}
+    key: ${GEMINI_API_KEY}

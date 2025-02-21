@@ -9,9 +9,38 @@ VALUES
     (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e4'::uuid, 'test4@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'MASTER', 'testMaster', 'nickname4'),
     (now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e5'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e5'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e5'::uuid, 'test5@example.com', '$2a$10$4eKGfDmoeH4VsoW9O908eOwiSD1Rkw161fVS2hAeQNHmhzlB9/xBa', 'OWNER', 'testOwner2', 'nickname5');
 
+
+-- p_district 테이블 더미데이터 추가
+INSERT INTO p_district (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, district_id,
+                        district_dong_name, district_sigungu_code, district_sigungu_name)
+VALUES (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624444'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624445'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,
+        '망원동' , '1234' , '서울특별시 마포구'),
+       (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624454'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624455'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624456'::uuid,
+        '합정동' , '1234' , '서울특별시 마포구'),
+       (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624554'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624655'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624756'::uuid,
+        '한남동' , '1234' , '서울특별시 마포구');
+
+
+-- p_restaurant_category 테이블 더미데이터 추가
+insert into p_restaurant_category (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, rc_id,
+                                   rc_name)
+values (now(),null,now(), 'd78dfdc2-edc6-4bec-f158-a7e055dcfc71'::uuid, null, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc72'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid, '한식' ),
+       (now(),null,now(), 'd78dfdc2-edc6-4bec-f158-a7e055dcfc71'::uuid, null, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc72'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc74'::uuid, '양식' );
+
+
 -- p_restaurant 테이블 목데이터 추가
-INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_address, res_name, res_image_url, res_owner_id)
-VALUES (now(), now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '02-0000-0000', '서울시 스파르타 스파르타동 스번지', '스파르타파스타', null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid);
+INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_address, res_name, res_image_url, res_owner_id, res_category_id)
+VALUES (now(), now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '02-0000-0000', '서울시 스파르타 스파르타동 스번지', '스파르타파스타', null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc74'::uuid);
+
+insert into p_restaurant (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_category_id,
+                          res_district_id, res_id, res_owner_id, res_phone, res_address, res_name, res_image_url)
+values (now(),null,now(),'768f5a3b-e6d8-46d6-f953-b9c425ab1cf9'::uuid, null, '768f5a3b-e6d8-46d6-f953-b9c425ab1cf0'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
+        'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'768f5a3b-e6d8-46d6-f953-b9c425ab1cf1'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-1234-5678' ,
+        '재현건물1층1호', '건물주', null),
+       (now(),null,now(),'2d99938f-57ad-4b6c-f234-ee77aaffd1e1'::uuid, null, '2d99938f-57ad-4b6c-f234-ee77aaffd1e2'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
+        'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'2d99938f-57ad-4b6c-f234-ee77aaffd1e3'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-2345-1234' ,
+        '재현건물2층2호', '건물주2', null);
+
 
 -- p_restaurant_score 테이블 목데이터 추가
 INSERT INTO p_restaurant_score
@@ -33,8 +62,8 @@ VALUES
 INSERT INTO p_order
     (order_res_total, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, order_id, order_location, order_res_id, order_user_id, order_request, order_status, order_type)
 VALUES
-    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
-    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
+    (25500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
+    (25500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de3'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de4'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de5'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
@@ -44,6 +73,16 @@ VALUES
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de9'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de0'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036d11'::uuid, '주문 배달지 주소', '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '주문에 대한 요청사항', 'COMPLETED', 'DELIVERY');
+
+-- p_order_menu 테이블 목데이터 추가
+INSERT INTO p_order_menu
+    (order_count, order_price, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, order_id, order_menu_id, order_rm_id)
+VALUES
+    (1, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed30'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d5'::uuid),
+    (2, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de1'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed31'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d6'::uuid),
+    (1, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed32'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d5'::uuid),
+    (2, 8500, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de2'::uuid, 'd8beeaac-9314-4e76-811a-edcc201fed33'::uuid, '439f222b-0cbb-4600-a989-e7fdabf120d6'::uuid);
+
 
 -- p_payment 테이블 목데이터 추가
 INSERT INTO p_payment
@@ -77,26 +116,3 @@ VALUES
     ('d8ef5ca7-2b3c-49bb-9c6d-425c85036de9'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, true, 2, now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '1c114e8f-ccd0-42b8-a7fa-67fee61d4d67'::uuid, 'test', 'test'),
     ('d8ef5ca7-2b3c-49bb-9c6d-425c85036de0'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, true, 1, now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, '1c114e8f-ccd0-42b8-a7fa-67fee61d4d13'::uuid, 'test', 'test');
 
--- p_district 테이블 더미데이터 추가
-INSERT INTO p_district (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, district_id,
-                        district_dong_name, district_sigungu_code, district_sigungu_name)
-VALUES (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624444'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624445'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,
-        '망원동' , '1234' , '서울특별시 마포구'),
-       (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624454'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624455'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624456'::uuid,
-        '합정동' , '1234' , '서울특별시 마포구'),
-       (now(), null, now(), 'd6df52e4-6ec8-4d46-b0c2-90f5f2624554'::uuid, null, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624655'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624756'::uuid,
-        '한남동' , '1234' , '서울특별시 마포구');
-
--- p_restaurant_category 테이블 더미데이터 추가
-insert into p_restaurant_category (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, rc_id,
-                                   rc_name)
-values (now(),null,now(), 'd78dfdc2-edc6-4bec-f158-a7e055dcfc71'::uuid, null, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc72'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid, '한식' );
--- p_restaurant 테이블 더미데이터 추가
-insert into p_restaurant (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_category_id,
-                          res_district_id, res_id, res_owner_id, res_phone, res_address, res_name, res_image_url)
-values (now(),null,now(),'768f5a3b-e6d8-46d6-f953-b9c425ab1cf9'::uuid, null, '768f5a3b-e6d8-46d6-f953-b9c425ab1cf0'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
-       'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'768f5a3b-e6d8-46d6-f953-b9c425ab1cf1'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-1234-5678' ,
-        '재현건물1층1호', '건물주', null),
-       (now(),null,now(),'2d99938f-57ad-4b6c-f234-ee77aaffd1e1'::uuid, null, '2d99938f-57ad-4b6c-f234-ee77aaffd1e2'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
-        'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'2d99938f-57ad-4b6c-f234-ee77aaffd1e3'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-2345-1234' ,
-        '재현건물2층2호', '건물주2', null);

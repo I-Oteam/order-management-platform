@@ -18,13 +18,9 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
 
 	boolean existsByResIdAndDeletedAtIsNull(UUID restaurantId);
 
-	Page<Restaurant> findAllByDeletedAtIsNull(Pageable pageable);
 
-	@Query("""
-		    SELECT r FROM Restaurant r 
-		    JOIN FETCH r.category c 
-		    WHERE r.deletedAt IS NULL 
-		    AND c.deletedAt IS NULL
-		""")
-	Page<Restaurant> findAllByDeletedAtIsNullWithCategory(Pageable pageable);
+	Page<Restaurant> findAllByDeletedAtIsNull(Pageable pageable);
+  
+	boolean existsByResIdAndOwner_userIdAndDeletedAtIsNull(UUID resId, UUID userId);
 }
+

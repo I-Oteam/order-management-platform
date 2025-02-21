@@ -7,13 +7,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
+import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.OrderMenuRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
@@ -29,7 +32,6 @@ import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.repository.UserRepository;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -79,47 +81,61 @@ public class OrderService {
 		return OrderResponseDto.fromEntity(savedOrder);
 	}
 
-	//주문 성공 상태
-	public void OrderStatusProcess(UUID orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
-
-		order.orderConfirm();
-		orderRepository.save(order);
-	}
-
 	//주문 전체 조회하기
-	@Transactional
-	public OrderListResponseDto getAllOrders() {
-		List<Order> orderList = orderRepository.findAll();
+	public OrderListResponseDto getAllOrders(UserDetailsImpl userDetails) {
+		List<Order> orderList = orderRepository.findAllByDeletedAtIsNull();
 		List<OrderResponseDto> responseDtos = orderList.stream()
 			.map(OrderResponseDto::fromEntity)
 			.collect(Collectors.toList());
+
+		//MANAGER가 아니라면 예외 발생
+		if (userDetails.getAuthorities().stream().noneMatch(
+			authority -> authority.getAuthority().equals("ROLE_MANAGER"))
+		) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
 
 		return new OrderListResponseDto(responseDtos);
 	}
 
 	//주문 상세 조회하기
-	@Transactional
-	public OrderResponseDto getOrderDetail(UUID orderId) {
-		Order order = orderRepository.findById(orderId)
+	public OrderResponseDto getOrderDetail(UUID orderId, UserDetailsImpl userDetails) {
+		Order order = orderRepository.findByOrderIdAndDeletedAtIsNull(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
+
+		//CUSTOMER나 MANAGER가 아니라면 예외 발생
+		if (userDetails.getAuthorities().stream().noneMatch(
+			authority -> authority.getAuthority().equals("ROLE_MANAGER") ||
+				authority.getAuthority().equals("ROLE_CUSTOMER")
+		)) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
 
 		return OrderResponseDto.fromEntity(order);
 	}
 
 	//주문 취소하기
 	@Transactional
-	public OrderResponseDto cancelOrder(UUID orderId, CancelOrderRequestDto requestDto) {
+	public OrderResponseDto cancelOrder(UUID orderId, CancelOrderRequestDto requestDto, UserDetailsImpl userDetails) {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
 
-		//5분이 지나면 취소 불가능
-		if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
-			throw new CustomApiException("취소 가능 시간이 지났습니다.");
+		//제 머릿속에서 나오는대로 썼더니 지저분하네요.. 이거 맞나요?
+		boolean isOwner = order.getRestaurant().getOwner().getUserId().equals(userDetails.getUserId());
+		boolean isCustomer = order.getUser().getUserId().equals(userDetails.getUserId());
+
+		if (isOwner) {
+			//가게 주인인 경우 취소 가능
+			order.orderCancel(requestDto);
+		} else if (isCustomer) {
+			//주문 고객인 경우 5분 이내에만 취소 가능
+			if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+				throw new CustomApiException(OrderException.INVALID_ORDER_CANCEL);
+			} else {
+				order.orderCancel(requestDto);
+			}
 		}
 
-		order.orderCancel(requestDto);
 		orderRepository.save(order);
 		return OrderResponseDto.fromEntity(order);
 	}
@@ -131,15 +147,34 @@ public class OrderService {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER));
 
-		//주문 가게 주인이 아니라면
+		//OWNER나 MANAGER가 아니라면 예외 발생
+		if (userDetails.getAuthorities().stream().noneMatch(
+			authority -> authority.getAuthority().equals("ROLE_MANAGER") ||
+				authority.getAuthority().equals("ROLE_OWNER")
+		)) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
+
+		// 주문 가게의 주인과 사용자 ID가 일치하지 않으면 예외 발생
 		if (!order.getRestaurant().getOwner().getUserId().equals(userDetails.getUserId())) {
 			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 		}
 
-		Order targetOrder = orderRepository.findByOrderIdAndDeletedAtIsNull(orderId)
-			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER));
+		order.softDelete(userDetails.getUserId());
+	}
 
-		targetOrder.softDelete(userDetails.getUserId());
+	public CommonPageResponse<OrderResponseDto> searchOrderByRestaurant(UserDetailsImpl userDetails, UUID resId,
+		OrderByRestaurantSearchCondition condition, Pageable pageable) {
+		// MANAGER, MASTER 조회가능
+		// 가게 주인 조회 가능
+		if (userDetails.getRole().equals(UserRoleEnum.OWNER)
+			&& !restaurantRepository.existsByResIdAndOwner_userIdAndDeletedAtIsNull(resId, userDetails.getUserId())) {
+			throw new CustomApiException(OrderException.UNAUTH_OWNER);
+		}
+		Page<OrderResponseDto> orderDtoPage = orderRepository.searchOrderByRestaurantAndCondition(resId, condition,
+				pageable)
+			.map(OrderResponseDto::fromEntity);
+		return new CommonPageResponse<>(orderDtoPage);
 	}
 }
 
