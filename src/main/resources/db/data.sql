@@ -29,8 +29,8 @@ values (now(),null,now(), 'd78dfdc2-edc6-4bec-f158-a7e055dcfc71'::uuid, null, 'd
 
 
 -- p_restaurant 테이블 목데이터 추가
-INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_address, res_name, res_image_url, res_owner_id, res_category_id)
-VALUES (now(), now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '02-0000-0000', '서울시 스파르타 스파르타동 스번지', '스파르타파스타', null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc74'::uuid);
+INSERT INTO p_restaurant (created_at, modified_at, created_by, modified_by, res_id, res_phone, res_address, res_name, res_image_url, res_owner_id, res_category_id, res_district_id)
+VALUES (now(), now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid, '02-0000-0000', '서울시 스파르타 스파르타동 스번지', '스파르타파스타', null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, 'd78dfdc2-edc6-4bec-f158-a7e055dcfc74'::uuid, 'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid);
 
 insert into p_restaurant (created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, res_category_id,
                           res_district_id, res_id, res_owner_id, res_phone, res_address, res_name, res_image_url)
