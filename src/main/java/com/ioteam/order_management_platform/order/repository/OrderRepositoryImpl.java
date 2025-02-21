@@ -18,6 +18,8 @@ import org.springframework.data.support.PageableExecutionUtils;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
 import com.ioteam.order_management_platform.order.entity.Order;
+import com.ioteam.order_management_platform.order.enums.OrderStatus;
+import com.ioteam.order_management_platform.order.enums.OrderType;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -76,6 +78,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.where(
 				order.restaurant.resId.eq(resId),
 				eqNickname(condition.getNickname()),
+				eqOrderStatus(condition.getOrderStatus()),
+				eqOrderType(condition.getOrderType()),
 				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
 				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
 			);
@@ -89,6 +93,14 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
 	private BooleanExpression eqRestaurantName(String restaurantName) {
 		return restaurantName == null ? null : order.restaurant.resName.eq(restaurantName);
+	}
+
+	private BooleanExpression eqOrderType(OrderType orderType) {
+		return orderType == null ? null : order.orderType.eq(orderType);
+	}
+
+	private BooleanExpression eqOrderStatus(OrderStatus orderStatus) {
+		return orderStatus == null ? null : order.orderStatus.eq(orderStatus);
 	}
 
 	private BooleanExpression eqNickname(String nickname) {
