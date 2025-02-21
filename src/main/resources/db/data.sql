@@ -58,8 +58,8 @@ VALUES
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036de7'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de7'::uuid, 'CREDIT_CARD', '4333333333333333', 'PENDING'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036de8'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de8'::uuid, 'KAKAO_PAY', '2222333344445555', 'PENDING'),
     (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036de9'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de9'::uuid, 'BANK_TRANSFER', '6666777788889999', 'PENDING'),
-    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036de0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de0'::uuid, 'CREDIT_CARD', '4444555566667777', 'PENDING'),
-    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036d11'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036d11'::uuid, 'PAYCO', '8888999900001111', 'PENDING');
+    (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036de0'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036de0'::uuid, 'CREDIT_CARD', '4444555566667777', 'PENDING');
+    -- (100000, now(), null, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, null, 'd2ed72d8-090a-4efb-abe4-7acbdce120e1'::uuid, 'a1f5ca7b-2c3d-49bb-9c6d-425c85036d11'::uuid, 'd8ef5ca7-2b3c-49bb-9c6d-425c85036d11'::uuid, 'PAYCO', '8888999900001111', 'PENDING');
 
 
 -- p_review 테이블 목데이터 추가
