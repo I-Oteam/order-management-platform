@@ -96,6 +96,11 @@ public class RestaurantService {
 		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
 			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
 
+		// 해당 유저가 가게 주인인지 판별
+		if (!userDetails.getUserId().equals(targetRestaurant.getOwner().getUserId())) {
+			throw new CustomApiException(RestaurantException.MISMATCH_OWNER);
+		}
+
 		targetRestaurant.softDelete(resId);
 	}
 }
