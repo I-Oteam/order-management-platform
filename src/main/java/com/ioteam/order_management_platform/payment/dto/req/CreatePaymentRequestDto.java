@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.payment.entity.Payment;
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class CreatePaymentRequestDto {
 			.builder()
 			.paymentTotal(paymentTotal)
 			.paymentMethod(paymentMethod)
-			.paymentStatus("PENDING")
+			.paymentStatus(PaymentStatusEnum.valueOf("PENDING"))
 			.order(order)
 			.build();
 	}

@@ -11,7 +11,10 @@ public enum PaymentException implements ExceptionType {
 	INVALID_PAYMENT_ID(HttpStatus.NOT_FOUND, "payment ID가 유효하지 않습니다.", "E_INVALID_PAYMENT_ID"),
 	UNAUTHORIZED_PAYMENT_ACCESS(HttpStatus.UNAUTHORIZED, "접근이 유효하지 않습니다.", "E_UNAUTHORIZED_PAYMENT_ACCESS"),
 	INVALID_PERIOD(HttpStatus.UNPROCESSABLE_ENTITY, "기간 설정이 유효하지 않습니다.", "E_INVALID_PERIOD"),
-	UNAUTHORIZED_REQ(HttpStatus.FORBIDDEN, "권한이 없는 요청입니다.", "E_UNAUTHORIZED_REQ");
+	UNAUTHORIZED_REQ(HttpStatus.FORBIDDEN, "권한이 없는 요청입니다.", "E_UNAUTHORIZED_REQ"),
+	INVALID_USER(HttpStatus.FORBIDDEN, "현재 로그인한 사용자가 해당 결제를 진행할 권한이 없습니다.", "E_INVALID_USER"),
+	RESTAURANT_NOT_FOUND(HttpStatus.NOT_FOUND, "가게 정보가 조회되지 않습니다.", "E_RESTAURANT_NOT_FOUND"),
+	;
 
 	private final HttpStatus status;
 	private final String message;

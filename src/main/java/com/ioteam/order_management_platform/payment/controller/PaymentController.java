@@ -45,8 +45,9 @@ public class PaymentController {
 	@PreAuthorize("hasAnyRole('CUSTOMER','MANAGER','MASTER')")
 	@PostMapping
 	public ResponseEntity<CommonResponse<PaymentResponseDto>> createMenu(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@RequestBody CreatePaymentRequestDto requestDto) {
-		PaymentResponseDto responseDto = paymentService.createPayment(requestDto);
+		PaymentResponseDto responseDto = paymentService.createPayment(userDetails, requestDto);
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
 			.path("/api/payments/" + responseDto.getPaymentId().toString())
 			.build()
@@ -99,7 +100,7 @@ public class PaymentController {
 		@PathVariable UUID resId,
 		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
-			condition, userDetails.getUserId(), resId, pageable);
+			condition, userDetails, resId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
 	}
 
