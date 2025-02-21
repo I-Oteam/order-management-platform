@@ -24,6 +24,7 @@ import com.ioteam.order_management_platform.user.dto.req.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.req.SignupRequestDto;
 import com.ioteam.order_management_platform.user.dto.req.UserSearchCondition;
 import com.ioteam.order_management_platform.user.dto.res.AdminUserResponseDto;
+import com.ioteam.order_management_platform.user.dto.res.LoginResponseDto;
 import com.ioteam.order_management_platform.user.dto.res.UserInfoResponseDto;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 import com.ioteam.order_management_platform.user.service.UserService;
@@ -50,9 +51,9 @@ public class UserController {
 
 	@PostMapping("/login")
 	@Operation(summary = "로그인", description = "로그인은 인증/비인증 회원 모두 사용 가능")
-	public ResponseEntity<CommonResponse<String>> login(@RequestBody @Validated LoginRequestDto requestDto) {
-		String token = userService.login(requestDto);
-		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_LOGIN, token));
+	public ResponseEntity<CommonResponse<LoginResponseDto>> login(@RequestBody @Validated LoginRequestDto requestDto) {
+		LoginResponseDto responseDto = userService.login(requestDto);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.USER_LOGIN, responseDto));
 	}
 
 	@GetMapping("/{userId}")
