@@ -83,4 +83,24 @@ public class RestaurantService {
 
 		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
 	}
+
+	@Transactional
+	public void softDeleteRestaurant(UUID resId, UserDetailsImpl userDetails) {
+
+		boolean isAuthorized = hasManagerOrOwnerRole(userDetails);
+
+		if (!isAuthorized) {
+			throw new CustomApiException(RestaurantException.NOT_AUTHORIZED_ROLE);
+		}
+
+		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
+			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
+
+		// 해당 유저가 가게 주인인지 판별
+		if (!userDetails.getUserId().equals(targetRestaurant.getOwner().getUserId())) {
+			throw new CustomApiException(RestaurantException.MISMATCH_OWNER);
+		}
+
+		targetRestaurant.softDelete(resId);
+	}
 }
