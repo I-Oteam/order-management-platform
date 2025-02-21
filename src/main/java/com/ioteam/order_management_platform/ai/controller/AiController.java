@@ -3,6 +3,7 @@ package com.ioteam.order_management_platform.ai.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import com.ioteam.order_management_platform.ai.dto.req.RecommendDesRequestDto;
 import com.ioteam.order_management_platform.ai.dto.res.AnswerAiResponseDto;
 import com.ioteam.order_management_platform.ai.service.AiService;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
+import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,9 +32,9 @@ public class AiController {
 	@PostMapping("/menu-description")
 	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
 	public ResponseEntity<CommonResponse<AnswerAiResponseDto>> getAiMenuDescription(
-		@RequestBody RecommendDesRequestDto requestDto,
+		@RequestBody @Validated RecommendDesRequestDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		AnswerAiResponseDto responseDto = aiService.recommendMenuDescription(userDetails, requestDto);
-		return ResponseEntity.ok(new CommonResponse<>("code", responseDto));
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.AI_CREATE_MENU_DESCRIPTION, responseDto));
 	}
 }

@@ -38,7 +38,6 @@ public class AIResponse extends BaseEntity {
 	private String arQuestion;
 	@Column(length = 100, nullable = false)
 	private String arAnswer;
-	@Column(length = 100)
 	private String arModel;
 
 }
