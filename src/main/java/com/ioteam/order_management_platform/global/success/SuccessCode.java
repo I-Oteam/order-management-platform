@@ -59,8 +59,7 @@ public enum SuccessCode {
 	RESTAURANT_DELETE(HttpStatus.ACCEPTED, "가게가 성공적으로 삭제되었습니다.", "S_RESTAURANT_DELETE"),
 
 	// ai
-	AI_CREATE_MENU_DESCRIPTION(HttpStatus.OK, "메뉴 설명이 성공적으로 추천되었습니다.", "S_AI_CREATE_MENU_DESCRIPTION"),
-	;
+	AI_CREATE_MENU_DESCRIPTION(HttpStatus.OK, "메뉴 설명이 성공적으로 추천되었습니다.", "S_AI_CREATE_MENU_DESCRIPTION");
 
 	private final HttpStatus statusCode;
 	private final String message;
