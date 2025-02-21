@@ -25,4 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 		+ "and o.deletedAt is null")
 	Optional<Order> findByOrderIdAndUserIdAndResIdAndDeletedAtIsNotNullFetchJoin(UUID orderId, UUID userId,
 		UUID restaurantId);
+
+	//삭제
+	Optional<Order> findByOrderIdAndDeletedAtIsNull(UUID orderId);
 }

@@ -60,7 +60,6 @@ public class Order extends BaseEntity {
 
 
 	//주문 상태
-
 	//주문 취소(5분 안에)
 	public void orderCancel(CancelOrderRequestDto requestDto) {
 		this.orderStatus = OrderStatus.CANCELED;
