@@ -236,7 +236,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
 
 		return sort.stream()
-			.filter(order -> List.of("score", "createdAt").contains(order.getProperty()))
+			.filter(order -> List.of("score", "createdAt", "modifiedAt").contains(order.getProperty()))
 			.map(order -> {
 				Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
 				switch (order.getProperty()) {
@@ -244,6 +244,8 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 						return new OrderSpecifier(direction, review.reviewScore);
 					case "createdAt":
 						return new OrderSpecifier(direction, review.createdAt);
+					case "modifiedAt":
+						return new OrderSpecifier(direction, review.modifiedAt);
 				}
 				return null;
 			})
