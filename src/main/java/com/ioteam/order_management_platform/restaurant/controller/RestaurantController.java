@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.restaurant.dto.req.CreateRestaurantRequestDto;
+import com.ioteam.order_management_platform.restaurant.dto.req.ModifyRestaurantRequestDto;
 import com.ioteam.order_management_platform.restaurant.dto.res.RestaurantResponseDto;
 import com.ioteam.order_management_platform.restaurant.service.RestaurantService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
@@ -72,10 +74,26 @@ public class RestaurantController {
 		@PathVariable UUID resId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
+
 		restaurantService.softDeleteRestaurant(resId, userDetails);
 
 		return ResponseEntity.ok()
 			.body(new CommonResponse<>(SuccessCode.RESTAURANT_DELETE, null));
+	}
+
+	@PatchMapping("/restaurants/{resId}")
+	@Operation(summary = "가게 정보 수정", description = "가게 수정은 'MANAGER' , 'OWNER' 만 가능")
+	public ResponseEntity<CommonResponse<RestaurantResponseDto>> updateRestaurant(
+		@PathVariable UUID resId,
+		@RequestBody @Validated ModifyRestaurantRequestDto modifyRestaurantRequestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+
+		RestaurantResponseDto restaurantResponseDto = restaurantService.updateRestaurant(resId,
+			modifyRestaurantRequestDto, userDetails);
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_MODIFY, restaurantResponseDto));
 	}
 
 }

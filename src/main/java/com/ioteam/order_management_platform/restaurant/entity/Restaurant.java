@@ -2,12 +2,14 @@ package com.ioteam.order_management_platform.restaurant.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.category.entity.Category;
 import com.ioteam.order_management_platform.district.entity.District;
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
 import com.ioteam.order_management_platform.menu.entity.Menu;
+import com.ioteam.order_management_platform.restaurant.dto.req.ModifyRestaurantRequestDto;
 import com.ioteam.order_management_platform.user.entity.User;
 
 import jakarta.persistence.CascadeType;
@@ -69,4 +71,19 @@ public class Restaurant extends BaseEntity {
 
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<Menu> menuList = new ArrayList<>();
+
+	public void update(ModifyRestaurantRequestDto modifyRestaurantRequestDto, User modifiedUser,
+		Category modifiedCategory, District modifiedDistrict) {
+
+		// 트러블 슈팅
+		Optional.ofNullable(modifyRestaurantRequestDto.getResName()).ifPresent(value -> this.resName = value);
+		Optional.ofNullable(modifyRestaurantRequestDto.getResAddress()).ifPresent(value -> this.resAddress = value);
+		Optional.ofNullable(modifyRestaurantRequestDto.getResPhone()).ifPresent(value -> this.resPhone = value);
+		Optional.ofNullable(modifyRestaurantRequestDto.getResImageUrl()).ifPresent(value -> this.resImageUrl = value);
+
+		Optional.ofNullable(modifiedUser).ifPresent(value -> this.owner = value);
+		Optional.ofNullable(modifiedCategory).ifPresent(value -> this.category = value);
+		Optional.ofNullable(modifiedDistrict).ifPresent(value -> this.district = value);
+
+	}
 }
