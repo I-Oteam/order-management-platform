@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -75,7 +76,11 @@ public class PaymentController {
 	@GetMapping("/admin")
 	public ResponseEntity<CommonResponse<CommonPageResponse<AdminPaymentResponseDto>>> searchPaymentAdmin(
 		AdminPaymentSearchCondition condition,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable) {
 		CommonPageResponse<AdminPaymentResponseDto> pageResponse = paymentService.searchPaymentAdminByCondition(
 			condition, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
@@ -88,7 +93,11 @@ public class PaymentController {
 		CustomerPaymentSearchCondition condition,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID userId,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByUser(
 			condition, userDetails.getUserId(), userId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
@@ -101,7 +110,11 @@ public class PaymentController {
 		OwnerPaymentSearchCondition condition,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID resId,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
 			condition, userDetails, resId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));

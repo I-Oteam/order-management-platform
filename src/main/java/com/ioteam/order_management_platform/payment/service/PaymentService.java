@@ -132,7 +132,7 @@ public class PaymentService {
 		Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
 			.orElseThrow(() -> new CustomApiException(PaymentException.PAYMENT_NOT_FOUND));
 		if (payment.getPaymentStatus() == PaymentStatusEnum.PENDING && payment.getPaymentStatus() != newStatus) {
-			payment.setPaymentStatus(newStatus);
+			payment.updatePaymentDate(newStatus);
 			Payment updatedPayment = paymentRepository.save(payment);
 			return PaymentResponseDto.from(updatedPayment);
 		} else {

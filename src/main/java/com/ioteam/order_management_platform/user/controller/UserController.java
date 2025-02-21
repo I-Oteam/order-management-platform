@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -70,7 +71,11 @@ public class UserController {
 	public ResponseEntity<CommonResponse<CommonPageResponse<AdminUserResponseDto>>> searchUsers(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		UserSearchCondition condition,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable
 	) {
 		CommonPageResponse<AdminUserResponseDto> pageResponse = userService.searchUsersByCondition(userDetails,
 			condition, pageable);
