@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.ai.dto.req.RecommendDesRequestDto;
 import com.ioteam.order_management_platform.ai.dto.res.AnswerAiResponseDto;
 import com.ioteam.order_management_platform.ai.entity.AIResponse;
@@ -22,9 +25,9 @@ import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 @Transactional
 public class AiService {
 
-	@Value("gemini.api.url")
+	@Value("${gemini.api.url}")
 	private String geminiApiUrl;
-	@Value("gemini.api.key")
+	@Value("${gemini.api.key}")
 	private String geminiApiKey;
 
 	private final RestaurantRepository restaurantRepository;
@@ -59,7 +62,6 @@ public class AiService {
 
 		// API 호출
 		String aiAnswer = requestGemini(question);
-
 		// OWNER의 입력 키워드의 경우 최대 5개
 
 		// AI의 응답의 문장만 DB에 저장
@@ -70,13 +72,7 @@ public class AiService {
 	}
 
 	private String requestGemini(String question) {
-		// AI 연동
-		// 요청 payload 생성
-		// {
-		//   "contents": [{
-		//     "parts":[{"text": "Explain how AI works"}]
-		//     }]
-		//    }
+
 		Map<String, Object> requestBody = Map.of(
 			"contents", new Object[] {
 				Map.of("parts", new Object[] {
@@ -85,12 +81,25 @@ public class AiService {
 			}
 		);
 
-		return webClient.post()
+		String aiAnswer = webClient.post()
 			.uri(geminiApiUrl + geminiApiKey)
 			.header("Content-Type", "application/json")
 			.bodyValue(requestBody)
 			.retrieve()
 			.bodyToMono(String.class)
 			.block();
+
+		try {
+			JsonNode root = new ObjectMapper().readTree(aiAnswer);
+			return root.get("candidates")
+				.get(0)
+				.get("content")
+				.get("parts")
+				.get(0)
+				.get("text")
+				.asText();
+		} catch (JsonProcessingException e) {
+			throw new CustomApiException("AI 응답 파싱 중 오류 발생");
+		}
 	}
 }
