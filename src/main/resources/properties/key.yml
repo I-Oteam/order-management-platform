@@ -1,0 +1,8 @@
+spring:
+  config.activate.on-profile: key
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+    master: ${MASTER_TOKEN}
+    manager: ${MANAGER_TOKEN}
+    owner: ${OWNER_TOKEN}

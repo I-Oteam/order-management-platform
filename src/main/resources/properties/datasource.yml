@@ -1,0 +1,37 @@
+# local 환경
+spring:
+  config.activate.on-profile: local
+  datasource:
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: omp
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/data.sql # db 시작할때 실행시킬 script (더미 데이터 생성)
+
+---
+# test 환경
+spring:
+  config.activate.on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE  # db 주소 고정
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/data.sql # db 시작할때 실행시킬 script (더미 데이터 생성)
+
+---
+# prod 환경
+spring:
+  config.activate.on-profile: prod
+  datasource:
+    url: ${AWS_DB_URL}
+    username: ${AWS_DB_USERNAME}
+    password: ${AWS_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: omp
