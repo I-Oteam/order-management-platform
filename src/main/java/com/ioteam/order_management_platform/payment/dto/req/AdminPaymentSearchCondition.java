@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,6 +22,6 @@ public class AdminPaymentSearchCondition {
 	private BigDecimal maxPaymentTotal;
 	private String paymentMethod;
 	private String paymentNumber;
-	private String paymentStatus;
+	private PaymentStatusEnum paymentStatus;
 	private Boolean isDeleted;
 }

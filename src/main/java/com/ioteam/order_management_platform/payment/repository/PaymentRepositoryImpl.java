@@ -21,6 +21,7 @@ import com.ioteam.order_management_platform.payment.dto.req.CustomerPaymentSearc
 import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -208,8 +209,8 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 		return (paymentMethod == null || paymentMethod.isEmpty()) ? null : payment.paymentMethod.eq(paymentMethod);
 	}
 
-	private BooleanExpression eqPaymentStatus(String paymentStatus) {
-		return (paymentStatus == null || paymentStatus.isEmpty()) ? null : payment.paymentStatus.eq(paymentStatus);
+	private BooleanExpression eqPaymentStatus(PaymentStatusEnum paymentStatus) {
+		return (paymentStatus == null) ? null : payment.paymentStatus.eq(paymentStatus);
 	}
 
 	private Predicate isDeleted(Boolean isDeleted) {

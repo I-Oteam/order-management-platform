@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.payment.entity.Payment;
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class PaymentResponseDto {
 	private final String resName;
 	private final BigDecimal paymentTotal;
 	private final String paymentMethod;
-	private final String paymentStatus;
+	private final PaymentStatusEnum paymentStatus;
 	private final LocalDateTime createDate;
 	private final LocalDateTime succeedDate;
 	private final LocalDateTime failedDate;
