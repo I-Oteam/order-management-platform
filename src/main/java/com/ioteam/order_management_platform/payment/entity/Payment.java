@@ -9,6 +9,8 @@ import com.ioteam.order_management_platform.order.entity.Order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,12 +47,26 @@ public class Payment extends BaseEntity {
 	@Column(length = 100)
 	private String paymentNumber;
 
-	@Column(length = 100)
-	private String paymentStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10, nullable = false)
+	private PaymentStatusEnum paymentStatus;
 
 	@Column
 	private LocalDateTime paymentCompletedAt;
 
 	@Column
 	private LocalDateTime paymentFailedAt;
+
+	public void setPaymentStatus(PaymentStatusEnum newStatus) {
+		// 결제 상태가 'PENDING'에서 'COMPLETED'로 변경될 때 결제 완료 시간을 설정
+		if (newStatus == PaymentStatusEnum.COMPLETED && this.paymentStatus != PaymentStatusEnum.COMPLETED) {
+			this.paymentCompletedAt = LocalDateTime.now();
+		}
+		// 결제 상태가 'PENDING'에서 'FAILED'로 변경될 때 결제 실패 시간을 설정
+		if (newStatus == PaymentStatusEnum.FAILED && this.paymentStatus != PaymentStatusEnum.FAILED) {
+			this.paymentFailedAt = LocalDateTime.now();
+		}
+		// 상태 변경
+		this.paymentStatus = newStatus;
+	}
 }

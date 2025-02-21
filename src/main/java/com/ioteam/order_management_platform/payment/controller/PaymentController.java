@@ -11,10 +11,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,6 +29,7 @@ import com.ioteam.order_management_platform.payment.dto.req.CustomerPaymentSearc
 import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCondition;
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 import com.ioteam.order_management_platform.payment.service.PaymentService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
@@ -45,8 +48,9 @@ public class PaymentController {
 	@PreAuthorize("hasAnyRole('CUSTOMER','MANAGER','MASTER')")
 	@PostMapping
 	public ResponseEntity<CommonResponse<PaymentResponseDto>> createMenu(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@RequestBody CreatePaymentRequestDto requestDto) {
-		PaymentResponseDto responseDto = paymentService.createPayment(requestDto);
+		PaymentResponseDto responseDto = paymentService.createPayment(userDetails, requestDto);
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
 			.path("/api/payments/" + responseDto.getPaymentId().toString())
 			.build()
@@ -99,7 +103,7 @@ public class PaymentController {
 		@PathVariable UUID resId,
 		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
-			condition, userDetails.getUserId(), resId, pageable);
+			condition, userDetails, resId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
 	}
 
@@ -112,4 +116,15 @@ public class PaymentController {
 		paymentService.softDeletePayment(paymentId, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_DELETE, null));
 	}
+
+	@Operation(summary = "결제 상태 변경", description = "결제 상태 변경은 'MANAGER','MASTER' 만 가능")
+	@PreAuthorize("hasAnyRole('MANAGER','MASTER')")
+	@PatchMapping("/{paymentId}/status")
+	public ResponseEntity<CommonResponse<PaymentResponseDto>> changePaymentStatus(
+		@PathVariable UUID paymentId,
+		@RequestParam PaymentStatusEnum newStatus) {
+		PaymentResponseDto responseDto = paymentService.changePaymentStatus(paymentId, newStatus);
+		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_STATUS_CHANGED, responseDto));
+	}
+
 }

@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.global.exception;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -57,6 +58,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		HttpHeaders headers = new HttpHeaders();
 		return handleExceptionInternal(ex, new CommonErrorResponse(ex.getMessage(), BaseException.SERVER_ERROR),
 			headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	protected ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e,
+		WebRequest request) {
+		HttpHeaders headers = new HttpHeaders();
+		return handleExceptionInternal(e,
+			new CommonErrorResponse(BaseException.DUPLICATE_FIELD.getMessage(), BaseException.DUPLICATE_FIELD),
+			headers,
+			HttpStatus.CONFLICT,
+			request);
 	}
 
 	// 나머지 예외 처리는 오버라이드해서 커스텀할 수 있다.

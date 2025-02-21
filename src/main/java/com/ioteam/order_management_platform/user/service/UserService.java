@@ -15,6 +15,7 @@ import com.ioteam.order_management_platform.user.dto.req.LoginRequestDto;
 import com.ioteam.order_management_platform.user.dto.req.SignupRequestDto;
 import com.ioteam.order_management_platform.user.dto.req.UserSearchCondition;
 import com.ioteam.order_management_platform.user.dto.res.AdminUserResponseDto;
+import com.ioteam.order_management_platform.user.dto.res.LoginResponseDto;
 import com.ioteam.order_management_platform.user.dto.res.UserInfoResponseDto;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
@@ -50,21 +51,19 @@ public class UserService {
 		}
 	}
 
-	public String login(LoginRequestDto requestDto) {
+	public LoginResponseDto login(LoginRequestDto requestDto) {
 		String username = requestDto.getUsername();
 		String password = requestDto.getPassword();
 
-		User user = userRepository.findByUsername(username)
-			.orElseThrow(() -> new CustomApiException(UserException.INVALID_USERNAME));
-
-		if (user.getDeletedAt() != null) {
-			throw new CustomApiException(UserException.USER_DELETED);
-		}
+		User user = userRepository.findByUsernameAndDeletedAtIsNull(username)
+			.orElseThrow(() -> new CustomApiException(UserException.USER_NOT_FOUND));
 
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new CustomApiException(UserException.INVALID_PASSWORD);
 		}
-		return jwtUtil.createToken(username, user.getRole());
+		String token = jwtUtil.createToken(username, user.getRole());
+
+		return LoginResponseDto.from(user, token);
 	}
 
 	@Transactional(readOnly = true)

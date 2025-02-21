@@ -1,15 +1,19 @@
 package com.ioteam.order_management_platform.user.dto.res;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.ioteam.order_management_platform.user.entity.User;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
 @AllArgsConstructor
 public class UserInfoResponseDto {
+	UUID userId;
 	String username;
 	String email;
 	String nickname;
@@ -17,12 +21,14 @@ public class UserInfoResponseDto {
 	LocalDateTime updateDate;
 
 	public static UserInfoResponseDto from(User user) {
-		return new UserInfoResponseDto(
-			user.getUsername(),
-			user.getEmail(),
-			user.getNickname(),
-			user.getCreatedAt(),
-			user.getModifiedAt()
-		);
+		return UserInfoResponseDto
+			.builder()
+			.userId(user.getUserId())
+			.username(user.getUsername())
+			.email(user.getEmail())
+			.nickname(user.getNickname())
+			.createDate(user.getCreatedAt())
+			.updateDate(user.getModifiedAt())
+			.build();
 	}
 }

@@ -7,13 +7,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
+import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.OrderMenuRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
@@ -158,6 +161,20 @@ public class OrderService {
 		}
 
 		order.softDelete(userDetails.getUserId());
+	}
+
+	public CommonPageResponse<OrderResponseDto> searchOrderByRestaurant(UserDetailsImpl userDetails, UUID resId,
+		OrderByRestaurantSearchCondition condition, Pageable pageable) {
+		// MANAGER, MASTER 조회가능
+		// 가게 주인 조회 가능
+		if (userDetails.getRole().equals(UserRoleEnum.OWNER)
+			&& !restaurantRepository.existsByResIdAndOwner_userIdAndDeletedAtIsNull(resId, userDetails.getUserId())) {
+			throw new CustomApiException(OrderException.UNAUTH_OWNER);
+		}
+		Page<OrderResponseDto> orderDtoPage = orderRepository.searchOrderByRestaurantAndCondition(resId, condition,
+				pageable)
+			.map(OrderResponseDto::fromEntity);
+		return new CommonPageResponse<>(orderDtoPage);
 	}
 }
 

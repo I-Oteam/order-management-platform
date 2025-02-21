@@ -35,6 +35,7 @@ public class RestaurantResponseDto {
 			.districtName(savedRestaurant.getDistrict().getDistrictSigunguName() + " " + savedRestaurant.getDistrict()
 				.getDistrictDongName())
 			.ownerId(savedRestaurant.getOwner().getUserId())
+			.ownerName(savedRestaurant.getOwner().getUsername())
 			.resName(savedRestaurant.getResName())
 			.resAddress(savedRestaurant.getResAddress())
 			.resPhone(savedRestaurant.getResPhone())
