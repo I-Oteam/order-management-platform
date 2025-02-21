@@ -18,6 +18,7 @@ import com.ioteam.order_management_platform.payment.dto.req.OwnerPaymentSearchCo
 import com.ioteam.order_management_platform.payment.dto.res.AdminPaymentResponseDto;
 import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.entity.Payment;
+import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.ioteam.order_management_platform.payment.repository.PaymentRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
@@ -124,5 +125,18 @@ public class PaymentService {
 			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
 
 		payment.softDelete(userDetails.getUserId());
+	}
+
+	@Transactional
+	public PaymentResponseDto changePaymentStatus(UUID paymentId, PaymentStatusEnum newStatus) {
+		Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
+			.orElseThrow(() -> new CustomApiException(PaymentException.PAYMENT_NOT_FOUND));
+		if (payment.getPaymentStatus() == PaymentStatusEnum.PENDING && payment.getPaymentStatus() != newStatus) {
+			payment.setPaymentStatus(newStatus);
+			Payment updatedPayment = paymentRepository.save(payment);
+			return PaymentResponseDto.from(updatedPayment);
+		} else {
+			throw new CustomApiException(PaymentException.PAYMENT_ALREADY_COMPLETED);
+		}
 	}
 }
