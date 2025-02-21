@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,7 +49,11 @@ public class ReviewController {
 	@GetMapping("/reviews/admin")
 	public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviewAdmin(
 		AdminReviewSearchCondition condition,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable
 	) {
 
 		CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewAdminByCondition(condition,
@@ -64,7 +69,11 @@ public class ReviewController {
 	public ResponseEntity<CommonResponse<CommonPageResponse<ReviewResponseDto>>> searchReviewsByUser(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID userId,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable
 	) {
 
 		CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewByUser(
@@ -78,7 +87,11 @@ public class ReviewController {
 	public ResponseEntity<CommonResponse<CommonPageResponse<ReviewResponseDto>>> searchReviewsByRestaurant(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID resId,
-		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault
+		@SortDefault.SortDefaults(
+			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
+		) Pageable pageable
 	) {
 
 		CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewByRestaurant(
