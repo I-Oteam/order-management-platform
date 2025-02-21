@@ -1,5 +1,22 @@
 package com.ioteam.order_management_platform.order.controller;
 
+import java.net.URI;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
@@ -8,17 +25,10 @@ import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.service.OrderService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,18 +42,19 @@ public class OrderController {
 	//@PreAuthorize("hasRole('CUSTOMER')")
 	@PostMapping()
 	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(
-			@AuthenticationPrincipal UserDetailsImpl userDetails,
-			@Validated @RequestBody CreateOrderRequestDto requestDto) {
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@Validated @RequestBody CreateOrderRequestDto requestDto) {
 
-		OrderResponseDto responseDto = orderService.createOrder(userDetails.getUserId(), userDetails.getRole(), requestDto);
+		OrderResponseDto responseDto = orderService.createOrder(userDetails.getUserId(), userDetails.getRole(),
+			requestDto);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/orders/" + responseDto.getOrderId().toString())
-				.build()
-				.toUri();
+			.path("/api/orders/" + responseDto.getOrderId().toString())
+			.build()
+			.toUri();
 
 		return ResponseEntity.created(location)
-				.body(new CommonResponse<>(SuccessCode.ORDER_CREATE, responseDto));
+			.body(new CommonResponse<>(SuccessCode.ORDER_CREATE, responseDto));
 	}
 
 	@Operation(summary = "전체 주문 조회")
@@ -64,10 +75,24 @@ public class OrderController {
 
 	@Operation(summary = "주문 취소")
 	@PatchMapping("/{order_id}")
-	public ResponseEntity<CommonResponse<OrderResponseDto>> cancelOrder(@PathVariable("order_id") UUID orderId, @RequestBody CancelOrderRequestDto requestDto) {
-
+	public ResponseEntity<CommonResponse<OrderResponseDto>> cancelOrder(@PathVariable("order_id") UUID orderId,
+		@RequestBody CancelOrderRequestDto requestDto) {
 		OrderResponseDto responseDto = orderService.cancelOrder(orderId, requestDto);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_CANCEL, responseDto));
+	}
+
+	@Operation(summary = "주문 삭제")
+	@PreAuthorize("hasAnyRole('MANAGER', 'OWNER')")
+	@DeleteMapping("/{orderId}")
+	public ResponseEntity<CommonResponse<Void>> softDeleteOrder(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable UUID orderId
+	) {
+		orderService.softDeleteOrder(orderId, userDetails);
+
+		return ResponseEntity
+			.ok()
+			.body(new CommonResponse<>(SuccessCode.ORDER_DELETE, null));
 	}
 
 }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public enum OrderException implements ExceptionType {
 
+	INVALID_ORDER(HttpStatus.BAD_REQUEST, "주문이 존재하지 않습니다.", "E_INVALID_ORDER"),
 	INVALID_ORDER_ID(HttpStatus.BAD_REQUEST, "주문 아이디가 유효하지 않습니다.", "E_INVALID_ORDER_ID"),
 	INVALID_ORDER_RES_ID(HttpStatus.BAD_REQUEST, "가게 아이디가 유효하지 않습니다.", "E_INVALID_ORDER_RES_ID"),
 	INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 주문 타입입니다.", "E_INVALID_ORDER_TYPE"),
