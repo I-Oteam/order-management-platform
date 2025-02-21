@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.order.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,12 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.ioteam.order_management_platform.order.entity.Order;
-import com.ioteam.order_management_platform.order.enums.OrderStatus;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
 	//주문 상태
-	List<Order> findByOrderStatusAndCreatedAtBefore(OrderStatus orderStatus, LocalDateTime createdAt);
+	//List<Order> findByOrderStatusAndCreatedAtBefore(OrderStatus orderStatus, LocalDateTime createdAt);
 
 	@Query("select o from Order o "
 		+ "join fetch o.user ou "
@@ -26,6 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 	Optional<Order> findByOrderIdAndUserIdAndResIdAndDeletedAtIsNotNullFetchJoin(UUID orderId, UUID userId,
 		UUID restaurantId);
 
-	//삭제
+	List<Order> findAllByDeletedAtIsNull();
+
 	Optional<Order> findByOrderIdAndDeletedAtIsNull(UUID orderId);
 }

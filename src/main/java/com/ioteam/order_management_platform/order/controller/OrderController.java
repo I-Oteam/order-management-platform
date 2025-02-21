@@ -25,6 +25,7 @@ import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.service.OrderService;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
+import com.ioteam.order_management_platform.user.security.UserDetailsServiceImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,9 +38,10 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
 	private final OrderService orderService;
+	private final UserDetailsServiceImpl userDetailsServiceImpl;
 
 	@Operation(summary = "주문 생성")
-	//@PreAuthorize("hasRole('CUSTOMER')")
+	@PreAuthorize("hasRole('CUSTOMER')")
 	@PostMapping()
 	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -58,7 +60,7 @@ public class OrderController {
 	}
 
 	@Operation(summary = "전체 주문 조회")
-	//@PreAuthorize("hasRole('MANAGER')")
+	@PreAuthorize("hasRole('MANAGER')")
 	@GetMapping("/all")
 	public ResponseEntity<CommonResponse<OrderListResponseDto>> getAllOrders() {
 		OrderListResponseDto responseDto = orderService.getAllOrders();
@@ -66,7 +68,7 @@ public class OrderController {
 	}
 
 	@Operation(summary = "주문 상세 조회")
-	//@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
+	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
 	@GetMapping("/{order_id}")
 	public ResponseEntity<CommonResponse<OrderResponseDto>> getOrderDetail(@PathVariable("order_id") UUID orderId) {
 		OrderResponseDto responseDto = orderService.getOrderDetail(orderId);
@@ -76,8 +78,9 @@ public class OrderController {
 	@Operation(summary = "주문 취소")
 	@PatchMapping("/{order_id}")
 	public ResponseEntity<CommonResponse<OrderResponseDto>> cancelOrder(@PathVariable("order_id") UUID orderId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@RequestBody CancelOrderRequestDto requestDto) {
-		OrderResponseDto responseDto = orderService.cancelOrder(orderId, requestDto);
+		OrderResponseDto responseDto = orderService.cancelOrder(orderId, requestDto, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_CANCEL, responseDto));
 	}
 
@@ -94,5 +97,4 @@ public class OrderController {
 			.ok()
 			.body(new CommonResponse<>(SuccessCode.ORDER_DELETE, null));
 	}
-
 }
