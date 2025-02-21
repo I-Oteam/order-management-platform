@@ -52,14 +52,17 @@ public enum SuccessCode {
 	PAYMENT_SEARCH(HttpStatus.OK, "결제가 성공적으로 조회되었습니다.", "S_PAYMENT_SEARCH"),
 	PAYMENT_DELETE(HttpStatus.OK, "결제가 성공적으로 삭제되었습니다.", "S_PAYMENT_DELETE"),
 	PAYMENT_STATUS_CHANGED(HttpStatus.OK, "결제 상태가 성공적으로 변경되었습니다.", " S_PAYMENT_STATUS_CHANGED"),
-	// ai
 
 	// restaurant
 	RESTAURANT_CREATE(HttpStatus.OK, "가게가 성공적으로 생성되었습니다.", "S_RESTAURANT_CREATE"),
 	RESTAURANT_ONE_SEARCH(HttpStatus.OK, "해당 가게의 조회가 완료되었습니다.", " S_RESTAURANT_ONE_SEARCH"),
 	RESTAURANT_SEARCH(HttpStatus.OK, "모든 가게가 조회되었습니다.", " S_RESTAURANT_SEARCH"),
 	RESTAURANT_MODIFY(HttpStatus.NO_CONTENT, "가게가 성공적으로 수정되었습니다.", "S_RESTAURANT_MODIFY"),
-	RESTAURANT_DELETE(HttpStatus.ACCEPTED, "가게가 성공적으로 삭제되었습니다.", "S_RESTAURANT_DELETE");
+	RESTAURANT_DELETE(HttpStatus.ACCEPTED, "가게가 성공적으로 삭제되었습니다.", "S_RESTAURANT_DELETE"),
+
+	// ai
+	AI_CREATE_MENU_DESCRIPTION(HttpStatus.OK, "메뉴 설명이 성공적으로 추천되었습니다.", "S_AI_CREATE_MENU_DESCRIPTION");
+
 
 	private final HttpStatus statusCode;
 	private final String message;
