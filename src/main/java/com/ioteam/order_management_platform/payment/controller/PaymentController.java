@@ -45,8 +45,9 @@ public class PaymentController {
 	@PreAuthorize("hasAnyRole('CUSTOMER','MANAGER','MASTER')")
 	@PostMapping
 	public ResponseEntity<CommonResponse<PaymentResponseDto>> createMenu(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@RequestBody CreatePaymentRequestDto requestDto) {
-		PaymentResponseDto responseDto = paymentService.createPayment(requestDto);
+		PaymentResponseDto responseDto = paymentService.createPayment(userDetails, requestDto);
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
 			.path("/api/payments/" + responseDto.getPaymentId().toString())
 			.build()

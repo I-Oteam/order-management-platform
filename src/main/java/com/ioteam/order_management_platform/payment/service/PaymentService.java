@@ -35,10 +35,12 @@ public class PaymentService {
 	private final RestaurantRepository restaurantRepository;
 
 	@Transactional
-	public PaymentResponseDto createPayment(CreatePaymentRequestDto requestDto) {
+	public PaymentResponseDto createPayment(UserDetailsImpl userDetails, CreatePaymentRequestDto requestDto) {
 		Order order = orderRepository.findById(requestDto.getOrderId())
 			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_USERNAME));
-
+		if (!order.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
+			throw new CustomApiException(PaymentException.INVALID_USER);
+		}
 		if (paymentRepository.existsByOrderOrderId(requestDto.getOrderId())) {
 			throw new CustomApiException(PaymentException.PAYMENT_ALREADY_COMPLETED);
 		}
