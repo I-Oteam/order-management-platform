@@ -38,11 +38,11 @@ public class PaymentService {
 
 	@Transactional
 	public PaymentResponseDto createPayment(UserDetailsImpl userDetails, CreatePaymentRequestDto requestDto) {
-		Order order = orderRepository.findById(requestDto.getOrderId())
-			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_USERNAME));
-		if (!order.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
-			throw new CustomApiException(PaymentException.INVALID_USER);
-		}
+		// 주문이 유효한지, 주문자가 본인인지, 주문이 삭제되지 않았는지 확인
+		Order order = orderRepository.findValidOrderForPayment(requestDto.getOrderId(),
+				userDetails.getUser().getUserId())
+			.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_ORDER_OR_USER));
+		// 이미 결제된 내역이 있는지 확인
 		if (paymentRepository.existsByOrderOrderId(requestDto.getOrderId())) {
 			throw new CustomApiException(PaymentException.PAYMENT_ALREADY_COMPLETED);
 		}
