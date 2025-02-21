@@ -16,15 +16,15 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class SignupRequestDto {
-	@NotBlank(message = "nickname은 공백일 수 없습니다.")
+	@NotBlank(message = "별칭은 공백일 수 없습니다.")
 	private String nickname;
 
-	@NotBlank(message = "username은 공백일 수 없습니다.")
-	@Size(min = 4, max = 10, message = "사용자명은 4~10자 사이여야 합니다.")
-	@Pattern(regexp = "^[a-z0-9]{4,11}$", message = "사용자명은 알파벳 소문자(a-z)와 숫자(0-9)만 포함해야 합니다.")
+	@NotBlank(message = "아이디는 공백일 수 없습니다.")
+	@Size(min = 4, max = 10, message = "아이디는 4~10자 사이여야 합니다.")
+	@Pattern(regexp = "^[a-z0-9]{4,11}$", message = "아이디는 알파벳 소문자(a-z)와 숫자(0-9)만 포함해야 합니다.")
 	private String username;
 
-	@NotBlank(message = "password는 공백일 수 없습니다.")
+	@NotBlank(message = "비밀번호는 공백일 수 없습니다.")
 	@Size(min = 8, max = 15, message = "비밀번호는 8~15자 사이여야 합니다.")
 	@Pattern(
 		regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,16}$",
@@ -33,7 +33,7 @@ public class SignupRequestDto {
 	private String password;
 
 	@Email(message = "올바른 이메일 형식이 아닙니다.")
-	@NotBlank(message = "email은 공백일 수 없습니다.")
+	@NotBlank(message = "이메일은 공백일 수 없습니다.")
 	private String email;
 
 	@NotNull(message = "권한을 선택해주세요.")
