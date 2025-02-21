@@ -79,19 +79,34 @@ public class OrderService {
 	}
 
 	//주문 전체 조회하기
-	public OrderListResponseDto getAllOrders() {
+	public OrderListResponseDto getAllOrders(UserDetailsImpl userDetails) {
 		List<Order> orderList = orderRepository.findAllByDeletedAtIsNull();
 		List<OrderResponseDto> responseDtos = orderList.stream()
 			.map(OrderResponseDto::fromEntity)
 			.collect(Collectors.toList());
 
+		//MANAGER가 아니라면 예외 발생
+		if (userDetails.getAuthorities().stream().noneMatch(
+			authority -> authority.getAuthority().equals("ROLE_MANAGER"))
+		) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
+
 		return new OrderListResponseDto(responseDtos);
 	}
 
 	//주문 상세 조회하기
-	public OrderResponseDto getOrderDetail(UUID orderId) {
+	public OrderResponseDto getOrderDetail(UUID orderId, UserDetailsImpl userDetails) {
 		Order order = orderRepository.findByOrderIdAndDeletedAtIsNull(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
+
+		//CUSTOMER나 MANAGER가 아니라면 예외 발생
+		if (userDetails.getAuthorities().stream().noneMatch(
+			authority -> authority.getAuthority().equals("ROLE_MANAGER") ||
+				authority.getAuthority().equals("ROLE_CUSTOMER")
+		)) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
 
 		return OrderResponseDto.fromEntity(order);
 	}

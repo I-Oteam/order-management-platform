@@ -62,16 +62,18 @@ public class OrderController {
 	@Operation(summary = "전체 주문 조회")
 	@PreAuthorize("hasRole('MANAGER')")
 	@GetMapping("/all")
-	public ResponseEntity<CommonResponse<OrderListResponseDto>> getAllOrders() {
-		OrderListResponseDto responseDto = orderService.getAllOrders();
+	public ResponseEntity<CommonResponse<OrderListResponseDto>> getAllOrders(
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		OrderListResponseDto responseDto = orderService.getAllOrders(userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_ALL_INFO, responseDto));
 	}
 
 	@Operation(summary = "주문 상세 조회")
 	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
 	@GetMapping("/{order_id}")
-	public ResponseEntity<CommonResponse<OrderResponseDto>> getOrderDetail(@PathVariable("order_id") UUID orderId) {
-		OrderResponseDto responseDto = orderService.getOrderDetail(orderId);
+	public ResponseEntity<CommonResponse<OrderResponseDto>> getOrderDetail(@PathVariable("order_id") UUID orderId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		OrderResponseDto responseDto = orderService.getOrderDetail(orderId, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_DETAIL_INFO, responseDto));
 	}
 
