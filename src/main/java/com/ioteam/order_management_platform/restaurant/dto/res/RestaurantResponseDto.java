@@ -7,7 +7,9 @@ import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @Builder
 @AllArgsConstructor
@@ -26,6 +28,13 @@ public class RestaurantResponseDto {
 	private String resImageUrl;
 
 	public static RestaurantResponseDto fromRestaurant(Restaurant savedRestaurant) {
+		log.info("Category : {}", savedRestaurant.getCategory());
+		log.info("Category id: {}", savedRestaurant.getCategory().getRcId());
+		log.info("District : {}", savedRestaurant.getDistrict());
+		log.info("District id : {}", savedRestaurant.getDistrict().getDistrictId());
+		log.info("Owner : {}", savedRestaurant.getOwner());
+		log.info("Owner id : {}", savedRestaurant.getOwner().getUserId());
+
 		return RestaurantResponseDto
 			.builder()
 			.resId(savedRestaurant.getResId())

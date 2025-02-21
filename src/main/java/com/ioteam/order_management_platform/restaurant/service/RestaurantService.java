@@ -2,6 +2,8 @@ package com.ioteam.order_management_platform.restaurant.service;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,7 @@ import com.ioteam.order_management_platform.category.repository.CategoryReposito
 import com.ioteam.order_management_platform.district.entity.District;
 import com.ioteam.order_management_platform.district.execption.DistrictException;
 import com.ioteam.order_management_platform.district.repository.DistrictRepository;
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.restaurant.dto.req.CreateRestaurantRequestDto;
 import com.ioteam.order_management_platform.restaurant.dto.req.ModifyRestaurantRequestDto;
@@ -147,5 +150,18 @@ public class RestaurantService {
 		targetRestaurant.update(modifyRestaurantRequestDto, modifiedUser, modifiedCategory, modifiedDistrict);
 
 		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
+	}
+
+	public CommonPageResponse<RestaurantResponseDto> searchAllRestaurant(Pageable pageable) {
+
+		Page<Restaurant> restaurants = restaurantRepository.findAllByDeletedAtIsNull(pageable);
+
+		if (restaurants.isEmpty()) {
+			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
+		}
+
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
+
+		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
 }
