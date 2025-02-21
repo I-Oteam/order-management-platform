@@ -18,6 +18,6 @@ public interface PaymentRepositoryCustom {
 	Page<PaymentResponseDto> searchPaymentByUser(CustomerPaymentSearchCondition condition, UUID userId,
 		Pageable pageable);
 
-	Page<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition, UUID userId,
+	Page<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition,
 		UUID restaurantId, Pageable pageable);
 }

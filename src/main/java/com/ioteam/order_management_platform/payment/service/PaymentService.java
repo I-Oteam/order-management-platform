@@ -20,6 +20,7 @@ import com.ioteam.order_management_platform.payment.dto.res.PaymentResponseDto;
 import com.ioteam.order_management_platform.payment.entity.Payment;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.ioteam.order_management_platform.payment.repository.PaymentRepository;
+import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
@@ -97,12 +98,22 @@ public class PaymentService {
 	}
 
 	public CommonPageResponse<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition,
-		UUID userId, UUID resId,
+		UserDetailsImpl userDetails, UUID resId,
 		Pageable pageable) {
-		UUID resUserId = restaurantRepository.getReferenceById(resId).getOwner().getUserId();
-		if (!userId.equals(resUserId))
+		Restaurant restaurant = restaurantRepository.findById(resId)
+			.orElseThrow(() -> new CustomApiException(PaymentException.RESTAURANT_NOT_FOUND));
+
+		UUID resOwnerId = restaurant.getOwner().getUserId();
+		UserRoleEnum userRole = userDetails.getRole();
+
+		// 접근 권한 확인 (OWNER 이면서 해당 가게의 소유자이거나, MASTER 또는 MANAGER 만 허용)
+		boolean isOwnerOfThisRestaurant = userRole == UserRoleEnum.OWNER && userDetails.getUserId().equals(resOwnerId);
+		boolean hasHigherPrivileges = userRole == UserRoleEnum.MANAGER || userRole == UserRoleEnum.MASTER;
+
+		if (!isOwnerOfThisRestaurant && !hasHigherPrivileges) {
 			throw new CustomApiException(PaymentException.UNAUTHORIZED_REQ);
-		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByRestaurant(condition, userId, resId,
+		}
+		Page<PaymentResponseDto> paymentDtoPage = paymentRepository.searchPaymentByRestaurant(condition, resId,
 			pageable);
 		return new CommonPageResponse<>(paymentDtoPage);
 	}

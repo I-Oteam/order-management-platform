@@ -100,7 +100,7 @@ public class PaymentController {
 		@PathVariable UUID resId,
 		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		CommonPageResponse<PaymentResponseDto> pageResponse = paymentService.searchPaymentByRestaurant(
-			condition, userDetails.getUserId(), resId, pageable);
+			condition, userDetails, resId, pageable);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.PAYMENT_SEARCH, pageResponse));
 	}
 

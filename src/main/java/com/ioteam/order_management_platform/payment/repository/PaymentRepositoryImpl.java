@@ -125,7 +125,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 	}
 
 	@Override
-	public Page<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition, UUID userId,
+	public Page<PaymentResponseDto> searchPaymentByRestaurant(OwnerPaymentSearchCondition condition,
 		UUID restaurantId, Pageable pageable) {
 		List<PaymentResponseDto> dtoList = queryFactory
 			.select(payment)
