@@ -56,10 +56,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'com.h2database:h2'
 
-    // AI 요청
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    testImplementation 'io.projectreactor:reactor-test'
-
 }
 
 tasks.named('test') {
