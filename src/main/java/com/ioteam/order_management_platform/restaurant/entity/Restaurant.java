@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.restaurant.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -71,6 +74,17 @@ public class Restaurant extends BaseEntity {
 
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<Menu> menuList = new ArrayList<>();
+
+	// 식당이 생성될때 score 엔티티도 같이 생성
+	@OneToOne(mappedBy = "restaurant", cascade = CascadeType.PERSIST, orphanRemoval = true)
+	private RestaurantScore restaurantScore;
+
+	@PrePersist
+	public void createRestaurantScore() {
+		if (this.restaurantScore == null) {
+			this.restaurantScore = new RestaurantScore(this, BigDecimal.ZERO); // 기본 값 0으로 설정
+		}
+	}
 
 	public void update(ModifyRestaurantRequestDto modifyRestaurantRequestDto, User modifiedUser,
 		Category modifiedCategory, District modifiedDistrict) {
