@@ -38,9 +38,9 @@ public class MenuController {
 
 	private final MenuService menuService;
 
-	@Operation(summary = "상품 등록", description = "상품 수정은 OWNER와 MANAGER만 가능")
+	@Operation(summary = "상품 등록", description = "상품 수정은 OWNER와 MANAGER, MASTER만 가능")
 	@PostMapping()
-	@PreAuthorize("hasAnyRole('OWNER','MANAGER')")
+	@PreAuthorize("hasAnyRole('OWNER','MANAGER','MASTER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> createMenu(
 		@RequestBody @Validated CreateMenuRequestDto requestDto) {
 		MenuResponseDto responseDto = menuService.createMenu(requestDto);
@@ -68,9 +68,9 @@ public class MenuController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_DETAIL_INFO, responseDto));
 	}
 
-	@Operation(summary = "상품 수정", description = "상품 수정은 OWNER와 MANAGER만 가능")
+	@Operation(summary = "상품 수정", description = "상품 수정은 OWNER와 MANAGER, MASTER만 가능")
 	@PatchMapping("/{menu_id}")
-	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
+	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> modifyMenu(@PathVariable("menu_id") UUID menuId,
 		@RequestBody @Validated UpdateMenuRequestDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -78,18 +78,18 @@ public class MenuController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_MODIFY, responseDto));
 	}
 
-	@Operation(summary = "상품 숨김 처리", description = "상품 숨김처리는 OWNER와 MANAGER만 가능")
+	@Operation(summary = "상품 숨김 처리", description = "상품 숨김처리는 OWNER와 MANAGER, MASTER만 가능")
 	@PatchMapping("/{menu_id}/hidden")
-	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
+	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> hiddenMenu(@PathVariable("menu_id") UUID menuId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		MenuResponseDto responseDto = menuService.hiddenMenu(menuId, userDetails);
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.MENU_MODIFY, responseDto));
 	}
 
-	@Operation(summary = "상품 삭제", description = "상품 삭제는 OWNER와 MANAGER만 가능")
+	@Operation(summary = "상품 삭제", description = "상품 삭제는 OWNER와 MANAGER, MASTER만 가능")
 	@DeleteMapping("/{menu_id}")
-	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
+	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> deleteMenu(@PathVariable("menu_id") UUID menuId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		menuService.deleteMenu(menuId, userDetails);
