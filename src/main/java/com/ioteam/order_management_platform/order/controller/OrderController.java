@@ -3,6 +3,10 @@ package com.ioteam.order_management_platform.order.controller;
 import java.net.URI;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,10 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
+
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
@@ -113,10 +114,10 @@ public class OrderController {
 		@PathVariable UUID resId,
 		OrderByRestaurantSearchCondition condition,
 		@PageableDefault
-		@SortDefault.SortDefaults(
-			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
-				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
-		) Pageable pageable
+		@SortDefault.SortDefaults({
+			@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+			@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)
+		}) Pageable pageable
 	) {
 
 		CommonPageResponse<OrderResponseDto> pageResponse = orderService.searchOrderByRestaurant(
