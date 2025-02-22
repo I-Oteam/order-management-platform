@@ -18,7 +18,7 @@ public class RestaurantScoreScheduler {
 
 	private final RestaurantScoreRepository restaurantScoreRepository;
 
-	@Scheduled(cron = "0 * * * * *")
+	@Scheduled(cron = "0/10 * * * * *")
 	@Transactional
 	public void run() {
 		log.info("레스토랑 평점 업데이트 시작");
