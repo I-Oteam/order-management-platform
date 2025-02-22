@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import com.ioteam.order_management_platform.review.dto.res.QReviewRestaurantResp
 import com.ioteam.order_management_platform.review.dto.res.QReviewUserResponseDto;
 import com.ioteam.order_management_platform.review.dto.res.ReviewResponseDto;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -52,12 +54,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
-				eqUserId(condition.getUserId()),
-				eqRestaurantId(condition.getRestaurantId()),
-				eqReviewScore(condition.getScore()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				isPublic(condition.getIsPublic()),
-				isDeleted(condition.getIsDeleted())
+				adminSearchCondition(condition)
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
@@ -70,12 +67,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
-				eqUserId(condition.getUserId()),
-				eqRestaurantId(condition.getRestaurantId()),
-				eqReviewScore(condition.getScore()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				isPublic(condition.getIsPublic()),
-				isDeleted(condition.getIsDeleted())
+				adminSearchCondition(condition)
 			);
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
@@ -161,55 +153,66 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
 
+	private BooleanBuilder adminSearchCondition(AdminReviewSearchCondition condition) {
+		return eqUserId(condition.getUserId())
+			.and(eqRestaurantId(condition.getRestaurantId()))
+			.and(eqReviewScore(condition.getScore()))
+			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
+			.and(isPublic(condition.getIsPublic()))
+			.and(isDeleted(condition.getIsDeleted()));
+	}
+
 	private int validatePageSize(int pageSize) {
 		if (Set.of(10, 30, 50).contains(pageSize))
 			return pageSize;
 		throw new CustomApiException(BaseException.INVALID_PAGESIZE);
 	}
 
-	private BooleanExpression ifNotOwnerOnlyPublic(boolean isOwner) {
-
-		return isOwner ? null : review.isPublic.eq(true);
+	private BooleanBuilder ifNotOwnerOnlyPublic(boolean isOwner) {
+		return isOwner ? new BooleanBuilder() : new BooleanBuilder(review.isPublic.eq(true));
 	}
 
-	private BooleanExpression eqReviewScore(Integer score) {
-
-		return score == null ? null : review.reviewScore.eq(score);
+	private BooleanBuilder eqReviewScore(Integer score) {
+		return nullSafeBuilder(() -> review.reviewScore.eq(score));
 	}
 
-	private BooleanExpression eqUserId(UUID userId) {
-
-		return userId == null ? null : review.user.userId.eq(userId);
+	private BooleanBuilder eqUserId(UUID userId) {
+		return nullSafeBuilder(() -> review.user.userId.eq(userId));
 	}
 
-	private BooleanExpression eqRestaurantId(UUID resId) {
-
-		return resId == null ? null : review.restaurant.resId.eq(resId);
+	private BooleanBuilder eqRestaurantId(UUID resId) {
+		return nullSafeBuilder(() -> review.restaurant.resId.eq(resId));
 	}
 
-	private BooleanExpression betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
+	private BooleanBuilder betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
 
 		if (startCreatedAt == null || endCreatedAt == null)
-			return null;
+			return new BooleanBuilder();
 		if (startCreatedAt.isAfter(endCreatedAt))
 			throw new CustomApiException(ReviewException.INVALID_PERIOD);
-		return review.createdAt.between(startCreatedAt, endCreatedAt);
+		return new BooleanBuilder(review.createdAt.between(startCreatedAt, endCreatedAt));
 	}
 
-	private BooleanExpression isPublic(Boolean isPublic) {
-
-		return isPublic == null ? null : review.isPublic.eq(isPublic);
+	private BooleanBuilder isPublic(Boolean isPublic) {
+		return nullSafeBuilder(() -> review.isPublic.eq(isPublic));
 	}
 
-	private BooleanExpression isDeleted(Boolean isDeleted) {
-
+	private BooleanBuilder isDeleted(Boolean isDeleted) {
 		if (isDeleted == null)
-			return null;
+			return new BooleanBuilder();
 		if (isDeleted)
-			return review.deletedAt.isNotNull();
+			return new BooleanBuilder(review.deletedAt.isNotNull());
 		if (!isDeleted)
-			return review.deletedAt.isNull();
+			return new BooleanBuilder(review.deletedAt.isNull());
 		return null;
+	}
+
+	private BooleanBuilder nullSafeBuilder(Supplier<BooleanExpression> f) {
+		try {
+			return new BooleanBuilder(f.get());
+		} catch (Exception e) {
+			return new BooleanBuilder();
+		}
 	}
 
 	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
