@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,10 +30,15 @@ public class RestaurantScore extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID rsId;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "rs_res_id")
 	private Restaurant restaurant;
 
 	@Column(precision = 2, scale = 1, columnDefinition = "NUMERIC(2,1)")
 	private BigDecimal rsScore;
+
+	public RestaurantScore(Restaurant savedRestaurant, BigDecimal zero) {
+		this.restaurant = savedRestaurant;
+		this.rsScore = zero;
+	}
 }

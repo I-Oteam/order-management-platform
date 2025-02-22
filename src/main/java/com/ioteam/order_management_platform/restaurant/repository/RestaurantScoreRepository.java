@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.restaurant.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,11 @@ public interface RestaurantScoreRepository extends JpaRepository<RestaurantScore
 	@Query("update RestaurantScore rs set rs.rsScore = "
 		+ "(select round(avg(r.reviewScore), 1) "
 		+ "from Review r "
-		+ "where r.restaurant = rs.restaurant and r.reviewScore is not null)")
+		+ "where r.restaurant = rs.restaurant "
+		+ "and r.reviewScore is not null "
+		+ "and r.deletedAt is null "
+		+ "and r.restaurant.deletedAt is null)")
 	int bulkUpdateRestaurantScore();
+
+	Optional<RestaurantScore> findByRestaurantResIdAndDeletedAtIsNull(UUID rsResId);
 }

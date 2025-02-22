@@ -36,17 +36,15 @@ insert into p_restaurant (created_at, deleted_at, modified_at, created_by, delet
                           res_district_id, res_id, res_owner_id, res_phone, res_address, res_name, res_image_url)
 values (now(),null,now(),'768f5a3b-e6d8-46d6-f953-b9c425ab1cf9'::uuid, null, '768f5a3b-e6d8-46d6-f953-b9c425ab1cf0'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
         'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'768f5a3b-e6d8-46d6-f953-b9c425ab1cf1'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-1234-5678' ,
-        '재현건물1층1호', '건물주', null),
-       (now(),null,now(),'2d99938f-57ad-4b6c-f234-ee77aaffd1e1'::uuid, null, '2d99938f-57ad-4b6c-f234-ee77aaffd1e2'::uuid,'d78dfdc2-edc6-4bec-f158-a7e055dcfc73'::uuid,
-        'd6df52e4-6ec8-4d46-b0c2-90f5f2624446'::uuid,'2d99938f-57ad-4b6c-f234-ee77aaffd1e3'::uuid , 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '010-2345-1234' ,
-        '재현건물2층2호', '건물주2', null);
+        '재현건물1층1호', '건물주', null);
 
 
 -- p_restaurant_score 테이블 목데이터 추가
 INSERT INTO p_restaurant_score
     (rs_score, created_at, deleted_at, modified_at, created_by, deleted_by, modified_by, rs_id, rs_res_id)
 VALUES
-    (NULL, now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '231cee45-79fb-4553-b109-934e607bb058'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid);
+    (NULL, now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce120e2'::uuid, '231cee45-79fb-4553-b109-934e607bb058'::uuid, '3fa85f64-5717-4562-b3fc-2c963f66afa6'::uuid),
+    (NULL,now(), NULL, now(), 'd2ed72d8-090a-4efb-abe4-7acbdce121e2'::uuid, NULL, 'd2ed72d8-090a-4efb-abe4-7acbdce122e2'::uuid, '231cee45-79fb-4553-b109-934e607bb059'::uuid, '768f5a3b-e6d8-46d6-f953-b9c425ab1cf1'::uuid);
 
 
 -- p_restaurant_menu 테이블 목데이터 추가
