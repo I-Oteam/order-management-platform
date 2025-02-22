@@ -1,11 +1,13 @@
 package com.ioteam.order_management_platform.menu.repository;
 
-import java.util.List;
 import java.util.UUID;
 
-import com.ioteam.order_management_platform.menu.entity.Menu;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 public interface MenuCustomRepository {
-	List<Menu> findMenusByResIdAndRole(UUID resId, UserDetailsImpl userDetails);
+	Page<MenuResponseDto> findMenusByResIdAndRole(UUID resId, UserDetailsImpl userDetails, Pageable pageable);
 }

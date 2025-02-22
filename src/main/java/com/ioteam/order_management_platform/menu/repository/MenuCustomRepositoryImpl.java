@@ -2,12 +2,20 @@ package com.ioteam.order_management_platform.menu.repository;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
+
+import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.entity.QMenu;
 import com.ioteam.order_management_platform.restaurant.entity.QRestaurant;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -21,7 +29,7 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Menu> findMenusByResIdAndRole(UUID resId, UserDetailsImpl userDetails) {
+	public Page<MenuResponseDto> findMenusByResIdAndRole(UUID resId, UserDetailsImpl userDetails, Pageable pageable) {
 		QMenu menu = QMenu.menu;
 		UserRoleEnum role = userDetails.getRole();
 		UUID userId = userDetails.getUserId();
@@ -34,7 +42,41 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 			condition = condition.and(menu.isPublic.eq(true));
 		}
 
-		return jpaQueryFactory.selectFrom(menu).where(condition).fetch();
+		long total = jpaQueryFactory
+			.selectFrom(menu)
+			.where(condition)
+			.fetchCount();
+
+		// 정렬 조건 변환
+		List<OrderSpecifier> orders = pageable.getSort().stream()
+			.map(order -> {
+				Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+				switch (order.getProperty()) {
+					case "createdAt":
+						return new OrderSpecifier(direction, menu.createdAt);
+					case "modifiedAt":
+						return new OrderSpecifier(direction, menu.modifiedAt);
+					case "rmPrice":
+						return new OrderSpecifier(direction, menu.rmPrice);
+					default:
+						return new OrderSpecifier(direction, menu.createdAt);
+				}
+			})
+			.collect(Collectors.toList());
+
+		List<Menu> menus = jpaQueryFactory
+			.selectFrom(menu)
+			.where(condition)
+			.orderBy(orders.toArray(new OrderSpecifier[0]))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		List<MenuResponseDto> content = menus.stream()
+			.map(MenuResponseDto::fromEntity)
+			.collect(Collectors.toList());
+
+		return PageableExecutionUtils.getPage(content, pageable, () -> total);
 	}
 
 	public boolean isOwner(UUID userId, UUID resId) {
