@@ -22,7 +22,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID>, OrderReposi
 		+ "and o.user.userId = :userId "
 		+ "and o.restaurant.resId = :restaurantId "
 		+ "and o.deletedAt is null")
-	Optional<Order> findByOrderIdAndUserIdAndResIdAndDeletedAtIsNotNullFetchJoin(UUID orderId, UUID userId,
+	Optional<Order> findByOrderIdAndUserIdAndResIdAndDeletedAtIsNullFetchJoin(UUID orderId, UUID userId,
 		UUID restaurantId);
 
 	List<Order> findAllByDeletedAtIsNull();
