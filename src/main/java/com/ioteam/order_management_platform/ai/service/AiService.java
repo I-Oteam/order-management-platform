@@ -37,6 +37,7 @@ public class AiService {
 
 	private final RestaurantRepository restaurantRepository;
 	private final AiRepository aiRepository;
+	private final RestClient restClient;
 
 	public AnswerAiResponseDto recommendMenuDescription(UserDetailsImpl userDetails,
 		RecommendDesRequestDto requestDto) {
@@ -60,8 +61,6 @@ public class AiService {
 		return AnswerAiResponseDto.of(response);
 	}
 
-	RestClient restClient = RestClient.create(); // RestClient 생성
-
 	private AnswerAiResponseDto requestGemini(String question) {
 		Map<String, Object> requestBody = Map.of(
 			"contents", new Object[] {
@@ -78,8 +77,6 @@ public class AiService {
 				.body(requestBody)
 				.retrieve()
 				.toEntity(GeminiResponseDto.class);
-
-			System.out.println(aiAnswer);
 
 			if (aiAnswer.getBody() == null) {
 				throw new CustomApiException(AIException.INVALID_AI_RESPONSE);
