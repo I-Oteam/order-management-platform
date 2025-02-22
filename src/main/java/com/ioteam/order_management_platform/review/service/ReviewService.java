@@ -78,7 +78,7 @@ public class ReviewService {
 	public ReviewResponseDto createReview(UUID userId, CreateReviewRequestDto requestDto) {
 
 		// 리뷰 작성자의 주문 번호가 맞는지 검증 && 레스토랑 아이디도 일치하는지 검증
-		Order order = orderRepository.findByOrderIdAndUserIdAndResIdAndDeletedAtIsNotNullFetchJoin(
+		Order order = orderRepository.findByOrderIdAndUserIdAndResIdAndDeletedAtIsNullFetchJoin(
 				requestDto.getOrderId(), userId, requestDto.getRestaurantId())
 			.orElseThrow(() -> {
 				throw new CustomApiException(ReviewException.INVALID_IDS);

@@ -3,15 +3,12 @@ package com.ioteam.order_management_platform.review.dto.res;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.ioteam.order_management_platform.review.entity.Review;
-import com.ioteam.order_management_platform.user.entity.User;
+import com.querydsl.core.annotations.QueryProjection;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
-@AllArgsConstructor
 @Getter
 public class AdminReviewResponseDto {
 
@@ -30,41 +27,25 @@ public class AdminReviewResponseDto {
 	private final LocalDateTime deletedAt;
 	private final UUID deletedBy;
 
-	public static AdminReviewResponseDto from(Review review, User user) {
-		return AdminReviewResponseDto
-			.builder()
-			.reviewId(review.getReviewId())
-			.user(ReviewUserResponseDto.from(review.getUser()))
-			.reviewScore(review.getReviewScore())
-			.reviewContent(review.getReviewContent())
-			.reviewImageUrl(review.getReviewImageUrl())
-			.isPublic(review.getIsPublic())
-			.createdAt(review.getCreatedAt())
-			.createdBy(review.getCreatedBy())
-			.modifiedAt(review.getModifiedAt())
-			.modifiedBy(review.getModifiedBy())
-			.deletedAt(review.getDeletedAt())
-			.deletedBy(review.getDeletedBy())
-			.build();
-	}
-
-	public static AdminReviewResponseDto from(Review review, ReviewUserResponseDto reviewUser,
-		ReviewRestaurantResponseDto reviewRestaurant) {
-		return AdminReviewResponseDto
-			.builder()
-			.reviewId(review.getReviewId())
-			.user(reviewUser)
-			.restaurant(reviewRestaurant)
-			.reviewScore(review.getReviewScore())
-			.reviewContent(review.getReviewContent())
-			.reviewImageUrl(review.getReviewImageUrl())
-			.isPublic(review.getIsPublic())
-			.createdAt(review.getCreatedAt())
-			.createdBy(review.getCreatedBy())
-			.modifiedAt(review.getModifiedAt())
-			.modifiedBy(review.getModifiedBy())
-			.deletedAt(review.getDeletedAt())
-			.deletedBy(review.getDeletedBy())
-			.build();
+	@QueryProjection
+	@Builder
+	public AdminReviewResponseDto(UUID reviewId, ReviewUserResponseDto user, ReviewRestaurantResponseDto restaurant,
+		int reviewScore, String reviewContent, String reviewImageUrl, UUID reviewOrderId, Boolean isPublic,
+		LocalDateTime createdAt, UUID createdBy, LocalDateTime modifiedAt, UUID modifiedBy, LocalDateTime deletedAt,
+		UUID deletedBy) {
+		this.reviewId = reviewId;
+		this.user = user;
+		this.restaurant = restaurant;
+		this.reviewScore = reviewScore;
+		this.reviewContent = reviewContent;
+		this.reviewImageUrl = reviewImageUrl;
+		this.reviewOrderId = reviewOrderId;
+		this.isPublic = isPublic;
+		this.createdAt = createdAt;
+		this.createdBy = createdBy;
+		this.modifiedAt = modifiedAt;
+		this.modifiedBy = modifiedBy;
+		this.deletedAt = deletedAt;
+		this.deletedBy = deletedBy;
 	}
 }

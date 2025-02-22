@@ -3,18 +3,24 @@ package com.ioteam.order_management_platform.review.dto.res;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.user.entity.User;
+import com.querydsl.core.annotations.QueryProjection;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
-@AllArgsConstructor
 @Getter
-public class ReviewUserResponseDto { // todo. 리뷰 응답에서 담을 유저 정보이므로, 리뷰 패키지 내에 작성해봄
+public class ReviewUserResponseDto {
 	private final UUID userId;
 	private final String username;
 	private final String nickname;
+
+	@QueryProjection
+	@Builder
+	public ReviewUserResponseDto(UUID userId, String username, String nickname) {
+		this.userId = userId;
+		this.username = username;
+		this.nickname = nickname;
+	}
 
 	public static ReviewUserResponseDto from(User user) {
 		return ReviewUserResponseDto.builder()
