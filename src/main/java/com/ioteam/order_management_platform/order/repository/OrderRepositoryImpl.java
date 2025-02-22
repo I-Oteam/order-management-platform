@@ -19,6 +19,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
+import com.ioteam.order_management_platform.order.dto.req.OrderByUserSearchCondition;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
@@ -152,5 +153,59 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 				return null;
 			})
 			.toArray(OrderSpecifier[]::new);
+	}
+
+	@Override
+	public Page<Order> searchOrderByUserAndCondition(UUID userId,
+		OrderByUserSearchCondition condition,
+		Pageable pageable) {
+
+		OrderSpecifier[] orderSpecifiers = createOrderSpecifiers(pageable.getSort());
+
+		// 1. 페이지네이션 + 조건에 맞는 order Id 조회
+		List<UUID> orderIds = queryFactory
+			.select(order.orderId)
+			.from(order)
+			.where(
+				order.user.userId.eq(userId), //사용자의 주문만 조회
+				eqOrderStatus(condition.getOrderStatus()),
+				eqOrderType(condition.getOrderType()),
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+			)
+			.orderBy(orderSpecifiers)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		if (orderIds.isEmpty()) {
+			return new PageImpl<>(Collections.emptyList(), pageable, 0);
+		}
+
+		// 2. 주문 ID 기반으로 페치조인 조회
+		List<Order> orders = queryFactory
+			.selectFrom(order).distinct()
+			.leftJoin(order.orderMenus, orderMenu).fetchJoin()
+			.leftJoin(orderMenu.menu).fetchJoin()
+			.leftJoin(order.restaurant).fetchJoin()
+			.where(
+				order.orderId.in(orderIds)
+			)
+			.orderBy(orderSpecifiers)
+			.fetch();
+
+		// 3. 카운트 쿼리
+		JPAQuery<Long> countQuery = queryFactory
+			.select(order.count())
+			.from(order)
+			.where(
+				order.user.userId.eq(userId),
+				eqOrderStatus(condition.getOrderStatus()),
+				eqOrderType(condition.getOrderType()),
+				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
+				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+			);
+
+		return PageableExecutionUtils.getPage(orders, pageable, () -> countQuery.fetchOne());
 	}
 }
