@@ -127,8 +127,8 @@ public class RestaurantService {
 			throw new CustomApiException(RestaurantException.INSUFFICIENT_PERMISSION);
 		}
 
-		targetRestaurant.softDelete(resId);
-		restaurantScore.softDelete(restaurantScore.getRsId());
+		targetRestaurant.softDelete(userDetails.getUserId());
+		restaurantScore.softDelete(userDetails.getUserId());
 	}
 
 	@Transactional
