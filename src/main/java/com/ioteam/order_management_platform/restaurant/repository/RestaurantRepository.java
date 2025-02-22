@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.restaurant.repository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,5 +34,11 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
 		""")
 	Page<Restaurant> findAllWithScoreByDeletedAtIsNull(Pageable pageable);
 
+	@Query("SELECT r FROM Restaurant r JOIN FETCH r.restaurantScore rs WHERE rs.rsScore >= :minScore AND rs.rsScore < :maxScore AND r.deletedAt IS NULL")
+	Page<Restaurant> findRestaurantsByScoreRangeAndDeletedAtIsNull(@Param("minScore") BigDecimal minScore,
+		@Param("maxScore") BigDecimal maxScore, Pageable pageable);
+
+	@Query("SELECT r FROM Restaurant r JOIN FETCH r.restaurantScore rs WHERE r.deletedAt IS NULL ORDER BY rs.rsScore DESC")
+	Page<Restaurant> findAllWithScoreSortedByScoreDescAndDeletedAtIsNull(Pageable pageable);
 }
 

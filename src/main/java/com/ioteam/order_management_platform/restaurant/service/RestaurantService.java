@@ -1,5 +1,7 @@
 package com.ioteam.order_management_platform.restaurant.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -173,6 +175,45 @@ public class RestaurantService {
 	public CommonPageResponse<RestaurantResponseDto> searchAllRestaurant(Pageable pageable) {
 
 		Page<Restaurant> restaurants = restaurantRepository.findAllWithScoreByDeletedAtIsNull(pageable);
+
+		if (restaurants.isEmpty()) {
+			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
+		}
+
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
+			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
+			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
+		});
+
+		return new CommonPageResponse<>(restaurantResponseDtoPage);
+	}
+
+	public CommonPageResponse<RestaurantResponseDto> searchRestaurantsByScoreRange(BigDecimal score,
+		Pageable pageable) {
+
+		// min이상 max미만 검색
+		BigDecimal minScore = score.setScale(1, RoundingMode.FLOOR);
+		BigDecimal maxScore = minScore.add(BigDecimal.valueOf(1));
+
+		Page<Restaurant> restaurants = restaurantRepository.findRestaurantsByScoreRangeAndDeletedAtIsNull(minScore,
+			maxScore, pageable);
+
+		if (restaurants.isEmpty()) {
+			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
+		}
+
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
+			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
+			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
+		});
+
+		return new CommonPageResponse<>(restaurantResponseDtoPage);
+	}
+
+	public CommonPageResponse<RestaurantResponseDto> searchAllRestaurantsSortedByScore(Pageable pageable) {
+
+		Page<Restaurant> restaurants = restaurantRepository.findAllWithScoreSortedByScoreDescAndDeletedAtIsNull(
+			pageable);
 
 		if (restaurants.isEmpty()) {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
