@@ -88,7 +88,7 @@ public class MenuService {
 
 	private boolean canModifyOrDelete(UserDetailsImpl userDetails, Menu menu) {
 		UserRoleEnum role = userDetails.getRole();
-		if (role.equals(UserRoleEnum.MANAGER)) {
+		if (role.equals(UserRoleEnum.MANAGER) || role.equals(UserRoleEnum.MASTER)) {
 			return true;
 		}
 		if (role.equals(UserRoleEnum.OWNER)) {

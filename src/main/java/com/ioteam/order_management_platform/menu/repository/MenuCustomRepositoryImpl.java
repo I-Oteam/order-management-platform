@@ -10,6 +10,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.menu.entity.Menu;
+import com.ioteam.order_management_platform.menu.entity.MenuStatus;
 import com.ioteam.order_management_platform.menu.entity.QMenu;
 import com.ioteam.order_management_platform.restaurant.entity.QRestaurant;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
@@ -39,7 +40,7 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 
 		// role과 OWNER id 일치 여부에 따른 condition 추가
 		if (role.equals(UserRoleEnum.CUSTOMER) || (role.equals(UserRoleEnum.OWNER) && !isOwner)) {
-			condition = condition.and(menu.isPublic.eq(true));
+			condition = condition.and(menu.rmStatus.ne(MenuStatus.HIDDEN));
 		}
 
 		long total = jpaQueryFactory

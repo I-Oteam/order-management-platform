@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.ioteam.order_management_platform.menu.entity.MenuStatus;
+
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +21,6 @@ public class UpdateMenuRequestDto {
 	private String rmImageUrl;
 	@Length(max = 100)
 	private String rmDescription;
+	private MenuStatus rmStatus;
 	private Boolean isPublic;
-
 }
