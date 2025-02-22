@@ -1,15 +1,16 @@
 package com.ioteam.order_management_platform.menu.service;
 
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.menu.dto.req.CreateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.dto.req.UpdateMenuRequestDto;
-import com.ioteam.order_management_platform.menu.dto.res.MenuListResponseDto;
 import com.ioteam.order_management_platform.menu.dto.res.MenuResponseDto;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.exception.MenuException;
@@ -40,10 +41,11 @@ public class MenuService {
 		return MenuResponseDto.fromEntity(savedMenu);
 	}
 
-	public MenuListResponseDto getAllMenus(UUID resId, UserDetailsImpl userDetails) {
+	public CommonPageResponse<MenuResponseDto> getAllMenus(UUID resId, UserDetailsImpl userDetails,
+		Pageable pageable) {
 		validRestaurantExist(resId);
-		List<Menu> menuList = menuRepository.findMenusByResIdAndRole(resId, userDetails);
-		return MenuListResponseDto.of(menuList);
+		Page<MenuResponseDto> menuList = menuRepository.findMenusByResIdAndRole(resId, userDetails, pageable);
+		return new CommonPageResponse<>(menuList);
 	}
 
 	public MenuResponseDto getMenuDetail(UUID menuId) {
