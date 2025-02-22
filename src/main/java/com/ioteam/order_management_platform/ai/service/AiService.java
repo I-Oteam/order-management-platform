@@ -1,11 +1,14 @@
 package com.ioteam.order_management_platform.ai.service;
 
+import static org.springframework.http.MediaType.*;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 import com.ioteam.order_management_platform.ai.dto.req.RecommendDesRequestDto;
 import com.ioteam.order_management_platform.ai.dto.res.AnswerAiResponseDto;
@@ -20,8 +23,11 @@ import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepo
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AiService {
 
 	@Value("${gemini.api.url}")
@@ -31,14 +37,7 @@ public class AiService {
 
 	private final RestaurantRepository restaurantRepository;
 	private final AiRepository aiRepository;
-	private final WebClient webClient;
-
-	public AiService(RestaurantRepository restaurantRepository, AiRepository aiRepository,
-		WebClient.Builder webClient) {
-		this.restaurantRepository = restaurantRepository;
-		this.aiRepository = aiRepository;
-		this.webClient = webClient.build();
-	}
+	private final RestClient restClient;
 
 	public AnswerAiResponseDto recommendMenuDescription(UserDetailsImpl userDetails,
 		RecommendDesRequestDto requestDto) {
@@ -47,6 +46,10 @@ public class AiService {
 		Restaurant restaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(requestDto.getResId())
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
 
+		if (!hasAuthorityForMenu(user, restaurant)) {
+			throw new CustomApiException(MenuException.NOT_AUTHORIZED_FOR_MENU);
+		}
+		
 		String question = "가게 이름: " + restaurant.getResName()
 			+ ", 메뉴 이름: " + requestDto.getRmName()
 			+ ", 가게 카테고리: " + restaurant.getCategory().getRcName()
@@ -72,20 +75,26 @@ public class AiService {
 		);
 
 		try {
-			GeminiResponseDto aiAnswer = webClient.post()
+			ResponseEntity<GeminiResponseDto> aiAnswer = restClient.post()
 				.uri(geminiApiUrl + geminiApiKey)
-				.header("Content-Type", "application/json")
-				.bodyValue(requestBody)
+				.contentType(APPLICATION_JSON)
+				.body(requestBody)
 				.retrieve()
-				.bodyToMono(GeminiResponseDto.class)
-				.block();
+				.toEntity(GeminiResponseDto.class);
 
-			if (aiAnswer == null) {
+			if (aiAnswer.getBody() == null) {
 				throw new CustomApiException(AIException.INVALID_AI_RESPONSE);
 			}
-			return AnswerAiResponseDto.fromGemini(aiAnswer);
+			return AnswerAiResponseDto.fromGemini(aiAnswer.getBody());
 		} catch (Exception e) {
 			throw new CustomApiException(AIException.AI_SERVICE_UNAVAILABLE);
 		}
+	}
+
+	private boolean hasAuthorityForMenu(User user, Restaurant restaurant) {
+		if (user.getUserId().equals(restaurant.getOwner().getUserId())) {
+			return true;
+		}
+		return false;
 	}
 }
