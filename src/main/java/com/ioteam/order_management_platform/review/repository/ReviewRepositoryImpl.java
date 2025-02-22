@@ -54,7 +54,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
-				adminSearch(condition)
+				adminSearchCondition(condition)
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
@@ -67,7 +67,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
-				adminSearch(condition)
+				adminSearchCondition(condition)
 			);
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
@@ -153,7 +153,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
 
-	private BooleanBuilder adminSearch(AdminReviewSearchCondition condition) {
+	private BooleanBuilder adminSearchCondition(AdminReviewSearchCondition condition) {
 		return eqUserId(condition.getUserId())
 			.and(eqRestaurantId(condition.getRestaurantId()))
 			.and(eqReviewScore(condition.getScore()))
@@ -161,7 +161,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.and(isPublic(condition.getIsPublic()))
 			.and(isDeleted(condition.getIsDeleted()));
 	}
-	
+
 	private int validatePageSize(int pageSize) {
 		if (Set.of(10, 30, 50).contains(pageSize))
 			return pageSize;
