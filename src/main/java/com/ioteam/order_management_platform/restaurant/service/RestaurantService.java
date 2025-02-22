@@ -19,8 +19,11 @@ import com.ioteam.order_management_platform.restaurant.dto.req.CreateRestaurantR
 import com.ioteam.order_management_platform.restaurant.dto.req.ModifyRestaurantRequestDto;
 import com.ioteam.order_management_platform.restaurant.dto.res.RestaurantResponseDto;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
+import com.ioteam.order_management_platform.restaurant.entity.RestaurantScore;
 import com.ioteam.order_management_platform.restaurant.execption.RestaurantException;
+import com.ioteam.order_management_platform.restaurant.execption.RestaurantScoreException;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
+import com.ioteam.order_management_platform.restaurant.repository.RestaurantScoreRepository;
 import com.ioteam.order_management_platform.user.entity.User;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.exception.UserException;
@@ -40,6 +43,7 @@ public class RestaurantService {
 	private final RestaurantRepository restaurantRepository;
 	private final DistrictRepository districtRepository;
 	private final CategoryRepository categoryRepository;
+	private final RestaurantScoreRepository restaurantScoreRepository;
 
 	private boolean hasManagerOrOwnerRole(UserDetailsImpl userDetails) {
 		return userDetails
@@ -52,7 +56,13 @@ public class RestaurantService {
 	}
 
 	private boolean hasPermissionForRestaurant(UserDetailsImpl userDetails, Restaurant restaurant) {
-		return hasManagerOrOwnerRole(userDetails) || userDetails.getUserId().equals(restaurant.getOwner().getUserId());
+
+		if (userDetails.getRole().equals(UserRoleEnum.MANAGER))
+			return true;
+		else if (userDetails.getRole().equals(UserRoleEnum.OWNER))
+			return userDetails.getUserId().equals(restaurant.getOwner().getUserId());
+
+		return false;
 	}
 
 	@Transactional
@@ -83,23 +93,32 @@ public class RestaurantService {
 		);
 
 		Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+		// RestaurantScore restaurantScore = restaurantScoreRepository.findByRestaurantResIdAndDeletedAtIsNull(
+		// 		savedRestaurant.getResId())
+		// 	.orElseThrow(() -> new CustomApiException(RestaurantScoreException.NOT_FOUND_SCORE));
+		RestaurantScore restaurantScore = savedRestaurant.getRestaurantScore();
+		log.info("restaurant score: {}", restaurantScore.getRsScore());
 
-		return RestaurantResponseDto.fromRestaurant(savedRestaurant);
+		return RestaurantResponseDto.fromRestaurant(savedRestaurant, restaurantScore);
 	}
 
 	public RestaurantResponseDto searchOneRestaurant(UUID resId) {
 
-		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
+		Restaurant targetRestaurant = restaurantRepository.findByResIdWithScoreAndDeletedAtIsNull(resId)
 			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
+		RestaurantScore restaurantScore = targetRestaurant.getRestaurantScore();
 
-		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
+		return RestaurantResponseDto.fromRestaurant(targetRestaurant, restaurantScore);
 	}
 
 	@Transactional
 	public void softDeleteRestaurant(UUID resId, UserDetailsImpl userDetails) {
 
-		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
+		Restaurant targetRestaurant = restaurantRepository.findByResIdWithScoreAndDeletedAtIsNull(resId)
 			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
+
+		RestaurantScore restaurantScore = restaurantScoreRepository.findByRestaurantResIdAndDeletedAtIsNull(resId)
+			.orElseThrow(() -> new CustomApiException(RestaurantScoreException.NOT_FOUND_SCORE));
 
 		// 해당 유저가 가게 주인인지 판별
 		if (!hasPermissionForRestaurant(userDetails, targetRestaurant)) {
@@ -107,6 +126,7 @@ public class RestaurantService {
 		}
 
 		targetRestaurant.softDelete(resId);
+		restaurantScore.softDelete(restaurantScore.getRsId());
 	}
 
 	@Transactional
@@ -114,7 +134,7 @@ public class RestaurantService {
 		ModifyRestaurantRequestDto modifyRestaurantRequestDto,
 		UserDetailsImpl userDetails) {
 
-		Restaurant targetRestaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(resId)
+		Restaurant targetRestaurant = restaurantRepository.findByResIdWithScoreAndDeletedAtIsNull(resId)
 			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
 
 		User modifiedUser = null;
@@ -126,14 +146,12 @@ public class RestaurantService {
 				throw new CustomApiException(RestaurantException.NOT_AUTHORIZED_ROLE);
 			}
 		}
-		log.info(String.valueOf(modifyRestaurantRequestDto.getResOwnerId()));
 
 		Category modifiedCategory = null;
 		if (modifyRestaurantRequestDto.getRcId() != null) {
 			modifiedCategory = categoryRepository.findByRcIdAndDeletedAtIsNull(modifyRestaurantRequestDto.getRcId())
 				.orElseThrow(() -> new CustomApiException(CategoryException.CATEGORY_NOT_FOUND));
 		}
-		log.info(String.valueOf(modifyRestaurantRequestDto.getRcId()));
 
 		District modifiedDistrict = null;
 		if (modifyRestaurantRequestDto.getResDistrictId() != null) {
@@ -141,26 +159,29 @@ public class RestaurantService {
 					modifyRestaurantRequestDto.getResDistrictId())
 				.orElseThrow(() -> new CustomApiException(DistrictException.DISTRICT_NOT_FOUND));
 		}
-		log.info(String.valueOf(modifyRestaurantRequestDto.getResDistrictId()));
 
 		if (!hasPermissionForRestaurant(userDetails, targetRestaurant)) {
 			throw new CustomApiException(RestaurantException.INSUFFICIENT_PERMISSION);
 		}
 
 		targetRestaurant.update(modifyRestaurantRequestDto, modifiedUser, modifiedCategory, modifiedDistrict);
+		RestaurantScore restaurantScore = targetRestaurant.getRestaurantScore();
 
-		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
+		return RestaurantResponseDto.fromRestaurant(targetRestaurant, restaurantScore);
 	}
 
 	public CommonPageResponse<RestaurantResponseDto> searchAllRestaurant(Pageable pageable) {
 
-		Page<Restaurant> restaurants = restaurantRepository.findAllByDeletedAtIsNull(pageable);
+		Page<Restaurant> restaurants = restaurantRepository.findAllWithScoreByDeletedAtIsNull(pageable);
 
 		if (restaurants.isEmpty()) {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
 		}
 
-		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
+			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
+			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
+		});
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
