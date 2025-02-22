@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -84,14 +83,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 		MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
-		String message = "";
-		for (FieldError fieldError : fieldErrors) {
-			if (!message.equals(""))
-				message += " | ";
-			message = fieldError.getField() + " : " + fieldError.getDefaultMessage();
-		}
-		return handleExceptionInternal(ex, new CommonErrorResponse(message, BaseException.INVALID_INPUT), headers,
+		List<CommonErrorResponse.ErrorField> errorFields = ex.getBindingResult()
+			.getFieldErrors()
+			.stream()
+			.map(e -> new CommonErrorResponse.ErrorField(e.getField(), e.getDefaultMessage()))
+			.toList();
+
+		return handleExceptionInternal(ex, new CommonErrorResponse(BaseException.INVALID_INPUT, errorFields), headers,
 			status, request);
 	}
 }
