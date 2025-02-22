@@ -31,4 +31,5 @@ public interface OrderRepository extends JpaRepository<Order, UUID>, OrderReposi
 
 	@Query("SELECT o FROM Order o JOIN FETCH o.user WHERE o.orderId = :orderId AND o.user.userId = :userId AND o.deletedAt IS NULL")
 	Optional<Order> findValidOrderForPayment(@Param("orderId") UUID orderId, @Param("userId") UUID userId);
+
 }

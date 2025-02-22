@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
@@ -17,6 +18,7 @@ import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
+import com.ioteam.order_management_platform.order.dto.req.OrderByUserSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.OrderMenuRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
@@ -163,6 +165,7 @@ public class OrderService {
 		order.softDelete(userDetails.getUserId());
 	}
 
+	//가게별 조회
 	public CommonPageResponse<OrderResponseDto> searchOrderByRestaurant(UserDetailsImpl userDetails, UUID resId,
 		OrderByRestaurantSearchCondition condition, Pageable pageable) {
 		// MANAGER, MASTER 조회가능
@@ -172,6 +175,21 @@ public class OrderService {
 			throw new CustomApiException(OrderException.UNAUTH_OWNER);
 		}
 		Page<OrderResponseDto> orderDtoPage = orderRepository.searchOrderByRestaurantAndCondition(resId, condition,
+				pageable)
+			.map(OrderResponseDto::fromEntity);
+		return new CommonPageResponse<>(orderDtoPage);
+	}
+
+	//사용자별 조회
+	public CommonPageResponse<OrderResponseDto> searchOrderByUser(UserDetailsImpl userDetails, UUID userId,
+		OrderByUserSearchCondition condition, Pageable pageable) {
+		//CUSTOMER, MANAGER, MASTER 조회가능
+		//주문 고객만 조회 가능
+		if (userDetails.getRole().equals(UserRoleEnum.CUSTOMER)
+			&& !userRepository.existsByUserIdAndDeletedAtIsNull(userDetails.getUserId())) {
+			throw new CustomApiException(OrderException.UNAUTH_OWNER);
+		}
+		Page<OrderResponseDto> orderDtoPage = orderRepository.searchOrderByUserAndCondition(userId, condition,
 				pageable)
 			.map(OrderResponseDto::fromEntity);
 		return new CommonPageResponse<>(orderDtoPage);
