@@ -226,4 +226,20 @@ public class RestaurantService {
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
+
+	public CommonPageResponse<RestaurantResponseDto> searchCategoryRestaurants(UUID rcId, Pageable pageable) {
+
+		Page<Restaurant> restaurants = restaurantRepository.findAllByCategory_RcIdAndDeletedAtIsNull(rcId, pageable);
+
+		if (restaurants.isEmpty()) {
+			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
+		}
+
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
+			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
+			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
+		});
+
+		return new CommonPageResponse<>(restaurantResponseDtoPage);
+	}
 }

@@ -133,4 +133,17 @@ public class RestaurantController {
 			.body(new CommonResponse<>(SuccessCode.RESTAURANT_SEARCH, restaurants));
 	}
 
+	@GetMapping("/restaurants/category")
+	@Operation(summary = "카테고리별 가게 조회", description = "아무나 조회 가능\n")
+	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getRestaurantsByCategory(
+		@RequestParam(value = "category", required = true) UUID rcId,
+		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+	) {
+
+		CommonPageResponse<RestaurantResponseDto> restaurants = restaurantService.searchCategoryRestaurants(rcId,
+			pageable);
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_SEARCH, restaurants));
+	}
 }
