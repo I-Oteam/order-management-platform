@@ -129,6 +129,11 @@ public class CategoryService {
 			throw new CustomApiException(CategoryException.EMPTY_CATEGORY_NAME);
 		}
 
+		String updatedName = updateCategoryDto.getRcName().trim();
+		if (categoryRepository.existsByRcNameAndDeletedAtIsNull(updatedName)) {
+			throw new CustomApiException(CategoryException.DUPLICATE_CATEGORY_NAME);
+		}
+
 		targetCategory.update(updateCategoryDto);
 
 		return CategoryResponseDto.fromCategory(targetCategory);

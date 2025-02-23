@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
-import com.ioteam.order_management_platform.restaurant.entity.RestaurantScore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,10 +29,12 @@ public class RestaurantResponseDto {
 	private String resImageUrl;
 	private BigDecimal resScore;
 
-	public static RestaurantResponseDto fromRestaurant(Restaurant savedRestaurant, RestaurantScore restaurantScore) {
+	public static RestaurantResponseDto fromRestaurant(Restaurant savedRestaurant) {
 
-		log.info("score : {}", restaurantScore);
-		BigDecimal score = (restaurantScore.getRsScore() != null) ? restaurantScore.getRsScore() : BigDecimal.ZERO;
+		BigDecimal score =
+			(savedRestaurant.getRestaurantScore().getRsScore() != null) ?
+				savedRestaurant.getRestaurantScore().getRsScore() :
+				BigDecimal.ZERO;
 
 		return RestaurantResponseDto
 			.builder()

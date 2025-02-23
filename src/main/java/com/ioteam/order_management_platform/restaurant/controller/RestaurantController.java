@@ -136,11 +136,11 @@ public class RestaurantController {
 	@GetMapping("/restaurants/category")
 	@Operation(summary = "카테고리별 가게 조회", description = "아무나 조회 가능\n")
 	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getRestaurantsByCategory(
-		@RequestParam(value = "category", required = true) UUID rcId,
+		@RequestParam(value = "category", required = true) String rcName,
 		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
 	) {
 
-		CommonPageResponse<RestaurantResponseDto> restaurants = restaurantService.searchCategoryRestaurants(rcId,
+		CommonPageResponse<RestaurantResponseDto> restaurants = restaurantService.searchCategoryRestaurants(rcName,
 			pageable);
 
 		return ResponseEntity.ok()
