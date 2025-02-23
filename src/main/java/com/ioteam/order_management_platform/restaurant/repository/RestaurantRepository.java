@@ -41,6 +41,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
 	@Query("SELECT r FROM Restaurant r JOIN FETCH r.restaurantScore rs WHERE r.deletedAt IS NULL ORDER BY rs.rsScore DESC")
 	Page<Restaurant> findAllWithScoreSortedByScoreDescAndDeletedAtIsNull(Pageable pageable);
 
-	Page<Restaurant> findAllByCategory_RcIdAndDeletedAtIsNull(UUID rcId, Pageable pageable);
+	Page<Restaurant> findAllByCategory_RcNameAndDeletedAtIsNull(String rcName, Pageable pageable);
 }
 

@@ -227,9 +227,10 @@ public class RestaurantService {
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
 
-	public CommonPageResponse<RestaurantResponseDto> searchCategoryRestaurants(UUID rcId, Pageable pageable) {
+	public CommonPageResponse<RestaurantResponseDto> searchCategoryRestaurants(String rcName, Pageable pageable) {
 
-		Page<Restaurant> restaurants = restaurantRepository.findAllByCategory_RcIdAndDeletedAtIsNull(rcId, pageable);
+		Page<Restaurant> restaurants = restaurantRepository.findAllByCategory_RcNameAndDeletedAtIsNull(rcName,
+			pageable);
 
 		if (restaurants.isEmpty()) {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
