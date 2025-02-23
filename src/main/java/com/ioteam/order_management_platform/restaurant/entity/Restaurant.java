@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "p_restaurant",
 	uniqueConstraints = {
+		// 기술적인 부분x 정책으로(다른테이블로 이관)
 		@UniqueConstraint(name = "uk_res_phone", columnNames = "res_phone")
 	})
 @Getter
