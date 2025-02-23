@@ -1,6 +1,5 @@
 package com.ioteam.order_management_platform.order.repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,9 +11,6 @@ import com.ioteam.order_management_platform.order.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, UUID>, OrderRepositoryCustom {
 
-	//주문 상태
-	//List<Order> findByOrderStatusAndCreatedAtBefore(OrderStatus orderStatus, LocalDateTime createdAt);
-
 	@Query("select o from Order o "
 		+ "join fetch o.user ou "
 		+ "join fetch o.restaurant or "
@@ -25,11 +21,11 @@ public interface OrderRepository extends JpaRepository<Order, UUID>, OrderReposi
 	Optional<Order> findByOrderIdAndUserIdAndResIdAndDeletedAtIsNullFetchJoin(UUID orderId, UUID userId,
 		UUID restaurantId);
 
-	List<Order> findAllByDeletedAtIsNull();
-
 	Optional<Order> findByOrderIdAndDeletedAtIsNull(UUID orderId);
 
 	@Query("SELECT o FROM Order o JOIN FETCH o.user WHERE o.orderId = :orderId AND o.user.userId = :userId AND o.deletedAt IS NULL")
 	Optional<Order> findValidOrderForPayment(@Param("orderId") UUID orderId, @Param("userId") UUID userId);
 
+	@Query("SELECT o FROM Order o JOIN FETCH o.user WHERE o.orderId = :orderId AND o.deletedAt IS NULL")
+	Optional<Order> findByOrderIdAndDeletedAtIsNullFetchJoinUser(UUID orderId);
 }
