@@ -46,8 +46,9 @@ public class MenuController {
 	@PostMapping()
 	@PreAuthorize("hasAnyRole('OWNER','MANAGER','MASTER')")
 	public ResponseEntity<CommonResponse<MenuResponseDto>> createMenu(
-		@RequestBody @Validated CreateMenuRequestDto requestDto) {
-		MenuResponseDto responseDto = menuService.createMenu(requestDto);
+		@RequestBody @Validated CreateMenuRequestDto requestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		MenuResponseDto responseDto = menuService.createMenu(requestDto, userDetails);
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
 			.path("/api/menus/" + responseDto.getRmId().toString())
 			.build()
