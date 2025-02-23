@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.category.entity.Category;
@@ -12,6 +13,8 @@ import com.ioteam.order_management_platform.global.entity.BaseEntity;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.restaurant.dto.req.ModifyRestaurantRequestDto;
 import com.ioteam.order_management_platform.user.entity.User;
+import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
+import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -99,5 +102,13 @@ public class Restaurant extends BaseEntity {
 		Optional.ofNullable(modifiedCategory).ifPresent(value -> this.category = value);
 		Optional.ofNullable(modifiedDistrict).ifPresent(value -> this.district = value);
 
+	}
+
+	public boolean isOwner(UserDetailsImpl userDetails) {
+		if (Set.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(userDetails.getRole()))
+			return true;
+		if (userDetails.getRole().equals(UserRoleEnum.OWNER))
+			return userDetails.getUserId().equals(this.getOwner().getUserId());
+		return false;
 	}
 }

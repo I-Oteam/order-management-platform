@@ -30,7 +30,7 @@ public class AiController {
 
 	@Operation(summary = "AI 상품 설명 추천 기능", description = "가게 주인이 작성한 5개의 키워드와 가게 정보와 메뉴 정보로 상품 설명 문구를 추천합니다.")
 	@PostMapping("/menu-description")
-	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
+	@PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
 	public ResponseEntity<CommonResponse<AnswerAiResponseDto>> getAiMenuDescription(
 		@RequestBody @Validated RecommendDesRequestDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
