@@ -31,7 +31,6 @@ public class RestaurantResponseDto {
 
 	public static RestaurantResponseDto fromRestaurant(Restaurant savedRestaurant) {
 
-		log.info("score : {}", savedRestaurant.getRestaurantScore());
 		BigDecimal score =
 			(savedRestaurant.getRestaurantScore().getRsScore() != null) ?
 				savedRestaurant.getRestaurantScore().getRsScore() :
