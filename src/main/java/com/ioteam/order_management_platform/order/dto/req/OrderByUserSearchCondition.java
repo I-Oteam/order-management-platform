@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class OrderByUserSearchCondition {
-
+	private String restaurantName;
 	private OrderStatus orderStatus;
 	private OrderType orderType;
 	private LocalDateTime startCreatedAt;
