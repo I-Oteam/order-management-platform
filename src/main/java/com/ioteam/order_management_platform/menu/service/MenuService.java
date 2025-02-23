@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.menu.service;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -113,7 +114,7 @@ public class MenuService {
 	}
 
 	private boolean hasPermissionForRestaurant(UserDetailsImpl userDetails, Restaurant restaurant) {
-		if (userDetails.getRole().equals(UserRoleEnum.MANAGER))
+		if (Set.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(userDetails.getRole()))
 			return true;
 		else if (userDetails.getRole().equals(UserRoleEnum.OWNER))
 			return userDetails.getUserId().equals(restaurant.getOwner().getUserId());
