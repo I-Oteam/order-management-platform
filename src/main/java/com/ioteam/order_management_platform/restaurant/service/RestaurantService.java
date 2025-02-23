@@ -123,7 +123,7 @@ public class RestaurantService {
 		if (!hasPermissionForRestaurant(userDetails, targetRestaurant)) {
 			throw new CustomApiException(RestaurantException.INSUFFICIENT_PERMISSION);
 		}
-
+		
 		targetRestaurant.softDelete(userDetails.getUserId());
 		restaurantScore.softDelete(userDetails.getUserId());
 	}

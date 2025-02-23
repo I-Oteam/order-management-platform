@@ -67,7 +67,7 @@ public class Restaurant extends BaseEntity {
 	@Column(length = 100, nullable = false)
 	private String resAddress;
 
-	@Column(length = 20, nullable = false)
+	@Column(length = 20)
 	private String resPhone;
 
 	private String resImageUrl;
@@ -84,6 +84,12 @@ public class Restaurant extends BaseEntity {
 		if (this.restaurantScore == null) {
 			this.restaurantScore = new RestaurantScore(this, BigDecimal.ZERO); // 기본 값 0으로 설정
 		}
+	}
+
+	@Override
+	public void softDelete(UUID userId) {
+		super.softDelete(userId);
+		this.resPhone = null;
 	}
 
 	public void update(ModifyRestaurantRequestDto modifyRestaurantRequestDto, User modifiedUser,
