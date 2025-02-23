@@ -16,6 +16,7 @@ import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.exception.MenuException;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
+import com.ioteam.order_management_platform.restaurant.execption.RestaurantException;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
@@ -33,9 +34,12 @@ public class MenuService {
 	private final RestaurantRepository restaurantRepository;
 
 	@Transactional
-	public MenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
+	public MenuResponseDto createMenu(CreateMenuRequestDto requestDto, UserDetailsImpl userDetails) {
 		Restaurant restaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(requestDto.getResId())
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
+		if (!hasPermissionForRestaurant(userDetails, restaurant)) {
+			throw new CustomApiException(RestaurantException.INSUFFICIENT_PERMISSION);
+		}
 		Menu menu = requestDto.toEntity(requestDto, restaurant);
 		Menu savedMenu = menuRepository.save(menu);
 		return MenuResponseDto.fromEntity(savedMenu);
@@ -58,8 +62,8 @@ public class MenuService {
 	public MenuResponseDto modifyMenu(UUID menuId, UpdateMenuRequestDto requestDto, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findByRmIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
-		if (!canModifyOrDelete(userDetails, menu)) {
-			throw new CustomApiException(MenuException.INVALID_MODIFY_ROLE);
+		if (!hasUpdateAuthority(userDetails, menu)) {
+			throw new CustomApiException(MenuException.NOT_AUTHORIZED_FOR_MENU);
 		}
 		Menu updatedMenu = menu.updateMenu(requestDto);
 		return MenuResponseDto.fromEntity(updatedMenu);
@@ -69,8 +73,8 @@ public class MenuService {
 	public MenuResponseDto hiddenMenu(UUID menuId, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findByRmIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
-		if (!canModifyOrDelete(userDetails, menu)) {
-			throw new CustomApiException(MenuException.INVALID_HIDDEN_ROLE);
+		if (!hasUpdateAuthority(userDetails, menu)) {
+			throw new CustomApiException(MenuException.NOT_AUTHORIZED_FOR_MENU);
 		}
 		Menu hiddenMenu = menu.hiddenMenu();
 		return MenuResponseDto.fromEntity(hiddenMenu);
@@ -80,27 +84,39 @@ public class MenuService {
 	public void deleteMenu(UUID menuId, UserDetailsImpl userDetails) {
 		Menu menu = menuRepository.findByRmIdAndDeletedAtIsNull(menuId)
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_MENU));
-		if (!canModifyOrDelete(userDetails, menu)) {
-			throw new CustomApiException(MenuException.INVALID_DELETE_ROLE);
+		if (!hasUpdateAuthority(userDetails, menu)) {
+			throw new CustomApiException(MenuException.NOT_AUTHORIZED_FOR_MENU);
 		}
 		menu.softDelete(userDetails.getUserId());
 	}
 
-	private boolean canModifyOrDelete(UserDetailsImpl userDetails, Menu menu) {
+	private boolean hasUpdateAuthority(UserDetailsImpl userDetails, Menu menu) {
 		UserRoleEnum role = userDetails.getRole();
 		if (role.equals(UserRoleEnum.MANAGER) || role.equals(UserRoleEnum.MASTER)) {
 			return true;
+		} else if (role.equals(UserRoleEnum.OWNER)) {
+			return hasPermissionForMenu(userDetails, menu);
 		}
-		if (role.equals(UserRoleEnum.OWNER)) {
-			UUID requestUser = userDetails.getUserId();
-			UUID ownerUser = menuRepository.getRestaurantOwnerId(menu.getRmId());
-			log.info(
-				"Updating menu with menuId: " + menu.getRmId() + " with ownerUser: " + ownerUser + " with requestUser: "
-					+ requestUser);
-			if (requestUser.equals(ownerUser)) {
-				return true;
-			}
+		return false;
+	}
+
+	private boolean hasPermissionForMenu(UserDetailsImpl userDetails, Menu menu) {
+		UUID requestUser = userDetails.getUserId();
+		UUID ownerUser = menuRepository.getRestaurantOwnerId(menu.getRmId());
+		log.info(
+			"Updating menu with menuId: " + menu.getRmId() + " with ownerUser: " + ownerUser + " with requestUser: "
+				+ requestUser);
+		if (requestUser.equals(ownerUser)) {
+			return true;
 		}
+		return false;
+	}
+
+	private boolean hasPermissionForRestaurant(UserDetailsImpl userDetails, Restaurant restaurant) {
+		if (userDetails.getRole().equals(UserRoleEnum.MANAGER))
+			return true;
+		else if (userDetails.getRole().equals(UserRoleEnum.OWNER))
+			return userDetails.getUserId().equals(restaurant.getOwner().getUserId());
 		return false;
 	}
 
