@@ -1,7 +1,9 @@
 name: CI
 on:
   push:
-    branches: main
+    branches:
+      - main
+      - feat/#163_multiStageBuild
 
 jobs:
   ci:
@@ -38,10 +40,21 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
+        if: github.ref == 'refs/heads/main'
         run: |
           REGION="ap-northeast-2"
           ECR_REPOSITORY="omp"
           IMAGE_TAG="latest"
+          
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build test image (only for feat/#163_multiStageBuild branch)
+        if: github.ref == 'refs/heads/feat/#163_multiStageBuild'
+        run: |
+          REGION="ap-northeast-2"
+          ECR_REPOSITORY="omp"
+          IMAGE_TAG="multistagebuild"
           
           docker build -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
