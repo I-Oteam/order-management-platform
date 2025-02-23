@@ -98,19 +98,16 @@ public class RestaurantService {
 		// RestaurantScore restaurantScore = restaurantScoreRepository.findByRestaurantResIdAndDeletedAtIsNull(
 		// 		savedRestaurant.getResId())
 		// 	.orElseThrow(() -> new CustomApiException(RestaurantScoreException.NOT_FOUND_SCORE));
-		RestaurantScore restaurantScore = savedRestaurant.getRestaurantScore();
-		log.info("restaurant score: {}", restaurantScore.getRsScore());
 
-		return RestaurantResponseDto.fromRestaurant(savedRestaurant, restaurantScore);
+		return RestaurantResponseDto.fromRestaurant(savedRestaurant);
 	}
 
 	public RestaurantResponseDto searchOneRestaurant(UUID resId) {
 
 		Restaurant targetRestaurant = restaurantRepository.findByResIdWithScoreAndDeletedAtIsNull(resId)
 			.orElseThrow(() -> new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT));
-		RestaurantScore restaurantScore = targetRestaurant.getRestaurantScore();
 
-		return RestaurantResponseDto.fromRestaurant(targetRestaurant, restaurantScore);
+		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
 	}
 
 	@Transactional
@@ -167,9 +164,8 @@ public class RestaurantService {
 		}
 
 		targetRestaurant.update(modifyRestaurantRequestDto, modifiedUser, modifiedCategory, modifiedDistrict);
-		RestaurantScore restaurantScore = targetRestaurant.getRestaurantScore();
 
-		return RestaurantResponseDto.fromRestaurant(targetRestaurant, restaurantScore);
+		return RestaurantResponseDto.fromRestaurant(targetRestaurant);
 	}
 
 	public CommonPageResponse<RestaurantResponseDto> searchAllRestaurant(Pageable pageable) {
@@ -180,10 +176,7 @@ public class RestaurantService {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
 		}
 
-		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
-			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
-			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
-		});
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
@@ -202,10 +195,7 @@ public class RestaurantService {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
 		}
 
-		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
-			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
-			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
-		});
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
@@ -219,10 +209,7 @@ public class RestaurantService {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
 		}
 
-		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
-			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
-			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
-		});
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
@@ -236,10 +223,7 @@ public class RestaurantService {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
 		}
 
-		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(restaurant -> {
-			RestaurantScore restaurantScore = restaurant.getRestaurantScore();
-			return RestaurantResponseDto.fromRestaurant(restaurant, restaurantScore);
-		});
+		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
