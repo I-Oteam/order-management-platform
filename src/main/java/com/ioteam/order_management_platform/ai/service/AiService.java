@@ -21,7 +21,6 @@ import com.ioteam.order_management_platform.menu.exception.MenuException;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 import com.ioteam.order_management_platform.user.entity.User;
-import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,7 @@ public class AiService {
 		Restaurant restaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(requestDto.getResId())
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
 
-		if (!hasPermissionForRestaurant(user, restaurant)) {
+		if (!restaurant.isOwner(userDetails)) {
 			throw new CustomApiException(MenuException.NOT_AUTHORIZED_FOR_MENU);
 		}
 
@@ -90,13 +89,5 @@ public class AiService {
 		} catch (Exception e) {
 			throw new CustomApiException(AIException.AI_SERVICE_UNAVAILABLE);
 		}
-	}
-
-	private boolean hasPermissionForRestaurant(User user, Restaurant restaurant) {
-		if (user.getRole().equals(UserRoleEnum.MANAGER))
-			return true;
-		else if (user.getRole().equals(UserRoleEnum.OWNER))
-			return user.getUserId().equals(restaurant.getOwner().getUserId());
-		return false;
 	}
 }

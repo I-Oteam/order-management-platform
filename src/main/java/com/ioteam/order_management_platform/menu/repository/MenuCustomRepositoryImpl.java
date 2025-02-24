@@ -43,27 +43,13 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 			condition = condition.and(menu.rmStatus.ne(MenuStatus.HIDDEN));
 		}
 
+		// 정렬 조건 변환
+		List<OrderSpecifier> orders = orderCondition(menu, pageable);
+
 		long total = jpaQueryFactory
 			.selectFrom(menu)
 			.where(condition)
 			.fetchCount();
-
-		// 정렬 조건 변환
-		List<OrderSpecifier> orders = pageable.getSort().stream()
-			.map(order -> {
-				Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-				switch (order.getProperty()) {
-					case "createdAt":
-						return new OrderSpecifier(direction, menu.createdAt);
-					case "modifiedAt":
-						return new OrderSpecifier(direction, menu.modifiedAt);
-					case "rmPrice":
-						return new OrderSpecifier(direction, menu.rmPrice);
-					default:
-						return new OrderSpecifier(direction, menu.createdAt);
-				}
-			})
-			.collect(Collectors.toList());
 
 		List<Menu> menus = jpaQueryFactory
 			.selectFrom(menu)
@@ -88,6 +74,24 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 			.where(restaurant.resId.eq(resId).and(restaurant.owner.userId.eq(userId)))
 			.fetchFirst();
 		return owner != null;
+	}
+
+	private List<OrderSpecifier> orderCondition(QMenu menu, Pageable pageable) {
+		return pageable.getSort().stream()
+			.map(order -> {
+				Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+				switch (order.getProperty()) {
+					case "createdAt":
+						return new OrderSpecifier(direction, menu.createdAt);
+					case "modifiedAt":
+						return new OrderSpecifier(direction, menu.modifiedAt);
+					case "rmPrice":
+						return new OrderSpecifier(direction, menu.rmPrice);
+					default:
+						return new OrderSpecifier(direction, menu.createdAt);
+				}
+			})
+			.collect(Collectors.toList());
 	}
 
 }

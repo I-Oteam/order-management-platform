@@ -37,7 +37,7 @@ public class MenuService {
 	public MenuResponseDto createMenu(CreateMenuRequestDto requestDto, UserDetailsImpl userDetails) {
 		Restaurant restaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(requestDto.getResId())
 			.orElseThrow(() -> new CustomApiException(MenuException.INVALID_RESTAURANT_ID));
-		if (!hasPermissionForRestaurant(userDetails, restaurant)) {
+		if (!restaurant.isOwner(userDetails)) {
 			throw new CustomApiException(RestaurantException.INSUFFICIENT_PERMISSION);
 		}
 		Menu menu = requestDto.toEntity(requestDto, restaurant);
@@ -109,14 +109,6 @@ public class MenuService {
 		if (requestUser.equals(ownerUser)) {
 			return true;
 		}
-		return false;
-	}
-
-	private boolean hasPermissionForRestaurant(UserDetailsImpl userDetails, Restaurant restaurant) {
-		if (userDetails.getRole().equals(UserRoleEnum.MANAGER))
-			return true;
-		else if (userDetails.getRole().equals(UserRoleEnum.OWNER))
-			return userDetails.getUserId().equals(restaurant.getOwner().getUserId());
 		return false;
 	}
 
