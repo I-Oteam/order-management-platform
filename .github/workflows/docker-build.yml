@@ -43,5 +43,5 @@ jobs:
           ECR_REPOSITORY="omp"
           IMAGE_TAG="latest"
           
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build --target runtime -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
