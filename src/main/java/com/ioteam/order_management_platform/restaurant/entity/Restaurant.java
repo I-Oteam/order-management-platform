@@ -76,8 +76,8 @@ public class Restaurant extends BaseEntity {
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<Menu> menuList = new ArrayList<>();
 
-	// 식당이 생성될때 score 엔티티도 같이 생성
-	@OneToOne(mappedBy = "restaurant", cascade = CascadeType.PERSIST, orphanRemoval = true)
+	// 가게가 생성될때 score 엔티티도 같이 생성
+	@OneToOne(mappedBy = "restaurant", cascade = CascadeType.PERSIST)
 	private RestaurantScore restaurantScore;
 
 	@PrePersist
