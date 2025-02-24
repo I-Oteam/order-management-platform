@@ -14,6 +14,8 @@ import lombok.Getter;
 @Getter
 public class AdminOrderSearchCondition {
 	private UUID restaurantId;
+	private String username;
+	private String nickname;
 	private String restaurantName;
 	private LocalDateTime startCreatedAt;
 	private LocalDateTime endCreatedAt;
