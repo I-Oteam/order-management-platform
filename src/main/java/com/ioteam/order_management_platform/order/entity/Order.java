@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.global.entity.BaseEntity;
-import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
@@ -73,7 +72,7 @@ public class Order extends BaseEntity {
 
 	//주문 상태
 	//주문 취소
-	public void orderCancel(CancelOrderRequestDto requestDto) {
+	public void orderCancel() {
 		this.orderStatus = OrderStatus.CANCELED;
 	}
 }
