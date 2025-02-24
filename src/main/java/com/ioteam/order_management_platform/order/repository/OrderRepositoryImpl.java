@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.order.repository;
 
+import static com.ioteam.order_management_platform.global.utils.QuerydslUtil.*;
 import static com.ioteam.order_management_platform.order.entity.QOrder.*;
 import static com.ioteam.order_management_platform.order.entity.QOrderMenu.*;
 
@@ -25,8 +26,8 @@ import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -44,15 +45,13 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
 		OrderSpecifier[] orderSpecifiers = createOrderSpecifiers(pageable.getSort());
 
-		// 1. 페이지네이션 + 조건에 맞는 order Id 조회 
+		// 1. 페이지네이션 + 조건에 맞는 order Id 조회
 		List<UUID> orderIds = queryFactory
 			.select(order.orderId)
 			.from(order)
 			.where(
 				order.restaurant.resId.eq(resId),
-				eqNickname(condition.getNickname()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byResSearch(condition)
 			)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
@@ -81,83 +80,10 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.restaurant.resId.eq(resId),
-				eqNickname(condition.getNickname()),
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byResSearch(condition)
 			);
 
 		return PageableExecutionUtils.getPage(orders, pageable, () -> countQuery.fetchOne());
-	}
-
-	private int validatePageSize(int pageSize) {
-		if (Set.of(10, 30, 50).contains(pageSize))
-			return pageSize;
-		throw new CustomApiException(BaseException.INVALID_PAGESIZE);
-	}
-
-	private BooleanExpression eqRestaurantId(UUID restaurantId) {
-		return restaurantId == null ? null : order.restaurant.resId.eq(restaurantId);
-	}
-
-	private BooleanExpression eqRestaurantName(String restaurantName) {
-		return restaurantName == null ? null : order.restaurant.resName.eq(restaurantName);
-	}
-
-	private BooleanExpression eqUserName(String userName) {
-		return userName == null ? null : order.user.username.eq(userName);
-	}
-
-	private BooleanExpression eqOrderType(OrderType orderType) {
-		return orderType == null ? null : order.orderType.eq(orderType);
-	}
-
-	private BooleanExpression eqOrderStatus(OrderStatus orderStatus) {
-		return orderStatus == null ? null : order.orderStatus.eq(orderStatus);
-	}
-
-	private BooleanExpression eqNickname(String nickname) {
-		return nickname == null ? null : order.user.nickname.eq(nickname);
-	}
-
-	private BooleanExpression betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
-		if (startCreatedAt == null || endCreatedAt == null)
-			return null;
-		if (startCreatedAt.isAfter(endCreatedAt))
-			throw new CustomApiException(PaymentException.INVALID_PERIOD);
-		return order.createdAt.between(startCreatedAt, endCreatedAt);
-	}
-
-	private BooleanExpression betweenResTotal(BigDecimal min, BigDecimal max) {
-		if (min == null && max == null)
-			return null;
-		if (min != null && max != null)
-			return order.orderResTotal.between(min, max);
-		if (min != null)
-			return order.orderResTotal.goe(min);
-		return order.orderResTotal.loe(max);
-	}
-
-	private OrderSpecifier[] createOrderSpecifiers(Sort sorts) {
-
-		return sorts.stream()
-			.filter(sort -> List.of("orderResTotal", "createdAt", "modifiedAt").contains(sort.getProperty()))
-			.map(sort -> {
-				com.querydsl.core.types.Order direction =
-					sort.getDirection().isAscending() ? com.querydsl.core.types.Order.ASC :
-						com.querydsl.core.types.Order.DESC;
-				switch (sort.getProperty()) {
-					case "orderResTotal":
-						return new OrderSpecifier(direction, order.orderResTotal);
-					case "createdAt":
-						return new OrderSpecifier(direction, order.createdAt);
-					case "modifiedAt":
-						return new OrderSpecifier(direction, order.modifiedAt);
-				}
-				return null;
-			})
-			.toArray(OrderSpecifier[]::new);
 	}
 
 	@Override
@@ -173,10 +99,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.user.userId.eq(userId), //사용자의 주문만 조회
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byUserSearch(condition)
 			)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
@@ -205,10 +128,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.user.userId.eq(userId),
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byUserSearch(condition)
 			);
 
 		return PageableExecutionUtils.getPage(orders, pageable, () -> countQuery.fetchOne());
@@ -223,14 +143,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.select(order.orderId)
 			.from(order)
 			.where(
-				eqRestaurantId(condition.getRestaurantId()),
-				eqRestaurantName(condition.getRestaurantName()),
-				// eqUserName(condition.getUsername()),
-				// eqNickname(condition.getNickname()),
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byAdminSearch(condition)
 			)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
@@ -257,16 +170,106 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.select(order.count())
 			.from(order)
 			.where(
-				eqRestaurantId(condition.getRestaurantId()),
-				eqRestaurantName(condition.getRestaurantName()),
-				// eqUserName(condition.getUsername()),
-				// eqNickname(condition.getNickname()),
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byAdminSearch(condition)
 			);
 
 		return PageableExecutionUtils.getPage(orders, pageable, countQuery::fetchOne);
+	}
+
+	private BooleanBuilder byAdminSearch(AdminOrderSearchCondition condition) {
+
+		return eqRestaurantId(condition.getRestaurantId())
+			.and(eqRestaurantName(condition.getRestaurantName()))
+			.and(eqUsername(condition.getUsername()))
+			.and(eqNickname(condition.getNickname()))
+			.and(eqOrderStatus(condition.getOrderStatus()))
+			.and(eqOrderType(condition.getOrderType()))
+			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
+			.and(betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal()));
+	}
+
+	private BooleanBuilder byResSearch(OrderByRestaurantSearchCondition condition) {
+		return eqNickname(condition.getNickname())
+			.and(eqOrderStatus(condition.getOrderStatus()))
+			.and(eqOrderType(condition.getOrderType()))
+			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
+			.and(betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal()));
+	}
+
+	private BooleanBuilder byUserSearch(OrderByUserSearchCondition condition) {
+		return eqRestaurantName(condition.getRestaurantName())
+			.and(eqOrderStatus(condition.getOrderStatus()))
+			.and(eqOrderType(condition.getOrderType()))
+			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
+			.and(betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal()));
+	}
+
+	private int validatePageSize(int pageSize) {
+		if (Set.of(10, 30, 50).contains(pageSize))
+			return pageSize;
+		throw new CustomApiException(BaseException.INVALID_PAGESIZE);
+	}
+
+	private BooleanBuilder eqRestaurantId(UUID restaurantId) {
+		return nullSafeBuilder(() -> order.restaurant.resId.eq(restaurantId));
+	}
+
+	private BooleanBuilder eqUsername(String username) {
+		return nullSafeBuilder(() -> order.user.username.eq(username));
+	}
+
+	private BooleanBuilder eqRestaurantName(String restaurantName) {
+		return nullSafeBuilder(() -> order.restaurant.resName.eq(restaurantName));
+	}
+
+	private BooleanBuilder eqOrderType(OrderType orderType) {
+		return nullSafeBuilder(() -> order.orderType.eq(orderType));
+	}
+
+	private BooleanBuilder eqOrderStatus(OrderStatus orderStatus) {
+		return nullSafeBuilder(() -> order.orderStatus.eq(orderStatus));
+	}
+
+	private BooleanBuilder eqNickname(String nickname) {
+		return nullSafeBuilder(() -> order.user.nickname.eq(nickname));
+	}
+
+	private BooleanBuilder betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
+		if (startCreatedAt == null || endCreatedAt == null)
+			return new BooleanBuilder();
+		if (startCreatedAt.isAfter(endCreatedAt))
+			throw new CustomApiException(PaymentException.INVALID_PERIOD);
+		return new BooleanBuilder(order.createdAt.between(startCreatedAt, endCreatedAt));
+	}
+
+	private BooleanBuilder betweenResTotal(BigDecimal min, BigDecimal max) {
+		if (min == null && max == null)
+			return new BooleanBuilder();
+		if (min != null && max != null)
+			return new BooleanBuilder(order.orderResTotal.between(min, max));
+		if (min != null)
+			return new BooleanBuilder(order.orderResTotal.goe(min));
+		return new BooleanBuilder(order.orderResTotal.loe(max));
+	}
+
+	private OrderSpecifier[] createOrderSpecifiers(Sort sorts) {
+
+		return sorts.stream()
+			.filter(sort -> List.of("orderResTotal", "createdAt", "modifiedAt").contains(sort.getProperty()))
+			.map(sort -> {
+				com.querydsl.core.types.Order direction =
+					sort.getDirection().isAscending() ? com.querydsl.core.types.Order.ASC :
+						com.querydsl.core.types.Order.DESC;
+				switch (sort.getProperty()) {
+					case "orderResTotal":
+						return new OrderSpecifier(direction, order.orderResTotal);
+					case "createdAt":
+						return new OrderSpecifier(direction, order.createdAt);
+					case "modifiedAt":
+						return new OrderSpecifier(direction, order.modifiedAt);
+				}
+				return null;
+			})
+			.toArray(OrderSpecifier[]::new);
 	}
 }
