@@ -180,40 +180,6 @@ public class RestaurantService {
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
 
-	// public CommonPageResponse<RestaurantResponseDto> searchRestaurantsByScoreRange(BigDecimal score,
-	// 	Pageable pageable) {
-	//
-	// 	// min이상 max미만 검색
-	// 	BigDecimal minScore = score.setScale(1, RoundingMode.FLOOR);
-	// 	BigDecimal maxScore = minScore.add(BigDecimal.valueOf(1));
-	//
-	// 	Page<Restaurant> restaurants = restaurantRepository.findRestaurantsByScoreRangeAndDeletedAtIsNull(minScore,
-	// 		maxScore, pageable);
-	//
-	// 	if (restaurants.isEmpty()) {
-	// 		throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
-	// 	}
-	//
-	// 	Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
-	//
-	// 	return new CommonPageResponse<>(restaurantResponseDtoPage);
-	// }
-	//
-	// public CommonPageResponse<RestaurantResponseDto> searchAllRestaurantsSortedByScore(Pageable pageable) {
-	//
-	// 	Page<Restaurant> restaurants = restaurantRepository.findAllWithScoreSortedByScoreDescAndDeletedAtIsNull(
-	// 		pageable);
-	//
-	// 	if (restaurants.isEmpty()) {
-	// 		throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
-	// 	}
-	//
-	// 	Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
-	//
-	// 	return new CommonPageResponse<>(restaurantResponseDtoPage);
-	// }
-
-	// JPQL 서비스 2개로직을 > QueryDSL 1개로 변경
 	public CommonPageResponse<RestaurantResponseDto> searchRestaurants(BigDecimal score, Pageable pageable) {
 		Page<Restaurant> restaurants = restaurantRepository.searchRestaurants(score, pageable);
 
