@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
-import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.order.dto.req.AdminOrderSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.OrderByUserSearchCondition;
@@ -55,7 +53,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
-			.limit(validatePageSize(pageable.getPageSize()))
+			.limit(pageable.getPageSize())
 			.fetch();
 
 		if (orderIds.isEmpty()) {
@@ -202,12 +200,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.and(eqOrderType(condition.getOrderType()))
 			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
 			.and(betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal()));
-	}
-
-	private int validatePageSize(int pageSize) {
-		if (Set.of(10, 30, 50).contains(pageSize))
-			return pageSize;
-		throw new CustomApiException(BaseException.INVALID_PAGESIZE);
 	}
 
 	private BooleanBuilder eqRestaurantId(UUID restaurantId) {
