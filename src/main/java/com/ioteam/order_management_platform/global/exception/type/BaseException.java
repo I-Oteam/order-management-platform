@@ -9,7 +9,8 @@ public enum BaseException implements ExceptionType {
 	NULL_DATA(HttpStatus.BAD_REQUEST, "널 데이터가 존재해서는 안 됩니다.", "E_NULL"),
 	UNAUTHORIZED_REQ(HttpStatus.FORBIDDEN, "권한이 없는 요청입니다.", "E_UNAUTH"),
 	DUPLICATE_FIELD(HttpStatus.CONFLICT, "중복된 데이터가 존재합니다.", "E_DUPLICATE"),
-	INVALID_PAGESIZE(HttpStatus.BAD_REQUEST, "페이지 사이즈는 10, 30, 50만 가능합니다.", "E_PAGE_SIZE");
+	INVALID_PAGESIZE(HttpStatus.BAD_REQUEST, "페이지 사이즈는 10, 30, 50만 가능합니다.", "E_PAGE_SIZE"),
+	UNAUTHENTICATED_REQ(HttpStatus.UNAUTHORIZED, "인증되지 않은 접근입니다.", "E_UNAUTHENTICATED");
 
 	private final HttpStatus status;
 	private final String message;

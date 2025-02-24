@@ -30,6 +30,10 @@ public class WebSecurityConfig {
 
 	private final AuthenticationConfiguration authenticationConfiguration;
 
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -83,6 +87,9 @@ public class WebSecurityConfig {
 		http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
+		http.exceptionHandling(handling -> handling
+			.authenticationEntryPoint(jwtAuthenticationEntryPoint) // 401 에러 핸들링
+			.accessDeniedHandler(jwtAccessDeniedHandler)); // 403 에러 핸들링
 		return http.build();
 	}
 }
