@@ -54,11 +54,10 @@
  1. [공통 예외처리 정책](https://github.com/I-Oteam/order-management-platform/wiki/%EA%B3%B5%ED%86%B5-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC-%EC%A0%95%EC%B1%85)
  2. [QueryDsl의 Projections 활용](https://github.com/I-Oteam/order-management-platform/wiki/QueryDsl%EC%9D%98-Projections-%ED%99%9C%EC%9A%A9)
  3. [WebClient와 RestTemplate 그리고 RestClient](https://github.com/I-Oteam/order-management-platform/wiki/WebClient%EC%99%80-RestTemplate-%EA%B7%B8%EB%A6%AC%EA%B3%A0-RestClient)
- 4. [Logging 정책](https://github.com/I-Oteam/order-management-platform/wiki/Logging-%EC%A0%95%EC%B1%85)
 
 ### 공통 관심 사항
 1. [QueryDSL](https://github.com/I-Oteam/order-management-platform/wiki/QueryDSL)
-
+2. [Logging 정책](https://github.com/I-Oteam/order-management-platform/wiki/Logging-%EC%A0%95%EC%B1%85)
 
 ### 설계 대비 API 구현률
 - [API 구현율](https://github.com/I-Oteam/order-management-platform/wiki/%EC%84%A4%EA%B3%84-%EB%8C%80%EB%B9%84-API-%EA%B5%AC%ED%98%84%EC%9C%A8#%EC%84%A4%EA%B3%84-%EB%8C%80%EB%B9%84-api-%EA%B5%AC%ED%98%84%EC%9C%A8)
