@@ -2,7 +2,6 @@
 spring:
   config.activate.on-profile: local
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
     show-sql: true
     properties:
@@ -11,13 +10,13 @@ spring:
     hibernate:
       ddl-auto: create
     defer-datasource-initialization: true # hibernate가 초기화되기 전 data.sql 실행하는 것을 방지
+    open-in-view: false
 
 ---
 # test 환경
 spring:
   config.activate.on-profile: test
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     generate-ddl: true
     show-sql: true
     properties:
@@ -26,13 +25,13 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true # hibernate가 초기화되기 전 data.sql 실행하는 것을 방지
+    open-in-view: false
 
 ---
 # prod 환경
 spring:
   config.activate.on-profile: prod
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
     show-sql: true
     properties:
@@ -41,3 +40,4 @@ spring:
     hibernate:
       ddl-auto: create
     defer-datasource-initialization: true # hibernate가 초기화되기 전 data.sql 실행하는 것을 방지
+    open-in-view: false

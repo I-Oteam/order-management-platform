@@ -1,28 +1,27 @@
 package com.ioteam.order_management_platform.order.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.menu.entity.Menu;
 import com.ioteam.order_management_platform.menu.repository.MenuRepository;
+import com.ioteam.order_management_platform.order.dto.req.AdminOrderSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.CancelOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.CreateOrderRequestDto;
 import com.ioteam.order_management_platform.order.dto.req.OrderByRestaurantSearchCondition;
+import com.ioteam.order_management_platform.order.dto.req.OrderByUserSearchCondition;
 import com.ioteam.order_management_platform.order.dto.req.OrderMenuRequestDto;
-import com.ioteam.order_management_platform.order.dto.res.OrderListResponseDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.entity.OrderMenu;
-import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.exception.OrderException;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
@@ -32,7 +31,6 @@ import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
 import com.ioteam.order_management_platform.user.repository.UserRepository;
 import com.ioteam.order_management_platform.user.security.UserDetailsImpl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -52,29 +50,22 @@ public class OrderService {
 	@Transactional
 	public OrderResponseDto createOrder(UUID userId, UserRoleEnum role, CreateOrderRequestDto requestDto) {
 
-		User referenceUser = userRepository.getReferenceById(userId);
-		Restaurant referenceRestaurant = restaurantRepository.getReferenceById(requestDto.getOrderResId());
+		if (requestDto.getOrderMenuList().isEmpty())
+			throw new CustomApiException(OrderException.EMPTY_ORDER_MENU);
 
-		Order order = Order.builder()
-			.user(referenceUser)
-			.restaurant(referenceRestaurant)
-			.orderType(requestDto.getOrderType())
-			.orderLocation(requestDto.getOrderLocation())
-			.orderRequest(requestDto.getOrderRequest())
-			.orderResTotal(requestDto.getOrderResTotal())
-			.orderStatus(OrderStatus.WAITING)
-			.build();
+		User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+			.orElseThrow(() -> {
+				throw new CustomApiException(OrderException.INVALID_USER_ID);
+			});
+		Restaurant restaurant = restaurantRepository.findByResIdAndDeletedAtIsNull(requestDto.getOrderResId())
+			.orElseThrow(() -> {
+				throw new CustomApiException(OrderException.INVALID_RES_ID);
+			});
 
+		Order order = requestDto.toEntity(role, user, restaurant);
 		for (OrderMenuRequestDto orderMenuRequest : requestDto.getOrderMenuList()) {
-			Menu referenceMenu = menuRepository.getReferenceById(orderMenuRequest.getOrderMenuId());
-
-			OrderMenu orderMenu = OrderMenu.builder()
-				.order(order)
-				.menu(referenceMenu)
-				.orderPrice(orderMenuRequest.getOrderPrice())
-				.orderCount(orderMenuRequest.getOrderCount())
-				.build();
-
+			Menu menu = menuRepository.getReferenceById(orderMenuRequest.getOrderMenuId());
+			OrderMenu orderMenu = orderMenuRequest.toEntity(order, menu);
 			order.getOrderMenus().add(orderMenu);
 		}
 
@@ -82,48 +73,41 @@ public class OrderService {
 		return OrderResponseDto.fromEntity(savedOrder);
 	}
 
-	//주문 성공 상태
-	public void OrderStatusProcess(UUID orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
-
-		order.orderConfirm();
-		orderRepository.save(order);
-	}
-
-	//주문 전체 조회하기
-	@Transactional
-	public OrderListResponseDto getAllOrders() {
-		List<Order> orderList = orderRepository.findAll();
-		List<OrderResponseDto> responseDtos = orderList.stream()
-			.map(OrderResponseDto::fromEntity)
-			.collect(Collectors.toList());
-
-		return new OrderListResponseDto(responseDtos);
-	}
-
 	//주문 상세 조회하기
-	@Transactional
-	public OrderResponseDto getOrderDetail(UUID orderId) {
-		Order order = orderRepository.findById(orderId)
+	public OrderResponseDto getOrderDetail(UUID orderId, UserDetailsImpl userDetails) {
+		Order order = orderRepository.findByOrderIdAndDeletedAtIsNullFetchJoinUser(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
 
+		// CUSTOMER 이고 본인의 주문이 아닌 경우 예외
+		if (UserRoleEnum.CUSTOMER.equals(userDetails.getRole())
+			&& !order.getUser().getUserId().equals(userDetails.getUserId())) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		}
 		return OrderResponseDto.fromEntity(order);
 	}
 
 	//주문 취소하기
 	@Transactional
-	public OrderResponseDto cancelOrder(UUID orderId, CancelOrderRequestDto requestDto) {
-		Order order = orderRepository.findById(orderId)
+	public OrderResponseDto cancelOrder(UUID orderId, CancelOrderRequestDto requestDto, UserDetailsImpl userDetails) {
+		Order order = orderRepository.findByOrderIdAndDeletedAtIsNull(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
 
-		//5분이 지나면 취소 불가능
-		if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
-			throw new CustomApiException("취소 가능 시간이 지났습니다.");
-		}
+		boolean isOwner = userDetails.getRole().equals(UserRoleEnum.OWNER)
+			&& order.getRestaurant().getOwner().getUserId().equals(userDetails.getUserId());
+		boolean isCustomer = userDetails.getRole().equals(UserRoleEnum.CUSTOMER)
+			&& order.getUser().getUserId().equals(userDetails.getUserId());
 
-		order.orderCancel(requestDto);
-		orderRepository.save(order);
+		if (isOwner || UserRoleEnum.MANAGER.equals(userDetails.getRole())) {
+			//가게 주인이거나 매니저인 경우 취소 가능
+			order.orderCancel();
+		} else if (isCustomer) {
+			//주문 고객인 경우 5분 이내에만 취소 가능
+			if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+				throw new CustomApiException(OrderException.INVALID_ORDER_CANCEL);
+			} else {
+				order.orderCancel();
+			}
+		}
 		return OrderResponseDto.fromEntity(order);
 	}
 
@@ -131,25 +115,38 @@ public class OrderService {
 	@Transactional
 	public void softDeleteOrder(UUID orderId, UserDetailsImpl userDetails) {
 
-		Order order = orderRepository.findById(orderId)
+		Order order = orderRepository.findByOrderIdAndDeletedAtIsNullFetchJoinUser(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER));
 
-		//주문 가게 주인이 아니라면
-		if (!order.getRestaurant().getOwner().getUserId().equals(userDetails.getUserId())) {
+		// 고객이면, 주문자인지 검증
+		if (UserRoleEnum.CUSTOMER.equals(userDetails.getRole())
+			&& !order.getUser().getUserId().equals(userDetails.getUserId())) {
 			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 		}
-
-		Order targetOrder = orderRepository.findByOrderIdAndDeletedAtIsNull(orderId)
-			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER));
-
-		targetOrder.softDelete(userDetails.getUserId());
+		order.softDelete(userDetails.getUserId());
+		for (OrderMenu orderMenu : order.getOrderMenus()) {
+			orderMenu.softDelete(userDetails.getUserId());
+		}
 	}
 
+	//어드민(매니저, 마스터) 주문 전체 조회
+	public CommonPageResponse<OrderResponseDto> searchOrderByAdmin(AdminOrderSearchCondition condition,
+		Pageable pageable) {
+		// MANAGER, MASTER 조회가능
+		Page<OrderResponseDto> orderDtoPage = orderRepository.searchOrderAdminByCondition(condition,
+				pageable)
+			.map(OrderResponseDto::fromEntity);
+		return new CommonPageResponse<>(orderDtoPage);
+	}
+
+	//가게별 조회
 	public CommonPageResponse<OrderResponseDto> searchOrderByRestaurant(UserDetailsImpl userDetails, UUID resId,
 		OrderByRestaurantSearchCondition condition, Pageable pageable) {
 		// MANAGER, MASTER 조회가능
 		// 가게 주인 조회 가능
-		if (userDetails.getRole().equals(UserRoleEnum.OWNER)
+
+		// OWNER 인 경우, 해당 가게의 주인이 맞는지 확인
+		if (UserRoleEnum.OWNER.equals(userDetails.getRole())
 			&& !restaurantRepository.existsByResIdAndOwner_userIdAndDeletedAtIsNull(resId, userDetails.getUserId())) {
 			throw new CustomApiException(OrderException.UNAUTH_OWNER);
 		}
@@ -158,6 +155,19 @@ public class OrderService {
 			.map(OrderResponseDto::fromEntity);
 		return new CommonPageResponse<>(orderDtoPage);
 	}
+
+	//사용자별 조회
+	public CommonPageResponse<OrderResponseDto> searchOrderByUser(UserDetailsImpl userDetails, UUID requiredUserId,
+		OrderByUserSearchCondition condition, Pageable pageable) {
+		//CUSTOMER, MANAGER, MASTER 조회가능
+		//주문 고객만 조회 가능
+		if (!userDetails.getUserId().equals(requiredUserId)) {
+			throw new CustomApiException(OrderException.UNAUTH_CUSTOMER);
+		}
+
+		Page<OrderResponseDto> orderDtoPage = orderRepository.searchOrderByUserAndCondition(requiredUserId, condition,
+				pageable)
+			.map(OrderResponseDto::fromEntity);
+		return new CommonPageResponse<>(orderDtoPage);
+	}
 }
-
-

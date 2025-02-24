@@ -4,13 +4,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.review.entity.Review;
+import com.querydsl.core.annotations.QueryProjection;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
-@AllArgsConstructor
 @Getter
 public class ReviewResponseDto {
 
@@ -24,27 +22,28 @@ public class ReviewResponseDto {
 	private final Boolean isPublic;
 	private final LocalDateTime createdAt;
 
+	@QueryProjection
+	@Builder
+	public ReviewResponseDto(UUID reviewId, ReviewUserResponseDto user, ReviewRestaurantResponseDto restaurant,
+		int reviewScore, String reviewContent, String reviewImageUrl, UUID reviewOrderId, Boolean isPublic,
+		LocalDateTime createdAt) {
+		this.reviewId = reviewId;
+		this.user = user;
+		this.restaurant = restaurant;
+		this.reviewScore = reviewScore;
+		this.reviewContent = reviewContent;
+		this.reviewImageUrl = reviewImageUrl;
+		this.reviewOrderId = reviewOrderId;
+		this.isPublic = isPublic;
+		this.createdAt = createdAt;
+	}
+
 	public static ReviewResponseDto from(Review review) {
 		return ReviewResponseDto
 			.builder()
 			.reviewId(review.getReviewId())
 			.user(ReviewUserResponseDto.from(review.getUser()))
 			.restaurant(ReviewRestaurantResponseDto.from(review.getRestaurant()))
-			.reviewScore(review.getReviewScore())
-			.reviewContent(review.getReviewContent())
-			.reviewImageUrl(review.getReviewImageUrl())
-			.isPublic(review.getIsPublic())
-			.createdAt(review.getCreatedAt())
-			.build();
-	}
-
-	public static ReviewResponseDto from(Review review, ReviewUserResponseDto reviewUser,
-		ReviewRestaurantResponseDto reviewRestaurant) {
-		return ReviewResponseDto
-			.builder()
-			.reviewId(review.getReviewId())
-			.user(reviewUser)
-			.restaurant(reviewRestaurant)
 			.reviewScore(review.getReviewScore())
 			.reviewContent(review.getReviewContent())
 			.reviewImageUrl(review.getReviewImageUrl())

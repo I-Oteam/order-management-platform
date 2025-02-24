@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleValidationException(ValidationException e, WebRequest request) {
 
 		HttpHeaders headers = new HttpHeaders();
-		return handleExceptionInternal(e, new CommonErrorResponse(e.getMessage(), BaseException.INVALID_INPUT),
+		return handleExceptionInternal(e, new CommonErrorResponse(BaseException.INVALID_INPUT),
 			headers, HttpStatus.BAD_REQUEST, request);
 	}
 
@@ -48,8 +47,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		WebRequest request) {
 
 		HttpHeaders headers = new HttpHeaders();
-		return handleExceptionInternal(e, new CommonErrorResponse(e.getMessage(), BaseException.UNAUTHORIZED_REQ),
+		return handleExceptionInternal(e, new CommonErrorResponse(BaseException.UNAUTHORIZED_REQ),
 			headers, HttpStatus.FORBIDDEN, request);
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	protected ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e,
+		WebRequest request) {
+		HttpHeaders headers = new HttpHeaders();
+		return handleExceptionInternal(e,
+			new CommonErrorResponse(BaseException.DUPLICATE_FIELD),
+			headers,
+			HttpStatus.CONFLICT,
+			request);
 	}
 
 	@ExceptionHandler(Throwable.class)
@@ -58,17 +68,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		HttpHeaders headers = new HttpHeaders();
 		return handleExceptionInternal(ex, new CommonErrorResponse(ex.getMessage(), BaseException.SERVER_ERROR),
 			headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
-	}
-
-	@ExceptionHandler(DataIntegrityViolationException.class)
-	protected ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e,
-		WebRequest request) {
-		HttpHeaders headers = new HttpHeaders();
-		return handleExceptionInternal(e,
-			new CommonErrorResponse(BaseException.DUPLICATE_FIELD.getMessage(), BaseException.DUPLICATE_FIELD),
-			headers,
-			HttpStatus.CONFLICT,
-			request);
 	}
 
 	// 나머지 예외 처리는 오버라이드해서 커스텀할 수 있다.
@@ -84,14 +83,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 		MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
-		String message = "";
-		for (FieldError fieldError : fieldErrors) {
-			if (!message.equals(""))
-				message += " | ";
-			message = fieldError.getField() + " : " + fieldError.getDefaultMessage();
-		}
-		return handleExceptionInternal(ex, new CommonErrorResponse(message, BaseException.INVALID_INPUT), headers,
+		List<CommonErrorResponse.ErrorField> errorFields = ex.getBindingResult()
+			.getFieldErrors()
+			.stream()
+			.map(e -> new CommonErrorResponse.ErrorField(e.getField(), e.getDefaultMessage()))
+			.toList();
+
+		return handleExceptionInternal(ex, new CommonErrorResponse(BaseException.INVALID_INPUT, errorFields), headers,
 			status, request);
 	}
 }

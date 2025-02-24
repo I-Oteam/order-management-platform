@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.restaurant.dto.res;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
@@ -7,7 +8,9 @@ import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @Builder
 @AllArgsConstructor
@@ -24,8 +27,15 @@ public class RestaurantResponseDto {
 	private String resAddress;
 	private String resPhone;
 	private String resImageUrl;
+	private BigDecimal resScore;
 
 	public static RestaurantResponseDto fromRestaurant(Restaurant savedRestaurant) {
+
+		BigDecimal score =
+			(savedRestaurant.getRestaurantScore().getRsScore() != null) ?
+				savedRestaurant.getRestaurantScore().getRsScore() :
+				BigDecimal.ZERO;
+
 		return RestaurantResponseDto
 			.builder()
 			.resId(savedRestaurant.getResId())
@@ -40,6 +50,7 @@ public class RestaurantResponseDto {
 			.resAddress(savedRestaurant.getResAddress())
 			.resPhone(savedRestaurant.getResPhone())
 			.resImageUrl(savedRestaurant.getResImageUrl())
+			.resScore(score)
 			.build();
 	}
 }

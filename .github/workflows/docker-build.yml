@@ -1,7 +1,7 @@
-name: CI with Gradle And Docker
+name: CI
 on:
   push:
-    branches: develop
+    branches: main
 
 jobs:
   ci:
@@ -37,11 +37,11 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build and push image to Amazon ECR
         run: |
           REGION="ap-northeast-2"
           ECR_REPOSITORY="omp"
           IMAGE_TAG="latest"
           
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build --target runtime -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG

@@ -1,8 +1,12 @@
 package com.ioteam.order_management_platform.restaurant.controller;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -13,9 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.dto.CommonResponse;
 import com.ioteam.order_management_platform.global.success.SuccessCode;
 import com.ioteam.order_management_platform.restaurant.dto.req.CreateRestaurantRequestDto;
@@ -96,4 +102,48 @@ public class RestaurantController {
 			.body(new CommonResponse<>(SuccessCode.RESTAURANT_MODIFY, restaurantResponseDto));
 	}
 
+	@GetMapping("/restaurants/all")
+	@Operation(summary = "모든 가게 조회", description = "아무나 조회 가능")
+	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getAllRestaurants(
+		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		CommonPageResponse<RestaurantResponseDto> restaurants = restaurantService.searchAllRestaurant(pageable);
+
+		return ResponseEntity
+			.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_SEARCH, restaurants));
+	}
+
+	@GetMapping("/restaurants/score")
+	@Operation(summary = "별점별 가게 조회", description = "아무나 조회 가능\n별점순으로 가게를 조회하거나 특정별점 조회 가능")
+	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getRestaurantsByScore(
+		@RequestParam(value = "score", required = false) BigDecimal score,
+		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+	) {
+
+		CommonPageResponse<RestaurantResponseDto> restaurants;
+
+		if (score != null) {
+			restaurants = restaurantService.searchRestaurantsByScoreRange(score, pageable);
+		} else {
+			restaurants = restaurantService.searchAllRestaurantsSortedByScore(pageable);
+		}
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_SEARCH, restaurants));
+	}
+
+	@GetMapping("/restaurants/category")
+	@Operation(summary = "카테고리별 가게 조회", description = "아무나 조회 가능\n")
+	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getRestaurantsByCategory(
+		@RequestParam(value = "category", required = true) String rcName,
+		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+	) {
+
+		CommonPageResponse<RestaurantResponseDto> restaurants = restaurantService.searchCategoryRestaurants(rcName,
+			pageable);
+
+		return ResponseEntity.ok()
+			.body(new CommonResponse<>(SuccessCode.RESTAURANT_SEARCH, restaurants));
+	}
 }

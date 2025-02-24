@@ -225,11 +225,15 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 
 	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
 		return sort.stream()
-			.filter(order -> "createdAt".equals(order.getProperty())) // "createdAt"만 필터
-			.map(order -> new OrderSpecifier(
-				order.getDirection().isAscending() ? Order.ASC : Order.DESC,
-				payment.createdAt
-			))
+			.filter(order -> List.of("createdAt", "modifiedAt").contains(order.getProperty()))
+			.map(order -> {
+				Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+				return switch (order.getProperty()) {
+					case "createdAt" -> new OrderSpecifier<>(direction, payment.createdAt);
+					case "modifiedAt" -> new OrderSpecifier<>(direction, payment.modifiedAt);
+					default -> null;
+				};
+			})
 			.toArray(OrderSpecifier[]::new);
 	}
 

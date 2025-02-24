@@ -50,10 +50,10 @@ public class ReviewController {
 	public ResponseEntity<CommonResponse<CommonPageResponse<AdminReviewResponseDto>>> searchReviewAdmin(
 		AdminReviewSearchCondition condition,
 		@PageableDefault
-		@SortDefault.SortDefaults(
-			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
-				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
-		) Pageable pageable
+		@SortDefault.SortDefaults({
+			@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+			@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)
+		}) Pageable pageable
 	) {
 
 		CommonPageResponse<AdminReviewResponseDto> pageResponse = reviewService.searchReviewAdminByCondition(condition,
@@ -70,10 +70,10 @@ public class ReviewController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID userId,
 		@PageableDefault
-		@SortDefault.SortDefaults(
-			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
-				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
-		) Pageable pageable
+		@SortDefault.SortDefaults({
+			@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+			@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)
+		}) Pageable pageable
 	) {
 
 		CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewByUser(
@@ -88,10 +88,10 @@ public class ReviewController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable UUID resId,
 		@PageableDefault
-		@SortDefault.SortDefaults(
-			{@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
-				@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)}
-		) Pageable pageable
+		@SortDefault.SortDefaults({
+			@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC),
+			@SortDefault(sort = "modifiedAt", direction = Sort.Direction.DESC)
+		}) Pageable pageable
 	) {
 
 		CommonPageResponse<ReviewResponseDto> pageResponse = reviewService.searchReviewByRestaurant(

@@ -11,6 +11,8 @@ import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,6 +47,9 @@ public class Menu extends BaseEntity {
 	private String rmImageUrl;
 	@Column(length = 100)
 	private String rmDescription;
+	@ColumnDefault("'ON_SALE'")
+	@Enumerated(EnumType.STRING)
+	private MenuStatus rmStatus;
 	@ColumnDefault("true")
 	private Boolean isPublic;
 
@@ -57,13 +62,15 @@ public class Menu extends BaseEntity {
 			this.rmImageUrl = requestDto.getRmImageUrl();
 		if (requestDto.getRmDescription() != null)
 			this.rmDescription = requestDto.getRmDescription();
+		if (requestDto.getRmStatus() != null)
+			this.rmStatus = requestDto.getRmStatus();
 		if (requestDto.getIsPublic() != null)
 			this.isPublic = requestDto.getIsPublic();
 		return this;
 	}
 
 	public Menu hiddenMenu() {
-		this.isPublic = !isPublic;
+		this.rmStatus = MenuStatus.HIDDEN;
 		return this;
 	}
 

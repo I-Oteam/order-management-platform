@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<included>
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <!-- 출력패턴 설정-->
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <file>${ERROR_FILE}</file>
+
+        <!-- File Rolling 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- .gz,.zip 등을 넣으면 자동 일자별 로그 파일 압축 -->
+            <fileNamePattern>${ERROR_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <!-- Application 기동 시 기존 아카이브 파일 삭제 -->
+            <cleanHistoryOnStart>false</cleanHistoryOnStart>
+            <maxFileSize>100MB</maxFileSize>
+            <!-- 아카이브 삭제 조건 1 : maxHistory 일자별 로그 파일 최대 보관일(단위: 일), 설정 일 초과 시 파일 자동 제거 -->
+            <maxHistory>10</maxHistory>
+            <!-- 아카이브 삭제 조건 2 : totalSizeCap, maxHistory 속성 설정 시에만 동작한다. -->
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+</included>

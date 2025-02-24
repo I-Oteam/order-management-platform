@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.review.repository;
 
+import static com.ioteam.order_management_platform.global.utils.QuerydslUtil.*;
 import static com.ioteam.order_management_platform.restaurant.entity.QRestaurant.*;
 import static com.ioteam.order_management_platform.review.entity.QReview.*;
 import static com.ioteam.order_management_platform.user.entity.QUser.*;
@@ -16,14 +17,15 @@ import org.springframework.data.support.PageableExecutionUtils;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.review.dto.req.AdminReviewSearchCondition;
 import com.ioteam.order_management_platform.review.dto.res.AdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.res.QAdminReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.res.QReviewResponseDto;
+import com.ioteam.order_management_platform.review.dto.res.QReviewRestaurantResponseDto;
+import com.ioteam.order_management_platform.review.dto.res.QReviewUserResponseDto;
 import com.ioteam.order_management_platform.review.dto.res.ReviewResponseDto;
-import com.ioteam.order_management_platform.review.dto.res.ReviewRestaurantResponseDto;
-import com.ioteam.order_management_platform.review.dto.res.ReviewUserResponseDto;
-import com.ioteam.order_management_platform.review.entity.Review;
 import com.ioteam.order_management_platform.review.exception.ReviewException;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -38,38 +40,23 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	public Page<AdminReviewResponseDto> searchReviewAdminByCondition(AdminReviewSearchCondition condition,
 		Pageable pageable) {
 
-		List<AdminReviewResponseDto> dtoList = queryFactory.select(review, user.userId, user.username, user.nickname,
-				restaurant.resId, restaurant.resName)
+		List<AdminReviewResponseDto> dtoList = queryFactory
+			.select(new QAdminReviewResponseDto(review.reviewId,
+				new QReviewUserResponseDto(user.userId, user.username, user.nickname),
+				new QReviewRestaurantResponseDto(restaurant.resId, restaurant.resName),
+				review.reviewScore, review.reviewContent, review.reviewImageUrl, review.order.orderId, review.isPublic,
+				review.createdAt, review.createdBy, review.modifiedAt, review.modifiedBy, review.deletedAt,
+				review.deletedBy))
 			.from(review)
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
-				eqUserId(condition.getUserId()),
-				eqRestaurantId(condition.getRestaurantId()),
-				eqReviewScore(condition.getScore()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				isPublic(condition.getIsPublic()),
-				isDeleted(condition.getIsDeleted())
+				adminSearchCondition(condition)
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
-			.fetch()
-			.stream()
-			.map(tuple -> {
-				Review review1 = tuple.get(review);
-				ReviewUserResponseDto reviewUser = ReviewUserResponseDto.builder()
-					.userId(tuple.get(user.userId))
-					.username(tuple.get(user.username))
-					.nickname(tuple.get(user.nickname))
-					.build();
-				ReviewRestaurantResponseDto reviewRestaurant = ReviewRestaurantResponseDto.builder()
-					.restaurantId(tuple.get(restaurant.resId))
-					.restaurantName(tuple.get(restaurant.resName))
-					.build();
-				return AdminReviewResponseDto.from(review1, reviewUser, reviewRestaurant);
-			})
-			.toList();
+			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
 			.select(review.count())
@@ -77,12 +64,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
 			.where(
-				eqUserId(condition.getUserId()),
-				eqRestaurantId(condition.getRestaurantId()),
-				eqReviewScore(condition.getScore()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				isPublic(condition.getIsPublic()),
-				isDeleted(condition.getIsDeleted())
+				adminSearchCondition(condition)
 			);
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
@@ -90,8 +72,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	@Override
 	public Page<ReviewResponseDto> searchReviewByUser(UUID userId, Pageable pageable) {
 
-		List<ReviewResponseDto> dtoList = queryFactory.select(review, user.userId, user.username, user.nickname,
-				restaurant.resId, restaurant.resName)
+		List<ReviewResponseDto> dtoList = queryFactory
+			.select(new QReviewResponseDto(review.reviewId,
+				new QReviewUserResponseDto(user.userId, user.username, user.nickname),
+				new QReviewRestaurantResponseDto(restaurant.resId, restaurant.resName),
+				review.reviewScore, review.reviewContent, review.reviewImageUrl, review.order.orderId, review.isPublic,
+				review.createdAt)
+			)
 			.from(review)
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
@@ -102,22 +89,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
-			.fetch()
-			.stream()
-			.map(tuple -> {
-				Review review1 = tuple.get(review);
-				ReviewUserResponseDto reviewUser = ReviewUserResponseDto.builder()
-					.userId(tuple.get(user.userId))
-					.username(tuple.get(user.username))
-					.nickname(tuple.get(user.nickname))
-					.build();
-				ReviewRestaurantResponseDto reviewRestaurant = ReviewRestaurantResponseDto.builder()
-					.restaurantId(tuple.get(restaurant.resId))
-					.restaurantName(tuple.get(restaurant.resName))
-					.build();
-				return ReviewResponseDto.from(review1, reviewUser, reviewRestaurant);
-			})
-			.toList();
+			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
 			.select(review.count())
@@ -144,8 +116,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			)
 			.fetchCount() > 0;
 
-		List<ReviewResponseDto> dtoList = queryFactory.select(review, user.userId, user.username, user.nickname,
-				restaurant.resId, restaurant.resName)
+		List<ReviewResponseDto> dtoList = queryFactory
+			.select(new QReviewResponseDto(review.reviewId,
+				new QReviewUserResponseDto(user.userId, user.username, user.nickname),
+				new QReviewRestaurantResponseDto(restaurant.resId, restaurant.resName),
+				review.reviewScore, review.reviewContent, review.reviewImageUrl, review.order.orderId, review.isPublic,
+				review.createdAt)
+			)
 			.from(review)
 			.leftJoin(user).on(user.userId.eq(review.user.userId))
 			.leftJoin(restaurant).on(restaurant.resId.eq(review.restaurant.resId))
@@ -157,22 +134,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
-			.fetch()
-			.stream()
-			.map(tuple -> {
-				Review review1 = tuple.get(review);
-				ReviewUserResponseDto reviewUser = ReviewUserResponseDto.builder()
-					.userId(tuple.get(user.userId))
-					.username(tuple.get(user.username))
-					.nickname(tuple.get(user.nickname))
-					.build();
-				ReviewRestaurantResponseDto reviewRestaurant = ReviewRestaurantResponseDto.builder()
-					.restaurantId(tuple.get(restaurant.resId))
-					.restaurantName(tuple.get(restaurant.resName))
-					.build();
-				return ReviewResponseDto.from(review1, reviewUser, reviewRestaurant);
-			})
-			.toList();
+			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
 			.select(review.count())
@@ -188,48 +150,51 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		return PageableExecutionUtils.getPage(dtoList, pageable, () -> countQuery.fetchOne());
 	}
 
-	private BooleanExpression ifNotOwnerOnlyPublic(boolean isOwner) {
-
-		return isOwner ? null : review.isPublic.eq(true);
+	private BooleanBuilder adminSearchCondition(AdminReviewSearchCondition condition) {
+		return eqUserId(condition.getUserId())
+			.and(eqRestaurantId(condition.getRestaurantId()))
+			.and(eqReviewScore(condition.getScore()))
+			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
+			.and(isPublic(condition.getIsPublic()))
+			.and(isDeleted(condition.getIsDeleted()));
 	}
 
-	private BooleanExpression eqReviewScore(Integer score) {
-
-		return score == null ? null : review.reviewScore.eq(score);
+	private BooleanBuilder ifNotOwnerOnlyPublic(boolean isOwner) {
+		return isOwner ? new BooleanBuilder() : new BooleanBuilder(review.isPublic.eq(true));
 	}
 
-	private BooleanExpression eqUserId(UUID userId) {
-
-		return userId == null ? null : review.user.userId.eq(userId);
+	private BooleanBuilder eqReviewScore(Integer score) {
+		return nullSafeBuilder(() -> review.reviewScore.eq(score));
 	}
 
-	private BooleanExpression eqRestaurantId(UUID resId) {
-
-		return resId == null ? null : review.restaurant.resId.eq(resId);
+	private BooleanBuilder eqUserId(UUID userId) {
+		return nullSafeBuilder(() -> review.user.userId.eq(userId));
 	}
 
-	private BooleanExpression betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
+	private BooleanBuilder eqRestaurantId(UUID resId) {
+		return nullSafeBuilder(() -> review.restaurant.resId.eq(resId));
+	}
+
+	private BooleanBuilder betweenPeriod(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
 
 		if (startCreatedAt == null || endCreatedAt == null)
-			return null;
+			return new BooleanBuilder();
 		if (startCreatedAt.isAfter(endCreatedAt))
 			throw new CustomApiException(ReviewException.INVALID_PERIOD);
-		return review.createdAt.between(startCreatedAt, endCreatedAt);
+		return new BooleanBuilder(review.createdAt.between(startCreatedAt, endCreatedAt));
 	}
 
-	private BooleanExpression isPublic(Boolean isPublic) {
-
-		return isPublic == null ? null : review.isPublic.eq(isPublic);
+	private BooleanBuilder isPublic(Boolean isPublic) {
+		return nullSafeBuilder(() -> review.isPublic.eq(isPublic));
 	}
 
-	private BooleanExpression isDeleted(Boolean isDeleted) {
-
+	private BooleanBuilder isDeleted(Boolean isDeleted) {
 		if (isDeleted == null)
-			return null;
+			return new BooleanBuilder();
 		if (isDeleted)
-			return review.deletedAt.isNotNull();
+			return new BooleanBuilder(review.deletedAt.isNotNull());
 		if (!isDeleted)
-			return review.deletedAt.isNull();
+			return new BooleanBuilder(review.deletedAt.isNull());
 		return null;
 	}
 

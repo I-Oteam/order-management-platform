@@ -77,16 +77,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
 	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
 		return sort.stream()
-			.filter(order -> List.of("role", "createdAt").contains(order.getProperty()))
+			.filter(order -> List.of("role", "createdAt", "modifiedAt").contains(order.getProperty()))
 			.map(order -> {
 				Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-				switch (order.getProperty()) {
-					case "createdAt":
-						return new OrderSpecifier<>(direction, user.createdAt);
-					case "role":
-						return new OrderSpecifier<>(direction, user.role);
-				}
-				return null;
+				return switch (order.getProperty()) {
+					case "createdAt" -> new OrderSpecifier<>(direction, user.createdAt);
+					case "role" -> new OrderSpecifier<>(direction, user.role);
+					case "modifiedAt" -> new OrderSpecifier<>(direction, user.modifiedAt);
+					default -> null;
+				};
 			})
 			.toArray(OrderSpecifier[]::new);
 	}
