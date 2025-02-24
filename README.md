@@ -48,6 +48,7 @@
 ### 트러블 슈팅 : 우리 팀의 기술적 고민과 해결 과정
  1. [UserAuditorAware](https://github.com/I-Oteam/order-management-platform/wiki/UserAuditorAware)
  2. [Entity와 DTO](https://github.com/I-Oteam/order-management-platform/wiki/Entity%EC%99%80-DTO)
+ 3. [PageableArgumentResolver를 활용한 @Pageable 페이지 사이즈 제한](https://github.com/I-Oteam/order-management-platform/wiki/PageableArgumentResolver%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-@Pageable-%ED%8E%98%EC%9D%B4%EC%A7%80-%EC%82%AC%EC%9D%B4%EC%A6%88-%EC%A0%9C%ED%95%9C)
  
  ### 개발 측면에서 우리 팀이 잘한 점 
  1. [공통 예외처리 정책](https://github.com/I-Oteam/order-management-platform/wiki/%EA%B3%B5%ED%86%B5-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC-%EC%A0%95%EC%B1%85)
