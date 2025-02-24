@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +26,7 @@ import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.enums.OrderType;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -50,9 +52,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.restaurant.resId.eq(resId),
-				eqNickname(condition.getNickname()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byResSearch(condition)
 			)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
@@ -81,11 +81,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.restaurant.resId.eq(resId),
-				eqNickname(condition.getNickname()),
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byResSearch(condition)
 			);
 
 		return PageableExecutionUtils.getPage(orders, pageable, () -> countQuery.fetchOne());
@@ -173,10 +169,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.user.userId.eq(userId), //사용자의 주문만 조회
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byUserSearch(condition)
 			)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
@@ -205,10 +198,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 			.from(order)
 			.where(
 				order.user.userId.eq(userId),
-				eqOrderStatus(condition.getOrderStatus()),
-				eqOrderType(condition.getOrderType()),
-				betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()),
-				betweenResTotal(condition.getMinResTotal(), condition.getMaxResTotal())
+				byUserSearch(condition)
 			);
 
 		return PageableExecutionUtils.getPage(orders, pageable, () -> countQuery.fetchOne());

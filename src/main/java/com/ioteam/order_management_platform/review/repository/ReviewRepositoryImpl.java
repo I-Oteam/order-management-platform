@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.review.repository;
 
+import static com.ioteam.order_management_platform.global.utils.QuerydslUtil.*;
 import static com.ioteam.order_management_platform.restaurant.entity.QRestaurant.*;
 import static com.ioteam.order_management_platform.review.entity.QReview.*;
 import static com.ioteam.order_management_platform.user.entity.QUser.*;
@@ -8,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,6 @@ import com.ioteam.order_management_platform.review.exception.ReviewException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -205,14 +204,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		if (!isDeleted)
 			return new BooleanBuilder(review.deletedAt.isNull());
 		return null;
-	}
-
-	private BooleanBuilder nullSafeBuilder(Supplier<BooleanExpression> f) {
-		try {
-			return new BooleanBuilder(f.get());
-		} catch (Exception e) {
-			return new BooleanBuilder();
-		}
 	}
 
 	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
