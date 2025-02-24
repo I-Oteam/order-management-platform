@@ -7,7 +7,6 @@ import static com.ioteam.order_management_platform.user.entity.QUser.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
-import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.review.dto.req.AdminReviewSearchCondition;
 import com.ioteam.order_management_platform.review.dto.res.AdminReviewResponseDto;
 import com.ioteam.order_management_platform.review.dto.res.QAdminReviewResponseDto;
@@ -57,7 +55,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
-			.limit(validatePageSize(pageable.getPageSize()))
+			.limit(pageable.getPageSize())
 			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
@@ -90,7 +88,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
-			.limit(validatePageSize(pageable.getPageSize()))
+			.limit(pageable.getPageSize())
 			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
@@ -135,7 +133,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			)
 			.orderBy(createOrderSpecifiers(pageable.getSort()))
 			.offset(pageable.getOffset())
-			.limit(validatePageSize(pageable.getPageSize()))
+			.limit(pageable.getPageSize())
 			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
@@ -159,12 +157,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.and(betweenPeriod(condition.getStartCreatedAt(), condition.getEndCreatedAt()))
 			.and(isPublic(condition.getIsPublic()))
 			.and(isDeleted(condition.getIsDeleted()));
-	}
-
-	private int validatePageSize(int pageSize) {
-		if (Set.of(10, 30, 50).contains(pageSize))
-			return pageSize;
-		throw new CustomApiException(BaseException.INVALID_PAGESIZE);
 	}
 
 	private BooleanBuilder ifNotOwnerOnlyPublic(boolean isOwner) {
