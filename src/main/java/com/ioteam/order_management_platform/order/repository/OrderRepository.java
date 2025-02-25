@@ -30,7 +30,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID>, OrderReposi
 		"SET o.orderStatus = :cancelStatus " +
 		"WHERE o.orderId = :orderId " +
 		"AND ( " +
-		"    (:role IN ('MANAGER', 'OWNER') AND o.restaurant.owner.userId = :userId) " +
+		"    (:role = 'MANAGER') " +
+		" OR (:role = 'OWNER' AND o.restaurant.owner.userId = :userId) " +
 		" OR (:role = 'CUSTOMER' AND o.user.userId = :userId AND o.createdAt > :minTime) " +
 		")")
 	int cancelOrder(@Param("orderId") UUID orderId,
