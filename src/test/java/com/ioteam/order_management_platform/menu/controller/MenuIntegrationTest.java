@@ -107,4 +107,24 @@ class MenuIntegrationTest {
 				.value("SOLD_OUT"))
 			.andDo(print());
 	}
+
+	@WithMockCustomUser
+	@DisplayName("고객_상품 상세 조회 성공 200")
+	@Test
+	void getMenuDetail_Manager_200() throws Exception {
+		// given
+		UUID menuId = UUID.fromString("439f222b-0cbb-4600-a989-e7fdabf120d6");
+
+		// when, then
+		mockMvc.perform(
+				get("/api/menus/{menu_id}", menuId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.rmName")
+				.value("열리오올리오"))
+			.andExpect(jsonPath("$.result.rmStatus")
+				.value("SOLD_OUT"))
+			.andDo(print());
+	}
 }
