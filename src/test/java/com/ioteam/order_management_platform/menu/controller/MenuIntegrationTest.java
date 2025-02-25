@@ -1,5 +1,6 @@
 package com.ioteam.order_management_platform.menu.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteam.order_management_platform.menu.dto.req.CreateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.dto.req.UpdateMenuRequestDto;
 import com.ioteam.order_management_platform.menu.entity.MenuStatus;
+import com.ioteam.order_management_platform.menu.repository.MenuRepository;
 import com.ioteam.order_management_platform.utils.security.WithMockCustomUser;
 
 @AutoConfigureMockMvc
@@ -31,6 +33,8 @@ class MenuIntegrationTest {
 	private MockMvc mockMvc;
 	@Autowired
 	private ObjectMapper objectMapper;
+	@Autowired
+	private MenuRepository menuRepository;
 
 	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
 	@DisplayName("매니저_상품 생성 성공 201")
@@ -210,4 +214,22 @@ class MenuIntegrationTest {
 			.andDo(print());
 	}
 
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e2", role = "OWNER")
+	@DisplayName("가게주인_상품 삭제 처리 성공 200")
+	@Test
+	void deleteMenu_Owner_200() throws Exception {
+		// given
+		UUID menuId = UUID.fromString("439f222b-0cbb-4600-a989-e7fdabf120d6");
+
+		// when
+		mockMvc.perform(
+				delete("/api/menus/{menu_id}", menuId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isNoContent())
+			.andDo(print());
+
+		// then
+		boolean exists = menuRepository.findByRmIdAndDeletedAtIsNull(menuId).isPresent();
+		assertFalse(exists, "soft delete 실패!");
+	}
 }
