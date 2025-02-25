@@ -1,7 +1,6 @@
 package com.ioteam.order_management_platform.restaurant.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -123,7 +122,7 @@ public class RestaurantService {
 		if (!hasPermissionForRestaurant(userDetails, targetRestaurant)) {
 			throw new CustomApiException(RestaurantException.INSUFFICIENT_PERMISSION);
 		}
-		
+
 		targetRestaurant.softDelete(userDetails.getUserId());
 		restaurantScore.softDelete(userDetails.getUserId());
 	}
@@ -181,36 +180,14 @@ public class RestaurantService {
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
 
-	public CommonPageResponse<RestaurantResponseDto> searchRestaurantsByScoreRange(BigDecimal score,
-		Pageable pageable) {
-
-		// min이상 max미만 검색
-		BigDecimal minScore = score.setScale(1, RoundingMode.FLOOR);
-		BigDecimal maxScore = minScore.add(BigDecimal.valueOf(1));
-
-		Page<Restaurant> restaurants = restaurantRepository.findRestaurantsByScoreRangeAndDeletedAtIsNull(minScore,
-			maxScore, pageable);
+	public CommonPageResponse<RestaurantResponseDto> searchRestaurants(BigDecimal score, Pageable pageable) {
+		Page<Restaurant> restaurants = restaurantRepository.searchRestaurants(score, pageable);
 
 		if (restaurants.isEmpty()) {
 			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
 		}
 
 		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
-
-		return new CommonPageResponse<>(restaurantResponseDtoPage);
-	}
-
-	public CommonPageResponse<RestaurantResponseDto> searchAllRestaurantsSortedByScore(Pageable pageable) {
-
-		Page<Restaurant> restaurants = restaurantRepository.findAllWithScoreSortedByScoreDescAndDeletedAtIsNull(
-			pageable);
-
-		if (restaurants.isEmpty()) {
-			throw new CustomApiException(RestaurantException.NOT_FOUND_RESTAURANT);
-		}
-
-		Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurants.map(RestaurantResponseDto::fromRestaurant);
-
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
 

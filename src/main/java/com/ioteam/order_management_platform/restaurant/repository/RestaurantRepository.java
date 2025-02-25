@@ -14,7 +14,7 @@ import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 
 import jakarta.validation.constraints.NotNull;
 
-public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
+public interface RestaurantRepository extends JpaRepository<Restaurant, UUID>, RestaurantRepositoryCustom {
 
 	Optional<Restaurant> findByResIdAndDeletedAtIsNull(@NotNull UUID resId);
 

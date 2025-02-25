@@ -45,7 +45,7 @@ public class OrderController {
 
 	private final OrderService orderService;
 
-	@Operation(summary = "주문 생성", description = "가게별 주문 조회는 'CUSTOMER', 'OWNER' 만  가능")
+	@Operation(summary = "주문 생성", description = "주문 생성은 'CUSTOMER', 'OWNER' 만  가능")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")
 	@PostMapping()
 	public ResponseEntity<CommonResponse<OrderResponseDto>> createOrder(
@@ -64,7 +64,7 @@ public class OrderController {
 			.body(new CommonResponse<>(SuccessCode.ORDER_CREATE, responseDto));
 	}
 
-	@Operation(summary = "전체 주문 조회", description = "가게별 주문 조회는 'MANAGER', 'MASTER' 만  가능")
+	@Operation(summary = "전체 주문 조회", description = "전체 주문 조회는 'MANAGER', 'MASTER' 만  가능")
 	@PreAuthorize("hasAnyRole('MANAGER', 'MASTER')")
 	@GetMapping("/all")
 	public ResponseEntity<CommonResponse<CommonPageResponse<OrderResponseDto>>> getAllOrders(
@@ -79,7 +79,7 @@ public class OrderController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_ALL_INFO, responseDto));
 	}
 
-	@Operation(summary = "주문 상세 조회", description = "가게별 주문 조회는 'CUSTOMER', 'MANAGER' 만  가능")
+	@Operation(summary = "주문 상세 조회", description = "주문 상세 조회는 'CUSTOMER', 'MANAGER' 만  가능")
 	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
 	@GetMapping("/{order_id}")
 	public ResponseEntity<CommonResponse<OrderResponseDto>> getOrderDetail(@PathVariable("order_id") UUID orderId,
@@ -88,7 +88,7 @@ public class OrderController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_DETAIL_INFO, responseDto));
 	}
 
-	@Operation(summary = "주문 취소", description = "가게별 주문 조회는 'CUSTOMER', 'OWNER', 'MANAGER' 만  가능")
+	@Operation(summary = "주문 취소", description = "주문 취소는 'CUSTOMER', 'OWNER', 'MANAGER' 만  가능")
 	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER', 'OWNER')")
 	@PatchMapping("/{order_id}")
 	public ResponseEntity<CommonResponse<OrderResponseDto>> cancelOrder(@PathVariable("order_id") UUID orderId,
@@ -98,7 +98,7 @@ public class OrderController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_CANCEL, responseDto));
 	}
 
-	@Operation(summary = "주문 삭제", description = "가게별 주문 조회는 'CUSTOMER', 'MANAGER' 만  가능")
+	@Operation(summary = "주문 삭제", description = "주문 삭제는 'CUSTOMER', 'MANAGER' 만  가능")
 	@PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
 	@DeleteMapping("/{orderId}")
 	public ResponseEntity<CommonResponse<Void>> softDeleteOrder(
@@ -131,7 +131,7 @@ public class OrderController {
 		return ResponseEntity.ok(new CommonResponse<>(SuccessCode.ORDER_SEARCH, pageResponse));
 	}
 
-	@Operation(summary = "유저별 주문 조회", description = "유저별 주문 조회는 'CUSTOMER', 'MANAGER', 'MASTER' 만  가능")
+	@Operation(summary = "사용자별 주문 조회", description = "사용자별 주문 조회는 'CUSTOMER', 'MANAGER', 'MASTER' 만  가능")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER', 'MASTER')")
 	@GetMapping("/users/{userId}")
 	public ResponseEntity<CommonResponse<CommonPageResponse<OrderResponseDto>>> searchOrdersByUser(

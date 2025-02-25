@@ -16,13 +16,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_restaurant_score")
 @Entity
 public class RestaurantScore extends BaseEntity {
@@ -37,8 +35,12 @@ public class RestaurantScore extends BaseEntity {
 	@Column(precision = 2, scale = 1, columnDefinition = "NUMERIC(2,1)")
 	private BigDecimal rsScore;
 
-	public RestaurantScore(Restaurant savedRestaurant, BigDecimal zero) {
+	private RestaurantScore(Restaurant savedRestaurant, BigDecimal zero) {
 		this.restaurant = savedRestaurant;
 		this.rsScore = zero;
+	}
+
+	public static RestaurantScore of(Restaurant restaurant, BigDecimal rsScore) {
+		return new RestaurantScore(restaurant, rsScore);
 	}
 }

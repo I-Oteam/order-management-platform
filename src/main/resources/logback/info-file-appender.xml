@@ -16,7 +16,7 @@
         <!-- File Rolling 정책 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- .gz,.zip 등을 넣으면 자동 일자별 로그 파일 압축 -->
-            <fileNamePattern>${INFO_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <fileNamePattern>${INFO_FILE}.%d{yyyy-MM-dd, ${logback.timezone:-Asia/Seoul}}.%i.gz</fileNamePattern>
             <!-- Application 기동 시 기존 아카이브 파일 삭제 -->
             <cleanHistoryOnStart>false</cleanHistoryOnStart>
             <maxFileSize>100MB</maxFileSize>

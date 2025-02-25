@@ -118,23 +118,16 @@ public class RestaurantController {
 	@Operation(summary = "별점별 가게 조회", description = "아무나 조회 가능\n별점순으로 가게를 조회하거나 특정별점 조회 가능")
 	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getRestaurantsByScore(
 		@RequestParam(value = "score", required = false) BigDecimal score,
-		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+		@PageableDefault(size = 10, sort = "score", direction = Sort.Direction.ASC) Pageable pageable
 	) {
-
-		CommonPageResponse<RestaurantResponseDto> restaurants;
-
-		if (score != null) {
-			restaurants = restaurantService.searchRestaurantsByScoreRange(score, pageable);
-		} else {
-			restaurants = restaurantService.searchAllRestaurantsSortedByScore(pageable);
-		}
+		CommonPageResponse<RestaurantResponseDto> restaurants = restaurantService.searchRestaurants(score, pageable);
 
 		return ResponseEntity.ok()
 			.body(new CommonResponse<>(SuccessCode.RESTAURANT_SEARCH, restaurants));
 	}
 
 	@GetMapping("/restaurants/category")
-	@Operation(summary = "카테고리별 가게 조회", description = "아무나 조회 가능\n")
+	@Operation(summary = "카테고리별 가게 조회", description = "아무나 조회 가능")
 	public ResponseEntity<CommonResponse<CommonPageResponse<RestaurantResponseDto>>> getRestaurantsByCategory(
 		@RequestParam(value = "category", required = true) String rcName,
 		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable

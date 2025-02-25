@@ -55,4 +55,23 @@ class OrderControllerTest {
 				.value("3fa85f64-5717-4562-b3fc-2c963f66afa6"))
 			.andDo(print());
 	}
+
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@DisplayName("주문 상세 조회 성공 200")
+	@Test
+	void searchOrderDetailByUser_200() throws Exception {
+		// given
+		UUID orderId = UUID.fromString("d8ef5ca7-2b3c-49bb-9c6d-425c85036de1"); // 테스트용 주문 ID
+
+		// when, then
+		mockMvc.perform(get("/api/orders/{order_id}", orderId)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+			)
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.orderId").value(orderId.toString()))
+			.andExpect(jsonPath("$.result.orderType").value("DELIVERY"))
+			.andExpect(jsonPath("$.result.orderResTotal").value(25500))
+			.andDo(print());
+	}
 }
