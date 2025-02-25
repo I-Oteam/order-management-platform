@@ -22,6 +22,7 @@ import com.ioteam.order_management_platform.order.dto.req.OrderMenuRequestDto;
 import com.ioteam.order_management_platform.order.dto.res.OrderResponseDto;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.entity.OrderMenu;
+import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.exception.OrderException;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
@@ -92,23 +93,17 @@ public class OrderService {
 		Order order = orderRepository.findByOrderIdAndDeletedAtIsNull(orderId)
 			.orElseThrow(() -> new CustomApiException(OrderException.INVALID_ORDER_ID));
 
-		boolean isOwner = userDetails.getRole().equals(UserRoleEnum.OWNER)
-			&& order.getRestaurant().getOwner().getUserId().equals(userDetails.getUserId());
-		boolean isCustomer = userDetails.getRole().equals(UserRoleEnum.CUSTOMER)
-			&& order.getUser().getUserId().equals(userDetails.getUserId());
+		String role = userDetails.getRole().name();
+		UUID userId = userDetails.getUserId();
+		LocalDateTime minTime = LocalDateTime.now().minusMinutes(5);
+		OrderStatus cancelStatus = OrderStatus.CANCELED;
 
-		if (isOwner || UserRoleEnum.MANAGER.equals(userDetails.getRole())) {
-			//가게 주인이거나 매니저인 경우 취소 가능
-			order.orderCancel();
-		} else if (isCustomer) {
-			//주문 고객인 경우 5분 이내에만 취소 가능
-			if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
-				throw new CustomApiException(OrderException.INVALID_ORDER_CANCEL);
-			} else {
-				order.orderCancel();
-			}
+		if (orderRepository.cancelOrder(orderId, role, userId, minTime, cancelStatus) == 0) {
+			throw new CustomApiException(OrderException.INVALID_ORDER_CANCEL);
 		}
+
 		return OrderResponseDto.fromEntity(order);
+
 	}
 
 	//주문 삭제하기
