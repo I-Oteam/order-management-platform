@@ -45,6 +45,4 @@ spring:
 logging:
   file:
     path: logs
-  pattern:
-    dateformat: yyyy-MM-dd HH:mm:ss.SSSz,Asia/Seoul
 scheduled.enabled: ${SCHEDULED_ENABLED}
