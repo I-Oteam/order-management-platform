@@ -88,11 +88,11 @@ class MenuIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.result.totalElements")
-				.value(3))
+				.value(13))
 			.andExpect(jsonPath("$.result.content[0].rmName")
 				.value("열파르타"))
-			.andExpect(jsonPath("$.result.content[2].isPublic")
-				.value(false))
+			.andExpect(jsonPath("$.result.content[9].rmStatus")
+				.value("HIDDEN"))
 			.andDo(print());
 	}
 
@@ -110,10 +110,10 @@ class MenuIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.result.totalElements")
-				.value(2))
+				.value(11))
 			.andExpect(jsonPath("$.result.content[0].rmName")
 				.value("열파르타"))
-			.andExpect(jsonPath("$.result.content[1].rmStatus")
+			.andExpect(jsonPath("$.result.content[3].rmStatus")
 				.value("SOLD_OUT"))
 			.andDo(print());
 	}
@@ -123,7 +123,7 @@ class MenuIntegrationTest {
 	@Test
 	void getMenuDetail_Manager_200() throws Exception {
 		// given
-		UUID menuId = UUID.fromString("439f222b-0cbb-4600-a989-e7fdabf120d6");
+		UUID menuId = UUID.fromString("d1e2f3a4-3456-7890-abcd-ef1234567890");
 
 		// when, then
 		mockMvc.perform(
@@ -132,7 +132,7 @@ class MenuIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.result.rmName")
-				.value("열리오올리오"))
+				.value("데리야끼 치킨 덮밥"))
 			.andExpect(jsonPath("$.result.rmStatus")
 				.value("SOLD_OUT"))
 			.andDo(print());
