@@ -35,7 +35,7 @@ public class RestaurantScore extends BaseEntity {
 	@Column(precision = 2, scale = 1, columnDefinition = "NUMERIC(2,1)")
 	private BigDecimal rsScore;
 
-	public RestaurantScore(Restaurant savedRestaurant, BigDecimal zero) {
+	private RestaurantScore(Restaurant savedRestaurant, BigDecimal zero) {
 		this.restaurant = savedRestaurant;
 		this.rsScore = zero;
 	}
