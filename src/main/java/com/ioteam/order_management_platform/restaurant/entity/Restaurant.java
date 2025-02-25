@@ -27,11 +27,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,9 +41,7 @@ import lombok.NoArgsConstructor;
 		@UniqueConstraint(name = "uk_res_phone", columnNames = "res_phone")
 	})
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Restaurant extends BaseEntity {
 
 	@Id
@@ -83,11 +79,19 @@ public class Restaurant extends BaseEntity {
 	@OneToOne(mappedBy = "restaurant", cascade = CascadeType.PERSIST)
 	private RestaurantScore restaurantScore;
 
-	@PrePersist
-	public void createRestaurantScore() {
-		if (this.restaurantScore == null) {
-			this.restaurantScore = new RestaurantScore(this, BigDecimal.ZERO); // 기본 값 0으로 설정
-		}
+	@Builder
+	public Restaurant(User owner, Category category, District district, String resName, String resAddress,
+		String resPhone,
+		String resImageUrl, List<Menu> menuList, RestaurantScore restaurantScore) {
+		this.owner = owner;
+		this.category = category;
+		this.district = district;
+		this.resName = resName;
+		this.resAddress = resAddress;
+		this.resPhone = resPhone;
+		this.resImageUrl = resImageUrl;
+		this.menuList = menuList;
+		this.restaurantScore = RestaurantScore.of(this, BigDecimal.ZERO);
 	}
 
 	@Override
