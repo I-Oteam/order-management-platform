@@ -34,7 +34,7 @@ class MenuIntegrationTest {
 	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
 	@DisplayName("매니저_상품 생성 성공 201")
 	@Test
-	void createMenu_201() throws Exception {
+	void createMenu_Manager_201() throws Exception {
 		// given
 		CreateMenuRequestDto requestDto = CreateMenuRequestDto.builder()
 			.resId(UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"))
@@ -47,10 +47,11 @@ class MenuIntegrationTest {
 			.build();
 
 		// when, then
-		mockMvc.perform(post("/api/menus")
-				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.content(objectMapper.writeValueAsString(requestDto))
-				.contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(
+				post("/api/menus")
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.content(objectMapper.writeValueAsString(requestDto))
+					.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated())
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.result.rmName")
@@ -60,6 +61,50 @@ class MenuIntegrationTest {
 			.andExpect(jsonPath("$.result.rmDescription").value("test"))
 			.andExpect(jsonPath("$.result.rmStatus").value(MenuStatus.ON_SALE.name()))
 			.andExpect(jsonPath("$.result.isPublic").value(true))
+			.andDo(print());
+	}
+
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e3", role = "MANAGER")
+	@DisplayName("매니저_특정 가게 상품 전체 조회 성공 200")
+	@Test
+	void getAllMenus_Manager_200() throws Exception {
+		// given
+		UUID restaurantId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+
+		// when, then
+		mockMvc.perform(
+				get("/api/menus/restaurant/{restaurant_id}", restaurantId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.totalElements")
+				.value(3))
+			.andExpect(jsonPath("$.result.content[0].rmName")
+				.value("열파르타"))
+			.andExpect(jsonPath("$.result.content[2].isPublic")
+				.value(false))
+			.andDo(print());
+	}
+
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@DisplayName("고객_특정 가게 상품 전체 조회 성공 200")
+	@Test
+	void getAllMenus_Customer_200() throws Exception {
+		// given
+		UUID restaurantId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+
+		// when, then
+		mockMvc.perform(
+				get("/api/menus/restaurant/{restaurant_id}", restaurantId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.totalElements")
+				.value(2))
+			.andExpect(jsonPath("$.result.content[0].rmName")
+				.value("열파르타"))
+			.andExpect(jsonPath("$.result.content[1].rmStatus")
+				.value("SOLD_OUT"))
 			.andDo(print());
 	}
 }
