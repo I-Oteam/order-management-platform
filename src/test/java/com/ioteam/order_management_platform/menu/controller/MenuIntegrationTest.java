@@ -191,4 +191,23 @@ class MenuIntegrationTest {
 				.value("HIDDEN"))
 			.andDo(print());
 	}
+
+	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e2", role = "OWNER")
+	@DisplayName("가게주인_상품 숨김 처리 성공 200")
+	@Test
+	void hiddenMenu_Owner_200() throws Exception {
+		// given
+		UUID menuId = UUID.fromString("439f222b-0cbb-4600-a989-e7fdabf120d6");
+
+		// when, then
+		mockMvc.perform(
+				patch("/api/menus/{menu_id}/hidden", menuId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.result.rmStatus")
+				.value("HIDDEN"))
+			.andDo(print());
+	}
+
 }
