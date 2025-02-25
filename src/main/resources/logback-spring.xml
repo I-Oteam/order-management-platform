@@ -7,7 +7,7 @@
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
     <!-- 로그 패턴 설정 -->
     <property name="LOG_PATTERN"
-              value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %clr(%-5level) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %msg%n"/>
+              value="[%d{yyyy-MM-dd HH:mm:ss, ${logback.timezone:-Asia/Seoul}}:%-3relative] %clr(%-5level) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %boldWhite([%C.%M:%yellow(%L)]) - %msg%n"/>
 
     <!--    <include resource="org/springframework/boot/logging/logback/defaults.xml" />-->
     <!--    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />-->
@@ -30,8 +30,8 @@
         <property name="INFO_FILE" value="${LOG_TEMP}/spring.log}"/>
         <property name="ERROR_FILE" value="${LOG_TEMP}/spring_error.log}"/>
 
-        <include resource="info-file-appender.xml"/>
-        <include resource="error-file-appender.xml"/>
+        <include resource="./logback/info-file-appender.xml"/>
+        <include resource="./logback/error-file-appender.xml"/>
 
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
