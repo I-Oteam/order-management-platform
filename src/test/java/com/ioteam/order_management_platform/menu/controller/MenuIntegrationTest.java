@@ -86,7 +86,7 @@ class MenuIntegrationTest {
 			.andDo(print());
 	}
 
-	@WithMockCustomUser(userId = "d2ed72d8-090a-4efb-abe4-7acbdce120e1", role = "CUSTOMER")
+	@WithMockCustomUser
 	@DisplayName("고객_특정 가게 상품 전체 조회 성공 200")
 	@Test
 	void getAllMenus_Customer_200() throws Exception {
