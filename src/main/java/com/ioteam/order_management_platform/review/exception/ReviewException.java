@@ -11,7 +11,8 @@ public enum ReviewException implements ExceptionType {
 	INVALID_ORDER_ID(HttpStatus.NOT_FOUND, "order 아이디가 유효하지 않습니다.", "E_INVALID_ORDER_ID"),
 	UNAUTH_ORDER_ID(HttpStatus.FORBIDDEN, "order 아이디에 권한이 없습니다.", "E_UNAUTH_ORDER_ID"),
 	INVALID_IDS(HttpStatus.BAD_REQUEST, "order, user, restaurant 아이디가 적합하지 않습니다.", "E_INVALID_IDS"),
-	UNCOMPLETED_ORDER_ID(HttpStatus.UNPROCESSABLE_ENTITY, "완료되지 않은 주문에 리뷰를 쓸 수 없습니다.", "E_UNCOMPLETED_ORDER");
+	UNCOMPLETED_ORDER_ID(HttpStatus.UNPROCESSABLE_ENTITY, "완료되지 않은 주문에 리뷰를 쓸 수 없습니다.", "E_UNCOMPLETED_ORDER"),
+	INVALID_SORT_CONDITION(HttpStatus.UNPROCESSABLE_ENTITY, "정렬 조건이 부합하지 않습니다.", "E_SORT_CONDITION");
 
 	private final HttpStatus status;
 	private final String message;
