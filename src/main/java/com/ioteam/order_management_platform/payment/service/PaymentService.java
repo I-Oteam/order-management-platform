@@ -21,6 +21,7 @@ import com.ioteam.order_management_platform.payment.entity.Payment;
 import com.ioteam.order_management_platform.payment.entity.PaymentStatusEnum;
 import com.ioteam.order_management_platform.payment.exception.PaymentException;
 import com.ioteam.order_management_platform.payment.repository.PaymentRepository;
+import com.ioteam.order_management_platform.payment.service.strategy.PaymentRetrieveStrategies;
 import com.ioteam.order_management_platform.restaurant.entity.Restaurant;
 import com.ioteam.order_management_platform.restaurant.repository.RestaurantRepository;
 import com.ioteam.order_management_platform.user.entity.UserRoleEnum;
@@ -35,7 +36,46 @@ public class PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final OrderRepository orderRepository;
 	private final RestaurantRepository restaurantRepository;
+	private final PaymentRetrieveStrategies paymentRetrieveStrategist;
 
+	public PaymentResponseDto getPayment(UUID paymentId, UserDetailsImpl userDetails) {
+		UserRoleEnum role = userDetails.getRole();
+
+		return paymentRetrieveStrategist.stream()
+			.filter(it -> it.isSupport(role))
+			.findAny()
+			.orElseThrow(() -> new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS))
+			.getPayment(paymentId, userDetails);
+
+	}
+
+	// // MASTER, MANAGER: 모든 결제 내역 조회 가능
+	// if (userDetails.getRole() == UserRoleEnum.MASTER || userDetails.getRole() == UserRoleEnum.MANAGER) {
+	// 	Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
+	// 		.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
+	// 	return PaymentResponseDto.from(payment);
+	// }
+	//
+	// // CUSTOMER: 본인이 주문한 결제 내역만 조회 가능
+	// if (userDetails.getRole() == UserRoleEnum.CUSTOMER) {
+	// 	Payment payment = paymentRepository.findPaymentForCustomer(paymentId, userDetails.getUserId())
+	// 		.orElseThrow(() -> new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS));
+	// 	return PaymentResponseDto.from(payment);
+	// }
+	//
+	// // OWNER: 본인 가게의 주문 결제 내역만 조회 가능
+	// if (userDetails.getRole() == UserRoleEnum.OWNER) {
+	// 	Payment payment = paymentRepository.findPaymentWithOrderAndRestaurant(paymentId)
+	// 		.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
+	//
+	// 	// 본인이 해당 가게의 주인인지 확인
+	// 	if (!payment.getOrder().getRestaurant().getOwner().getUserId().equals(userDetails.getUserId())) {
+	// 		throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
+	// 	}
+	// 	return PaymentResponseDto.from(payment);
+	// }
+	//
+	// throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
 	@Transactional
 	public PaymentResponseDto createPayment(UserDetailsImpl userDetails, CreatePaymentRequestDto requestDto) {
 		// 주문이 유효한지, 주문자가 본인인지, 주문이 삭제되지 않았는지 확인
@@ -50,36 +90,6 @@ public class PaymentService {
 		Payment savedPayment = paymentRepository.save(requestDto.toEntity(order));
 
 		return PaymentResponseDto.from(savedPayment);
-	}
-
-	public PaymentResponseDto getPayment(UUID paymentId, UserDetailsImpl userDetails) {
-		// MASTER, MANAGER: 모든 결제 내역 조회 가능
-		if (userDetails.getRole() == UserRoleEnum.MASTER || userDetails.getRole() == UserRoleEnum.MANAGER) {
-			Payment payment = paymentRepository.findByPaymentIdAndDeletedAtIsNull(paymentId)
-				.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
-			return PaymentResponseDto.from(payment);
-		}
-
-		// CUSTOMER: 본인이 주문한 결제 내역만 조회 가능
-		if (userDetails.getRole() == UserRoleEnum.CUSTOMER) {
-			Payment payment = paymentRepository.findPaymentForCustomer(paymentId, userDetails.getUserId())
-				.orElseThrow(() -> new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS));
-			return PaymentResponseDto.from(payment);
-		}
-
-		// OWNER: 본인 가게의 주문 결제 내역만 조회 가능
-		if (userDetails.getRole() == UserRoleEnum.OWNER) {
-			Payment payment = paymentRepository.findPaymentWithOrderAndRestaurant(paymentId)
-				.orElseThrow(() -> new CustomApiException(PaymentException.INVALID_PAYMENT_ID));
-
-			// 본인이 해당 가게의 주인인지 확인
-			if (!payment.getOrder().getRestaurant().getOwner().getUserId().equals(userDetails.getUserId())) {
-				throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
-			}
-			return PaymentResponseDto.from(payment);
-		}
-
-		throw new CustomApiException(PaymentException.UNAUTHORIZED_PAYMENT_ACCESS);
 	}
 
 	public CommonPageResponse<AdminPaymentResponseDto> searchPaymentAdminByCondition(
