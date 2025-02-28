@@ -75,4 +75,8 @@ public class Order extends BaseEntity {
 	public void orderCancel() {
 		this.orderStatus = OrderStatus.CANCELED;
 	}
+
+	public boolean isCompletedOrder() {
+		return this.orderStatus.isCompleted();
+	}
 }

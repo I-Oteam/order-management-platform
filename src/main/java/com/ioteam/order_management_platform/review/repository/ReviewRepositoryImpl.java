@@ -6,8 +6,10 @@ import static com.ioteam.order_management_platform.review.entity.QReview.*;
 import static com.ioteam.order_management_platform.user.entity.QUser.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -201,19 +203,33 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	private OrderSpecifier[] createOrderSpecifiers(Sort sort) {
 
 		return sort.stream()
-			.filter(order -> List.of("score", "createdAt", "modifiedAt").contains(order.getProperty()))
 			.map(order -> {
 				Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-				switch (order.getProperty()) {
-					case "score":
-						return new OrderSpecifier(direction, review.reviewScore);
-					case "createdAt":
-						return new OrderSpecifier(direction, review.createdAt);
-					case "modifiedAt":
-						return new OrderSpecifier(direction, review.modifiedAt);
-				}
-				return null;
+				return Arrays.stream(ReviewSortType.values())
+					.filter(enumValue -> enumValue.checkIfMatched(order.getProperty()))
+					.findAny()
+					.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_SORT_CONDITION))
+					.getOrderSpecifier(direction);
 			})
 			.toArray(OrderSpecifier[]::new);
+	}
+
+	@RequiredArgsConstructor
+	enum ReviewSortType {
+		SCORE((direction) -> new OrderSpecifier<>(direction, review.reviewScore)),
+		CREATEDAT((direction) -> new OrderSpecifier<>(direction, review.createdAt)),
+		MODIFIEDAT((direction) -> new OrderSpecifier<>(direction, review.modifiedAt));
+
+		private final Function<Order, OrderSpecifier> typedOrderSpecifier;
+
+		private OrderSpecifier<?> getOrderSpecifier(Order direction) {
+			return typedOrderSpecifier.apply(direction);
+		}
+
+		private boolean checkIfMatched(String property) {
+			return this.name().equals(property
+				.replaceAll("_", "")
+				.toUpperCase());
+		}
 	}
 }
