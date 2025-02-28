@@ -69,4 +69,5 @@ public class Payment extends BaseEntity {
 		// 상태 변경
 		this.paymentStatus = newStatus;
 	}
+
 }
