@@ -2,6 +2,7 @@ package com.ioteam.order_management_platform.review.service;
 
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.order.entity.Order;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
+import com.ioteam.order_management_platform.restaurant.event.UpdateRestaurantScoreEvent;
 import com.ioteam.order_management_platform.review.dto.req.AdminReviewSearchCondition;
 import com.ioteam.order_management_platform.review.dto.req.CreateReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.req.ModifyReviewRequestDto;
@@ -31,6 +33,7 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final OrderRepository orderRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	public CommonPageResponse<AdminReviewResponseDto> searchReviewAdminByCondition(
 		AdminReviewSearchCondition condition, Pageable pageable) {
@@ -81,6 +84,7 @@ public class ReviewService {
 		}
 		Review review = requestDto.toEntity(order.getUser(), order, order.getRestaurant());
 		Review save = reviewRepository.save(review);
+		eventPublisher.publishEvent(UpdateRestaurantScoreEvent.of(review.getRestaurant().getResId()));
 		return ReviewResponseDto.from(save);
 	}
 
