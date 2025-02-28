@@ -205,15 +205,11 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		return sort.stream()
 			.map(order -> {
 				Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-				ReviewSortType reviewSortType = Arrays.stream(ReviewSortType.values())
-					.filter(enumValue -> enumValue.name()
-						.equals(order.getProperty()
-							.replaceAll("_", "")
-							.toUpperCase())
-					)
+				return Arrays.stream(ReviewSortType.values())
+					.filter(enumValue -> enumValue.checkIfMatched(order.getProperty()))
 					.findAny()
-					.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_SORT_CONDITION));
-				return reviewSortType.getOrderSpecifier(direction);
+					.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_SORT_CONDITION))
+					.getOrderSpecifier(direction);
 			})
 			.toArray(OrderSpecifier[]::new);
 	}
@@ -228,6 +224,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
 		private OrderSpecifier<?> getOrderSpecifier(Order direction) {
 			return typedOrderSpecifier.apply(direction);
+		}
+
+		private boolean checkIfMatched(String property) {
+			return this.name().equals(property
+				.replaceAll("_", "")
+				.toUpperCase());
 		}
 	}
 }
