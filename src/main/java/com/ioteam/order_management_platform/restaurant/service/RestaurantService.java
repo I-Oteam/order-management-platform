@@ -204,4 +204,9 @@ public class RestaurantService {
 
 		return new CommonPageResponse<>(restaurantResponseDtoPage);
 	}
+
+	@Transactional //(propagation = Propagation.REQUIRES_NEW)
+	public void updateRestaurantScore(UUID restaurantId) {
+		restaurantScoreRepository.updateRestaurantScore(restaurantId);
+	}
 }
