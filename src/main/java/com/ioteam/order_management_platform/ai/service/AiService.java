@@ -1,11 +1,10 @@
 package com.ioteam.order_management_platform.ai.service;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ioteam.order_management_platform.ai.dto.req.GeminiRequestDto;
 import com.ioteam.order_management_platform.ai.dto.req.RecommendDesRequestDto;
 import com.ioteam.order_management_platform.ai.dto.res.AnswerAiResponseDto;
 import com.ioteam.order_management_platform.ai.dto.res.GeminiResponseDto;
@@ -45,7 +44,7 @@ public class AiService {
 		if (!restaurant.isOwner(userDetails)) {
 			throw new CustomApiException(MenuException.NOT_AUTHORIZED_FOR_MENU);
 		}
-
+		// todo. 질문 프롬프트 생성 부분 리팩토링
 		String question = "가게 이름: " + restaurant.getResName()
 			+ ", 메뉴 이름: " + requestDto.getRmName()
 			+ ", 가게 카테고리: " + restaurant.getCategory().getRcName()
@@ -62,13 +61,7 @@ public class AiService {
 	}
 
 	private AnswerAiResponseDto requestGemini(String question) {
-		Map<String, Object> requestBody = Map.of(
-			"contents", new Object[] {
-				Map.of("parts", new Object[] {
-					Map.of("text", question)
-				})
-			}
-		);
+		GeminiRequestDto requestBody = GeminiRequestDto.of(question);
 
 		try {
 			GeminiResponseDto aiAnswer = geminiAiService.requestGemini(geminiApiKey, requestBody);
@@ -78,6 +71,7 @@ public class AiService {
 			}
 			return AnswerAiResponseDto.fromGemini(aiAnswer);
 		} catch (Exception e) {
+			log.info(e.getMessage());
 			throw new CustomApiException(AIException.AI_SERVICE_UNAVAILABLE);
 		}
 	}
