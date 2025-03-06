@@ -52,10 +52,10 @@
  
  ### 개발 측면에서 우리 팀이 잘한 점 
  1. [공통 예외처리 정책](https://github.com/I-Oteam/order-management-platform/wiki/%EA%B3%B5%ED%86%B5-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC-%EC%A0%95%EC%B1%85)
- 2. [QueryDsl의 Projections 활용](https://github.com/I-Oteam/order-management-platform/wiki/QueryDsl%EC%9D%98-Projections-%ED%99%9C%EC%9A%A9)
- 3. [WebClient와 RestTemplate 그리고 RestClient](https://github.com/I-Oteam/order-management-platform/wiki/WebClient%EC%99%80-RestTemplate-%EA%B7%B8%EB%A6%AC%EA%B3%A0-RestClient)
- 4. [Multi Stage Build를 활용한 도커 이미지 경량화](https://github.com/I-Oteam/order-management-platform/wiki/Multi-Stage-Build%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8F%84%EC%BB%A4-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EA%B2%BD%EB%9F%89%ED%99%94)
-
+ 2. [WebClient와 RestTemplate 그리고 RestClient](https://github.com/I-Oteam/order-management-platform/wiki/WebClient%EC%99%80-RestTemplate-%EA%B7%B8%EB%A6%AC%EA%B3%A0-RestClient)
+ 3. [Multi Stage Build를 활용한 도커 이미지 경량화](https://github.com/I-Oteam/order-management-platform/wiki/Multi-Stage-Build%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8F%84%EC%BB%A4-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EA%B2%BD%EB%9F%89%ED%99%94)
+ 4. [Git Submodule 활용](https://github.com/I-Oteam/order-management-platform/wiki/Git-Submodule-%ED%99%9C%EC%9A%A9)
+     
 ### 공통 관심 사항
 1. [QueryDSL](https://github.com/I-Oteam/order-management-platform/wiki/QueryDSL)
 2. [Logging 정책](https://github.com/I-Oteam/order-management-platform/wiki/Logging-%EC%A0%95%EC%B1%85)

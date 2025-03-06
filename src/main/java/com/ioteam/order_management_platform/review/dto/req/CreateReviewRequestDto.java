@@ -38,14 +38,6 @@ public class CreateReviewRequestDto {
 	private Boolean isPublic;
 
 	public Review toEntity(User user, Order order, Restaurant restaurant) {
-		return Review.builder()
-			.user(user)
-			.order(order)
-			.restaurant(restaurant)
-			.reviewScore(this.reviewScore)
-			.reviewContent(this.reviewContent)
-			.reviewImageUrl(this.reviewImageUrl)
-			.isPublic(this.isPublic)
-			.build();
+		return Review.of(user, order, restaurant, reviewScore, reviewContent, reviewImageUrl, isPublic);
 	}
 }

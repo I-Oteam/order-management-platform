@@ -4,5 +4,9 @@ public enum OrderStatus {
 	FAILED,
 	CANCELED,
 	WAITING,
-	COMPLETED
+	COMPLETED;
+
+	public boolean isCompleted() {
+		return OrderStatus.COMPLETED.equals(this);
+	}
 }

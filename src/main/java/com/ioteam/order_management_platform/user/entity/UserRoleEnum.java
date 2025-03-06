@@ -1,5 +1,7 @@
 package com.ioteam.order_management_platform.user.entity;
 
+import java.util.Set;
+
 import lombok.Getter;
 
 @Getter
@@ -17,6 +19,10 @@ public enum UserRoleEnum {
 
 	public String getAuthority() {
 		return authority;
+	}
+
+	public boolean checkIsAdmin() {
+		return Set.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(this);
 	}
 
 	public static class Authority {

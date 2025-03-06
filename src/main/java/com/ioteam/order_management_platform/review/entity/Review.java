@@ -21,15 +21,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_review")
 @Entity
 public class Review extends BaseEntity {
@@ -50,7 +46,7 @@ public class Review extends BaseEntity {
 	@JoinColumn(name = "review_res_id")
 	private Restaurant restaurant;
 
-	private int reviewScore;
+	private Integer reviewScore;
 
 	@Column(length = 1000)
 	private String reviewContent;
@@ -61,10 +57,34 @@ public class Review extends BaseEntity {
 	@ColumnDefault("true")
 	private Boolean isPublic;
 
+	private Review(User user, Order order, Restaurant restaurant, Integer reviewScore, String reviewContent,
+		String reviewImageUrl, Boolean isPublic) {
+		this.user = user;
+		this.order = order;
+		this.restaurant = restaurant;
+		this.reviewScore = reviewScore;
+		this.reviewContent = reviewContent;
+		this.reviewImageUrl = reviewImageUrl;
+		this.isPublic = isPublic;
+	}
+
+	public static Review of(User user, Order order, Restaurant restaurant, Integer reviewScore, String reviewContent,
+		String reviewImageUrl, Boolean isPublic) {
+		return new Review(user, order, restaurant, reviewScore, reviewContent, reviewImageUrl, isPublic);
+	}
+
 	public void modify(ModifyReviewRequestDto requestDto) {
 		this.reviewScore = requestDto.getReviewScore();
 		this.reviewContent = requestDto.getReviewContent();
 		this.reviewImageUrl = requestDto.getReviewImageUrl();
 		this.isPublic = requestDto.getIsPublic();
+	}
+
+	public boolean checkIsAuthor(UUID userId) {
+		return this.user.getUserId().equals(userId);
+	}
+
+	public boolean checkIsRestaurantOwner(UUID userId) {
+		return this.restaurant.getOwner().getUserId().equals(userId);
 	}
 }

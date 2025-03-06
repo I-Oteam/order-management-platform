@@ -1,8 +1,8 @@
 package com.ioteam.order_management_platform.review.service;
 
-import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,8 +12,8 @@ import com.ioteam.order_management_platform.global.dto.CommonPageResponse;
 import com.ioteam.order_management_platform.global.exception.CustomApiException;
 import com.ioteam.order_management_platform.global.exception.type.BaseException;
 import com.ioteam.order_management_platform.order.entity.Order;
-import com.ioteam.order_management_platform.order.enums.OrderStatus;
 import com.ioteam.order_management_platform.order.repository.OrderRepository;
+import com.ioteam.order_management_platform.restaurant.event.UpdateRestaurantScoreEvent;
 import com.ioteam.order_management_platform.review.dto.req.AdminReviewSearchCondition;
 import com.ioteam.order_management_platform.review.dto.req.CreateReviewRequestDto;
 import com.ioteam.order_management_platform.review.dto.req.ModifyReviewRequestDto;
@@ -33,6 +33,7 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final OrderRepository orderRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	public CommonPageResponse<AdminReviewResponseDto> searchReviewAdminByCondition(
 		AdminReviewSearchCondition condition, Pageable pageable) {
@@ -59,19 +60,14 @@ public class ReviewService {
 	public ReviewResponseDto getReview(UUID reviewId, UUID userId, UserRoleEnum role) {
 
 		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNullJoinFetch(reviewId)
-			.orElseThrow(() -> {
-				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
-			});
+			.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_REVIEW_ID));
 
 		// 1. is_public=true 누구나 확인 가능
 		// 2. is_public=false 관리자 혹은 작성자 혹은 가게 오너 만 확인 가능
-		if (review.getIsPublic()
-			|| Set.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(role)
-			|| review.getUser().getUserId().equals(userId)
-			|| review.getRestaurant().getOwner().getUserId().equals(userId)) {
-			return ReviewResponseDto.from(review);
+		if (!hasAuthToReadReview(userId, role, review)) {
+			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 		}
-		throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
+		return ReviewResponseDto.from(review);
 	}
 
 	@Transactional
@@ -80,16 +76,15 @@ public class ReviewService {
 		// 리뷰 작성자의 주문 번호가 맞는지 검증 && 레스토랑 아이디도 일치하는지 검증
 		Order order = orderRepository.findByOrderIdAndUserIdAndResIdAndDeletedAtIsNullFetchJoin(
 				requestDto.getOrderId(), userId, requestDto.getRestaurantId())
-			.orElseThrow(() -> {
-				throw new CustomApiException(ReviewException.INVALID_IDS);
-			});
+			.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_IDS));
 
 		// 완료된 주문인지 검증
-		if (!order.getOrderStatus().equals(OrderStatus.COMPLETED)) {
+		if (!order.isCompletedOrder()) {
 			throw new CustomApiException(ReviewException.UNCOMPLETED_ORDER_ID);
 		}
 		Review review = requestDto.toEntity(order.getUser(), order, order.getRestaurant());
 		Review save = reviewRepository.save(review);
+		eventPublisher.publishEvent(UpdateRestaurantScoreEvent.of(review.getRestaurant().getResId()));
 		return ReviewResponseDto.from(save);
 	}
 
@@ -98,9 +93,7 @@ public class ReviewService {
 
 		// 글 작성자 만 수정 가능
 		Review review = reviewRepository.findByReviewIdAndUserIdAndDeletedAtIsNullFetchJoin(reviewId, userId)
-			.orElseThrow(() -> {
-				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
-			});
+			.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_REVIEW_ID));
 		review.modify(requestDto);
 		return ReviewResponseDto.from(review);
 	}
@@ -109,15 +102,23 @@ public class ReviewService {
 	public void softDeleteReview(UUID reviewId, UUID userId, UserRoleEnum role) {
 
 		Review review = reviewRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
-			.orElseThrow(() -> {
-				throw new CustomApiException(ReviewException.INVALID_REVIEW_ID);
-			});
+			.orElseThrow(() -> new CustomApiException(ReviewException.INVALID_REVIEW_ID));
 
 		// 마스터나 매니저가 아니고, 작성자가 아닌 경우 예외 처리
-		if (!Set.of(UserRoleEnum.MANAGER, UserRoleEnum.MASTER).contains(role)
-			&& !review.getUser().getUserId().equals(userId)) {
+		if (!hasAuthToDeleteReview(userId, role, review)) {
 			throw new CustomApiException(BaseException.UNAUTHORIZED_REQ);
 		}
 		review.softDelete(userId);
+	}
+
+	private boolean hasAuthToReadReview(UUID userId, UserRoleEnum role, Review review) {
+		return review.getIsPublic()
+			|| role.checkIsAdmin()
+			|| review.checkIsAuthor(userId)
+			|| review.checkIsRestaurantOwner(userId);
+	}
+
+	private boolean hasAuthToDeleteReview(UUID userId, UserRoleEnum role, Review review) {
+		return role.checkIsAdmin() || review.checkIsAuthor(userId);
 	}
 }
